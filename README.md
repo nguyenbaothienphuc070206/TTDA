@@ -3,6 +3,7 @@
 Web app học Vovinam từ **cơ bản → trung cấp → nâng cao**.
 
 Điểm chính:
+
 - UI tối, nổi bật (xanh/cyan + điểm nhấn vàng), có hiệu ứng nền + hover.
 - Có **lộ trình bài học**, **trang chi tiết bài**, **đánh dấu hoàn thành** (lưu local).
 - Có **lịch tập 7 ngày** gợi ý theo cấp độ (lưu local).
@@ -43,6 +44,7 @@ Toàn bộ dữ liệu bài học nằm trong:
 - `data/lessons.js`
 
 Bạn có thể:
+
 - Thêm bài mới bằng cách thêm object vào mảng `LESSONS`.
 - Đổi thứ tự bài bằng cách đổi vị trí trong mảng.
 - Sửa nội dung từng bài: `goals`, `steps`, `mistakes`, `tips`.
@@ -58,5 +60,5 @@ App lưu ở localStorage:
 
 Nếu bạn deploy thật và muốn `sitemap.xml`/`robots.txt` dùng đúng domain:
 
-1) Copy `.env.example` → `.env.local`
-2) Điền `NEXT_PUBLIC_SITE_URL=https://your-domain.com`
+1. Copy `.env.example` → `.env.local`
+2. Điền `NEXT_PUBLIC_SITE_URL=https://your-domain.com`
