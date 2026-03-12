@@ -3,7 +3,10 @@
 import { useEffect, useMemo, useState } from "react";
 
 import { BELTS, getBeltById } from "@/data/belts";
-import { readExams, readMembers, writeExams } from "@/lib/adminData";
+import { readAttendance, readExams, readMembers, writeExams } from "@/lib/adminData";
+
+const ELIGIBILITY_LOOKBACK_DAYS = 30;
+const ELIGIBILITY_MIN_ATTENDANCE = 8;
 
 function makeId(prefix) {
   if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
@@ -37,6 +40,7 @@ function MessageBox({ tone, children }) {
 export default function ExamManager() {
   const [members, setMembers] = useState(() => readMembers());
   const [exams, setExams] = useState(() => readExams());
+  const [attendance, setAttendance] = useState(() => readAttendance());
 
   const [memberId, setMemberId] = useState("");
   const [targetBeltId, setTargetBeltId] = useState("hoang-dai");
@@ -52,14 +56,17 @@ export default function ExamManager() {
     const sync = () => {
       setMembers(readMembers());
       setExams(readExams());
+      setAttendance(readAttendance());
     };
 
     sync();
     window.addEventListener("vovinam-admin-members", sync);
+    window.addEventListener("vovinam-admin-attendance", sync);
     window.addEventListener("vovinam-admin-exams", sync);
     window.addEventListener("storage", sync);
     return () => {
       window.removeEventListener("vovinam-admin-members", sync);
+      window.removeEventListener("vovinam-admin-attendance", sync);
       window.removeEventListener("vovinam-admin-exams", sync);
       window.removeEventListener("storage", sync);
     };
@@ -74,11 +81,70 @@ export default function ExamManager() {
         const id = String(m.id || "");
         const name = String(m.name || "");
         const code = String(m.code || "");
+        const beltId = String(m.beltId || "") || "lam-dai";
+        const joinedAt = typeof m.joinedAt === "number" ? m.joinedAt : 0;
         if (!id || !name || !code) return null;
-        return { id, name, code };
+        return { id, name, code, beltId, joinedAt };
       })
       .filter(Boolean);
   }, [members]);
+
+  const eligibility = useMemo(() => {
+    const lookbackDays = ELIGIBILITY_LOOKBACK_DAYS;
+    const minSessions = ELIGIBILITY_MIN_ATTENDANCE;
+
+    const cutoff = new Date();
+    cutoff.setDate(cutoff.getDate() - lookbackDays);
+    const cutoffIso = cutoff.toISOString().slice(0, 10);
+
+    const totalByMember = new Map();
+    const recentByMember = new Map();
+    const lastDateByMember = new Map();
+
+    const records = Array.isArray(attendance) ? attendance : [];
+    for (const r of records) {
+      if (!r || typeof r !== "object") continue;
+      const mid = String(r.memberId || "");
+      const d = String(r.date || "");
+      if (!mid || !d) continue;
+
+      totalByMember.set(mid, (totalByMember.get(mid) || 0) + 1);
+      if (d >= cutoffIso) {
+        recentByMember.set(mid, (recentByMember.get(mid) || 0) + 1);
+      }
+
+      const prevLast = lastDateByMember.get(mid);
+      if (!prevLast || d > prevLast) {
+        lastDateByMember.set(mid, d);
+      }
+    }
+
+    const items = memberList
+      .map((m) => {
+        const belt = getBeltById(m.beltId);
+        const recentAttendance = recentByMember.get(m.id) || 0;
+        const totalAttendance = totalByMember.get(m.id) || 0;
+        const lastAttendance = lastDateByMember.get(m.id) || "";
+
+        return {
+          ...m,
+          beltTitle: belt ? belt.title : m.beltId,
+          recentAttendance,
+          totalAttendance,
+          lastAttendance,
+          eligible: recentAttendance >= minSessions,
+        };
+      })
+      .sort((a, b) => b.recentAttendance - a.recentAttendance);
+
+    return {
+      lookbackDays,
+      minSessions,
+      cutoffIso,
+      items,
+      eligible: items.filter((x) => x.eligible),
+    };
+  }, [attendance, memberList]);
 
   const normalizedExams = useMemo(() => {
     const list = Array.isArray(exams) ? exams : [];
@@ -205,6 +271,57 @@ export default function ExamManager() {
             <MessageBox tone={message.tone}>{message.text}</MessageBox>
           </div>
         ) : null}
+
+        <div className="mt-4 rounded-3xl border border-white/10 bg-slate-950/30 p-6">
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <div className="text-sm font-semibold text-white">Danh sách đủ điều kiện thi</div>
+              <p className="mt-1 text-xs leading-5 text-slate-300">
+                Điều kiện demo: ≥ {eligibility.minSessions} buổi điểm danh trong {eligibility.lookbackDays} ngày gần nhất (từ {" "}
+                {eligibility.cutoffIso}).
+              </p>
+            </div>
+            <div className="rounded-2xl border border-white/10 bg-white/5 px-3 py-2 text-xs font-semibold text-slate-200">
+              {eligibility.eligible.length}/{memberList.length}
+            </div>
+          </div>
+
+          {eligibility.eligible.length ? (
+            <div className="mt-4 grid gap-2">
+              {eligibility.eligible.slice(0, 10).map((m) => (
+                <div
+                  key={m.id}
+                  className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-white/10 bg-white/5 p-3"
+                >
+                  <div className="min-w-0">
+                    <div className="text-sm font-semibold text-white truncate">
+                      {m.name} <span className="text-xs font-semibold text-slate-300">({m.code})</span>
+                    </div>
+                    <div className="mt-1 text-xs text-slate-300">
+                      {m.beltTitle} • Chuyên cần: <span className="font-semibold text-white">{m.recentAttendance}</span> • Tổng: {m.totalAttendance}
+                      {m.lastAttendance ? ` • Gần nhất: ${m.lastAttendance}` : ""}
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMessage(null);
+                      setMemberId(m.id);
+                    }}
+                    className="inline-flex h-9 items-center justify-center rounded-xl border border-white/10 bg-white/5 px-3 text-xs font-semibold text-white transition hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-cyan-300/30"
+                  >
+                    Chọn
+                  </button>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="mt-4 rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-slate-300">
+              Chưa có hội viên nào đạt điều kiện theo rule demo. Bạn vẫn có thể chấm thi thủ công bằng dropdown bên dưới.
+            </div>
+          )}
+        </div>
 
         <div className="mt-4 grid gap-3 sm:grid-cols-2">
           <label className="block rounded-2xl border border-white/10 bg-white/5 p-3 sm:col-span-2">

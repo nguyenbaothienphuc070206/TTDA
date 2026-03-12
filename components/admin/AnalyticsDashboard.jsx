@@ -20,7 +20,7 @@ import { getLessonBySlug } from "@/data/lessons";
 import { formatVnd, getProductById } from "@/data/store";
 import { getVideoById } from "@/data/videos";
 import { getTechniqueBySlug } from "@/data/wiki";
-import { readAttendance, readMembers } from "@/lib/adminData";
+import { readAttendance, readExams, readMembers } from "@/lib/adminData";
 import { readAnalytics, topByCount } from "@/lib/analytics";
 import { readOrders } from "@/lib/orders";
 
@@ -50,6 +50,12 @@ function isoDate(ms) {
   const d = new Date(ms);
   if (Number.isNaN(d.getTime())) return "";
   return d.toISOString().slice(0, 10);
+}
+
+function clampScore(v) {
+  const n = Number(v);
+  if (!Number.isFinite(n)) return 0;
+  return Math.max(0, Math.min(10, Math.round(n * 10) / 10));
 }
 
 function lastDays(count) {
@@ -82,6 +88,7 @@ export default function AnalyticsDashboard() {
   const [analytics, setAnalytics] = useState(() => readAnalytics());
   const [members, setMembers] = useState(() => readMembers());
   const [attendance, setAttendance] = useState(() => readAttendance());
+  const [exams, setExams] = useState(() => readExams());
   const [orders, setOrders] = useState(() => readOrders());
 
   useEffect(() => {
@@ -89,6 +96,7 @@ export default function AnalyticsDashboard() {
       setAnalytics(readAnalytics());
       setMembers(readMembers());
       setAttendance(readAttendance());
+      setExams(readExams());
       setOrders(readOrders());
     };
 
@@ -96,12 +104,14 @@ export default function AnalyticsDashboard() {
     window.addEventListener("vovinam-analytics", sync);
     window.addEventListener("vovinam-admin-members", sync);
     window.addEventListener("vovinam-admin-attendance", sync);
+    window.addEventListener("vovinam-admin-exams", sync);
     window.addEventListener("vovinam-orders", sync);
     window.addEventListener("storage", sync);
     return () => {
       window.removeEventListener("vovinam-analytics", sync);
       window.removeEventListener("vovinam-admin-members", sync);
       window.removeEventListener("vovinam-admin-attendance", sync);
+      window.removeEventListener("vovinam-admin-exams", sync);
       window.removeEventListener("vovinam-orders", sync);
       window.removeEventListener("storage", sync);
     };
@@ -146,6 +156,25 @@ export default function AnalyticsDashboard() {
   }, [analytics.techniqueViews]);
 
   const days = useMemo(() => lastDays(14), []);
+
+  const examStats = useMemo(() => {
+    const list = Array.isArray(exams) ? exams : [];
+    let passed = 0;
+    let failed = 0;
+
+    for (const e of list) {
+      if (!e || typeof e !== "object") continue;
+      const avg =
+        (clampScore(e.technique) + clampScore(e.fitness) + clampScore(e.discipline)) /
+        3;
+      if (avg >= 7) passed += 1;
+      else failed += 1;
+    }
+
+    const total = passed + failed;
+    const passRate = total === 0 ? 0 : Math.round((passed / total) * 100);
+    return { total, passed, failed, passRate };
+  }, [exams]);
 
   const revenueByDay = useMemo(() => {
     const map = new Map();
@@ -262,6 +291,21 @@ export default function AnalyticsDashboard() {
     };
   }, [days, attendanceByDay, blue]);
 
+  const examChart = useMemo(() => {
+    return {
+      labels: ["Đạt", "Chưa đạt"],
+      datasets: [
+        {
+          label: "Kết quả thi",
+          data: [examStats.passed, examStats.failed],
+          backgroundColor: ["rgba(34, 211, 238, 0.22)", "rgba(59, 130, 246, 0.22)"],
+          borderColor: [cyan, blue],
+          borderWidth: 1,
+        },
+      ],
+    };
+  }, [examStats, cyan, blue]);
+
   const topOrders = useMemo(() => {
     const list = Array.isArray(orders) ? orders : [];
     const lines = [];
@@ -340,6 +384,36 @@ export default function AnalyticsDashboard() {
           <p className="mt-2 text-sm leading-6 text-slate-300">Top 7 theo lượt xem.</p>
 
           <div className="mt-4 grid gap-3">
+            <div className="rounded-2xl border border-white/10 bg-slate-950/30 p-4">
+              <div className="text-xs font-semibold text-slate-300">Kỳ thi lên đai</div>
+              <div className="mt-2 grid gap-1 text-sm text-slate-200">
+                <div className="flex items-center justify-between gap-3">
+                  <span className="truncate">Tổng số bài thi</span>
+                  <span className="shrink-0 font-semibold text-white">{examStats.total}</span>
+                </div>
+                <div className="flex items-center justify-between gap-3">
+                  <span className="truncate">Đạt</span>
+                  <span className="shrink-0 font-semibold text-white">{examStats.passed}</span>
+                </div>
+                <div className="flex items-center justify-between gap-3">
+                  <span className="truncate">Chưa đạt</span>
+                  <span className="shrink-0 font-semibold text-white">{examStats.failed}</span>
+                </div>
+                <div className="flex items-center justify-between gap-3">
+                  <span className="truncate">Tỷ lệ đạt</span>
+                  <span className="shrink-0 font-semibold text-white">{examStats.total ? `${examStats.passRate}%` : "—"}</span>
+                </div>
+              </div>
+
+              {examStats.total ? (
+                <div className="mt-3 h-40">
+                  <Bar data={examChart} options={commonOptions} />
+                </div>
+              ) : (
+                <div className="mt-3 text-slate-400">Chưa có dữ liệu.</div>
+              )}
+            </div>
+
             <div className="rounded-2xl border border-white/10 bg-slate-950/30 p-4">
               <div className="text-xs font-semibold text-slate-300">Bài học</div>
               <div className="mt-2 grid gap-1 text-sm text-slate-200">
