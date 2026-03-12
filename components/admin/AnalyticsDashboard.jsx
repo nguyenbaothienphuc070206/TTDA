@@ -164,8 +164,9 @@ export default function AnalyticsDashboard() {
 
     for (const e of list) {
       if (!e || typeof e !== "object") continue;
+      const scores = e.scores && typeof e.scores === "object" ? e.scores : e;
       const avg =
-        (clampScore(e.technique) + clampScore(e.fitness) + clampScore(e.discipline)) /
+        (clampScore(scores.technique) + clampScore(scores.fitness) + clampScore(scores.discipline)) /
         3;
       if (avg >= 7) passed += 1;
       else failed += 1;

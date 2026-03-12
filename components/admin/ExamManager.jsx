@@ -3,10 +3,26 @@
 import { useEffect, useMemo, useState } from "react";
 
 import { BELTS, getBeltById } from "@/data/belts";
-import { readAttendance, readExams, readMembers, writeExams } from "@/lib/adminData";
+import { readAttendance, readExams, readMembers, writeExams, writeMembers } from "@/lib/adminData";
 
 const ELIGIBILITY_LOOKBACK_DAYS = 30;
-const ELIGIBILITY_MIN_ATTENDANCE = 8;
+const ELIGIBILITY_MIN_ATTENDANCE_BY_TARGET_BELT = {
+  "lam-dai": 0,
+  "hoang-dai": 8,
+  "huyen-dai": 12,
+};
+
+const ELIGIBILITY_MIN_JOINED_DAYS_BY_TARGET_BELT = {
+  "lam-dai": 0,
+  "hoang-dai": 30,
+  "huyen-dai": 60,
+};
+
+const ELIGIBILITY_FAIL_COOLDOWN_DAYS_BY_TARGET_BELT = {
+  "lam-dai": 0,
+  "hoang-dai": 14,
+  "huyen-dai": 21,
+};
 
 function makeId(prefix) {
   if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
@@ -91,11 +107,29 @@ export default function ExamManager() {
 
   const eligibility = useMemo(() => {
     const lookbackDays = ELIGIBILITY_LOOKBACK_DAYS;
-    const minSessions = ELIGIBILITY_MIN_ATTENDANCE;
+    const target = getBeltById(targetBeltId) || BELTS[0];
+    const targetIndex = BELTS.findIndex((b) => b.id === target.id);
+    const prevBelt = targetIndex > 0 ? BELTS[targetIndex - 1] : null;
 
-    const cutoff = new Date();
-    cutoff.setDate(cutoff.getDate() - lookbackDays);
+    const minSessions =
+      ELIGIBILITY_MIN_ATTENDANCE_BY_TARGET_BELT[target.id] ??
+      ELIGIBILITY_MIN_ATTENDANCE_BY_TARGET_BELT["hoang-dai"];
+    const minJoinedDays =
+      ELIGIBILITY_MIN_JOINED_DAYS_BY_TARGET_BELT[target.id] ??
+      ELIGIBILITY_MIN_JOINED_DAYS_BY_TARGET_BELT["hoang-dai"];
+    const failCooldownDays =
+      ELIGIBILITY_FAIL_COOLDOWN_DAYS_BY_TARGET_BELT[target.id] ??
+      ELIGIBILITY_FAIL_COOLDOWN_DAYS_BY_TARGET_BELT["hoang-dai"];
+
+    const today = new Date();
+
+    const cutoff = new Date(today);
+    cutoff.setDate(today.getDate() - lookbackDays);
     const cutoffIso = cutoff.toISOString().slice(0, 10);
+
+    const cooldownCutoff = new Date(today);
+    cooldownCutoff.setDate(today.getDate() - Math.max(0, failCooldownDays));
+    const cooldownCutoffIso = cooldownCutoff.toISOString().slice(0, 10);
 
     const totalByMember = new Map();
     const recentByMember = new Map();
@@ -119,12 +153,74 @@ export default function ExamManager() {
       }
     }
 
+    const passedByMember = new Set();
+    const lastAttemptByMember = new Map();
+    const examList = Array.isArray(exams) ? exams : [];
+    for (const e of examList) {
+      if (!e || typeof e !== "object") continue;
+      const mid = String(e.memberId || "");
+      const d = String(e.date || "");
+      const belt = String(e.targetBeltId || "");
+      if (!mid || !d || belt !== target.id) continue;
+
+      const scores = e.scores && typeof e.scores === "object" ? e.scores : e;
+      const sTech = clampScore(scores.technique);
+      const sFit = clampScore(scores.fitness);
+      const sDis = clampScore(scores.discipline);
+      const avg = Math.round(((sTech + sFit + sDis) / 3) * 10) / 10;
+      const passed = avg >= 7;
+
+      if (passed) passedByMember.add(mid);
+
+      const prev = lastAttemptByMember.get(mid);
+      if (!prev || d > prev.date) {
+        lastAttemptByMember.set(mid, { date: d, passed, avg });
+      }
+    }
+
+    const msPerDay = 24 * 60 * 60 * 1000;
+    const nowMs = today.getTime();
+
     const items = memberList
       .map((m) => {
         const belt = getBeltById(m.beltId);
+        const memberBeltIndex = BELTS.findIndex((b) => b.id === m.beltId);
         const recentAttendance = recentByMember.get(m.id) || 0;
         const totalAttendance = totalByMember.get(m.id) || 0;
         const lastAttendance = lastDateByMember.get(m.id) || "";
+
+        const joinedDays = m.joinedAt ? Math.max(0, Math.floor((nowMs - m.joinedAt) / msPerDay)) : 0;
+        const joinedOk = joinedDays >= minJoinedDays;
+        const attendanceOk = recentAttendance >= minSessions;
+
+        const alreadyAtOrAbove = targetIndex >= 0 && memberBeltIndex >= targetIndex;
+        const alreadyPassed = passedByMember.has(m.id);
+        const lastAttempt = lastAttemptByMember.get(m.id) || null;
+        const failedRecently =
+          failCooldownDays > 0 &&
+          lastAttempt &&
+          !lastAttempt.passed &&
+          String(lastAttempt.date || "") >= cooldownCutoffIso;
+
+        let beltOk = true;
+        if (targetIndex === 0) {
+          beltOk = m.beltId === target.id;
+        } else if (prevBelt) {
+          beltOk = m.beltId === prevBelt.id;
+        }
+
+        const reasons = [];
+        if (alreadyAtOrAbove) reasons.push("Đã ở đai này (hoặc cao hơn)");
+        if (alreadyPassed) reasons.push("Đã đạt đai mục tiêu trước đó");
+        if (!beltOk && prevBelt) {
+          const prevTitle = getBeltById(prevBelt.id)?.title || prevBelt.id;
+          reasons.push(`Đai hiện tại phải là ${prevTitle}`);
+        }
+        if (!joinedOk) reasons.push(`Chưa đủ thời gian tham gia (${joinedDays}/${minJoinedDays} ngày)`);
+        if (!attendanceOk) reasons.push(`Chưa đủ chuyên cần (${recentAttendance}/${minSessions})`);
+        if (failedRecently) reasons.push(`Vừa thi trượt (cooldown ${failCooldownDays} ngày)`);
+
+        const eligible = reasons.length === 0;
 
         return {
           ...m,
@@ -132,19 +228,29 @@ export default function ExamManager() {
           recentAttendance,
           totalAttendance,
           lastAttendance,
-          eligible: recentAttendance >= minSessions,
+          joinedDays,
+          lastAttempt,
+          eligible,
+          reason: reasons[0] || "",
         };
       })
-      .sort((a, b) => b.recentAttendance - a.recentAttendance);
+      .sort((a, b) => Number(b.eligible) - Number(a.eligible) || b.recentAttendance - a.recentAttendance);
 
     return {
       lookbackDays,
       minSessions,
+      minJoinedDays,
+      failCooldownDays,
       cutoffIso,
+      cooldownCutoffIso,
+      targetBeltId: target.id,
+      targetBeltTitle: target.title,
+      prevBeltId: prevBelt ? prevBelt.id : "",
+      prevBeltTitle: prevBelt ? getBeltById(prevBelt.id)?.title || prevBelt.id : "",
       items,
       eligible: items.filter((x) => x.eligible),
     };
-  }, [attendance, memberList]);
+  }, [attendance, memberList, targetBeltId, exams]);
 
   const normalizedExams = useMemo(() => {
     const list = Array.isArray(exams) ? exams : [];
@@ -236,9 +342,36 @@ export default function ExamManager() {
     };
 
     writeExams([entry, ...(Array.isArray(exams) ? exams : [])]);
+
+    let promoted = false;
+    let promotionNote = "";
+    if (preview.passed) {
+      const targetIndex = BELTS.findIndex((b) => b.id === belt.id);
+      const memberIndex = BELTS.findIndex((b) => b.id === member.beltId);
+      const prevBelt = targetIndex > 0 ? BELTS[targetIndex - 1] : null;
+
+      if (targetIndex >= 0 && memberIndex >= 0 && targetIndex > memberIndex) {
+        if (prevBelt && member.beltId !== prevBelt.id) {
+          const currentTitle = getBeltById(member.beltId)?.title || member.beltId;
+          const prevTitle = getBeltById(prevBelt.id)?.title || prevBelt.id;
+          promotionNote = `Không tự cập nhật đai vì hội viên đang ở ${currentTitle} (cần ${prevTitle}).`;
+        } else {
+          const current = readMembers();
+          const next = current.map((m) => {
+            if (!m || typeof m !== "object") return m;
+            const id = String(m.id || "");
+            if (id !== member.id) return m;
+            return { ...m, beltId: belt.id };
+          });
+          writeMembers(next);
+          promoted = true;
+        }
+      }
+    }
+
     setMessage({
       tone: "success",
-      text: `Đã lưu bài thi cho ${member.name} • ${belt.title} • ${preview.passed ? "Đạt" : "Chưa đạt"}`,
+      text: `Đã lưu bài thi cho ${member.name} • ${belt.title} • ${preview.passed ? "Đạt" : "Chưa đạt"}${promoted ? " • Đã cập nhật đai" : promotionNote ? ` • ${promotionNote}` : ""}`,
     });
   };
 
@@ -275,9 +408,11 @@ export default function ExamManager() {
         <div className="mt-4 rounded-3xl border border-white/10 bg-slate-950/30 p-6">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
-              <div className="text-sm font-semibold text-white">Danh sách đủ điều kiện thi</div>
+              <div className="text-sm font-semibold text-white">Danh sách đủ điều kiện thi ({eligibility.targetBeltTitle})</div>
               <p className="mt-1 text-xs leading-5 text-slate-300">
-                Điều kiện demo: ≥ {eligibility.minSessions} buổi điểm danh trong {eligibility.lookbackDays} ngày gần nhất (từ {" "}
+                Điều kiện: {eligibility.prevBeltTitle ? `đai hiện tại = ${eligibility.prevBeltTitle}` : `đai hiện tại = ${eligibility.targetBeltTitle}`} •
+                chuyên cần ≥ {eligibility.minSessions}/{eligibility.lookbackDays} ngày • tham gia ≥ {eligibility.minJoinedDays} ngày
+                {eligibility.failCooldownDays ? ` • không trượt trong ${eligibility.failCooldownDays} ngày` : ""} (từ {" "}
                 {eligibility.cutoffIso}).
               </p>
             </div>
@@ -288,7 +423,7 @@ export default function ExamManager() {
 
           {eligibility.eligible.length ? (
             <div className="mt-4 grid gap-2">
-              {eligibility.eligible.slice(0, 10).map((m) => (
+              {eligibility.eligible.map((m) => (
                 <div
                   key={m.id}
                   className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-white/10 bg-white/5 p-3"
@@ -298,8 +433,10 @@ export default function ExamManager() {
                       {m.name} <span className="text-xs font-semibold text-slate-300">({m.code})</span>
                     </div>
                     <div className="mt-1 text-xs text-slate-300">
-                      {m.beltTitle} • Chuyên cần: <span className="font-semibold text-white">{m.recentAttendance}</span> • Tổng: {m.totalAttendance}
+                      {m.beltTitle} • Tham gia: <span className="font-semibold text-white">{m.joinedDays}</span> ngày • Chuyên cần:{" "}
+                      <span className="font-semibold text-white">{m.recentAttendance}</span>/{eligibility.minSessions} • Tổng: {m.totalAttendance}
                       {m.lastAttendance ? ` • Gần nhất: ${m.lastAttendance}` : ""}
+                      {m.lastAttempt ? ` • Thi gần nhất: ${m.lastAttempt.date} (${m.lastAttempt.passed ? "Đạt" : "Chưa đạt"} • TB ${m.lastAttempt.avg})` : ""}
                     </div>
                   </div>
 
