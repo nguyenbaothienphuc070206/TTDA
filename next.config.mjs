@@ -40,6 +40,14 @@ const nextConfig = {
   async headers() {
     return [
       {
+        source: "/ai-coach",
+        headers: securityHeadersAllowCamera,
+      },
+      {
+        source: "/ai-coach/:path*",
+        headers: securityHeadersAllowCamera,
+      },
+      {
         source: "/admin/diem-danh",
         headers: securityHeadersAllowCamera,
       },

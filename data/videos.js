@@ -1,5 +1,20 @@
 export const VIDEOS = [
   {
+    id: "hls-demo",
+    title: "Demo HLS streaming (mẫu)",
+    minutes: 5,
+    beltId: "lam-dai",
+    hlsUrl: "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8",
+    summary:
+      "Demo phát video HLS (m3u8) trực tiếp trong app. Dùng để minh hoạ hạ tầng player/SEO; bạn có thể thay bằng nguồn HLS thật sau.",
+    transcript: [
+      "Gợi ý: nếu video không chạy, kiểm tra CORS của nguồn HLS hoặc thử nguồn khác.",
+      "Trường hợp iPhone/Safari: HLS thường chạy native, không cần Hls.js.",
+      "Trường hợp Chrome/Edge: dùng Hls.js để phát m3u8.",
+    ],
+    tags: ["HLS", "streaming"],
+  },
+  {
     id: "quyen-1",
     title: "Bài quyền số 1 (mẫu)",
     minutes: 8,

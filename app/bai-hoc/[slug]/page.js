@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import JsonLd from "@/components/JsonLd";
 import LessonDoneButton from "@/components/LessonDoneButton";
 import TrackView from "@/components/TrackView";
 import { LESSONS, LEVELS, getLessonBySlug } from "@/data/lessons";
@@ -52,12 +53,35 @@ export function generateMetadata({ params }) {
   return {
     title: lesson.title,
     description: lesson.summary,
+    openGraph: {
+      title: lesson.title,
+      description: lesson.summary,
+      type: "article",
+    },
+    twitter: {
+      card: "summary",
+      title: lesson.title,
+      description: lesson.summary,
+    },
   };
 }
 
 export default function LessonPage({ params }) {
   const lesson = getLessonBySlug(params.slug);
   if (!lesson) notFound();
+
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: lesson.title,
+    description: lesson.summary,
+    timeRequired: `PT${Math.max(1, Number(lesson.minutes) || 0)}M`,
+    url: `/bai-hoc/${lesson.slug}`,
+    author: {
+      "@type": "Organization",
+      name: "Vovinam Learning",
+    },
+  };
 
   const level = LEVELS.find((l) => l.id === lesson.level);
 
@@ -68,6 +92,7 @@ export default function LessonPage({ params }) {
   return (
     <div className="mx-auto w-full max-w-4xl px-4 py-10">
       <TrackView type="lesson" id={lesson.slug} />
+      <JsonLd data={jsonLd} />
       <div className="mb-6 flex flex-wrap items-center gap-2 text-sm text-slate-300">
         <Link href="/lo-trinh" className="hover:text-white transition">
           ← Lộ trình

@@ -36,7 +36,7 @@ export default function RootLayout({ children }) {
     <html lang="vi">
       <body
         id="top"
-        className={`${geistSans.variable} ${geistMono.variable} antialiased flex min-h-screen flex-col bg-slate-950 text-slate-50`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased flex min-h-screen flex-col bg-[color:var(--app-bg)] text-[color:var(--app-fg)]`}
       >
         <AnimatedBackground />
         <PwaRegister />

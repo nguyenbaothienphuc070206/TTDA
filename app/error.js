@@ -16,15 +16,15 @@ export default function GlobalError({ error, reset }) {
     <div className="mx-auto w-full max-w-3xl px-4 py-16">
       <div className="rounded-[2.25rem] border border-white/10 bg-white/5 p-8 sm:p-12">
         <p className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-semibold text-slate-200">
-          Có lỗi xảy ra
+          Môn sinh đang chào
         </p>
 
         <h1 className="mt-5 text-2xl font-semibold tracking-tight text-white sm:text-3xl">
-          Ứng dụng gặp sự cố
+          Hệ thống xin phép dừng 1 nhịp
         </h1>
         <p className="mt-3 text-sm leading-6 text-slate-300">
-          Hãy thử tải lại trang hoặc quay về trang chủ. Ứng dụng không hiển thị
-          chi tiết lỗi ra màn hình để tránh lộ thông tin không cần thiết.
+          Trong lúc bạn luyện tập, ứng dụng vừa gặp lỗi. Hãy thử lại, hoặc quay
+          về trang chủ để tiếp tục.
         </p>
 
         <div className="mt-6 flex flex-col gap-3 sm:flex-row">

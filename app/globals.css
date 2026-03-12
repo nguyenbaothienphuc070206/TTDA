@@ -5,6 +5,38 @@
   --font-mono: var(--font-geist-mono);
 }
 
+:root {
+  --app-bg: rgb(2 6 23);
+  --app-fg: rgb(248 250 252);
+  --header-bg: rgba(2, 6, 23, 0.70);
+}
+
+html[data-theme="midnight"] {
+  --app-bg: rgb(0 0 0);
+  --header-bg: rgba(0, 0, 0, 0.72);
+}
+
+html[data-theme="midnight"] .bg-grid {
+  opacity: 0.22;
+}
+
+html[data-theme="midnight"] .bg-app-gradient {
+  background:
+    radial-gradient(900px circle at 15% 10%, rgba(34, 211, 238, 0.10), transparent 60%),
+    radial-gradient(900px circle at 85% 20%, rgba(59, 130, 246, 0.10), transparent 60%),
+    radial-gradient(900px circle at 55% 95%, rgba(250, 204, 21, 0.06), transparent 65%),
+    linear-gradient(180deg, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0.94) 50%, rgba(0, 0, 0, 1) 100%);
+}
+
+html[data-theme="midnight"] .bg-vignette {
+  background: radial-gradient(
+    1200px circle at 50% 10%,
+    rgba(0, 0, 0, 0) 0%,
+    rgba(0, 0, 0, 0.55) 55%,
+    rgba(0, 0, 0, 0.95) 100%
+  );
+}
+
 html,
 body {
   height: 100%;

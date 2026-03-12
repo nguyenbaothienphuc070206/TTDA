@@ -1,4 +1,5 @@
 import AiCoachChat from "@/components/AiCoachChat";
+import PoseCoach from "@/components/PoseCoach";
 
 export const metadata = {
   title: "AI Coach",
@@ -17,7 +18,10 @@ export default function AiCoachPage() {
         </p>
       </header>
 
-      <AiCoachChat />
+      <div className="grid gap-4 lg:grid-cols-2">
+        <AiCoachChat />
+        <PoseCoach />
+      </div>
     </div>
   );
 }

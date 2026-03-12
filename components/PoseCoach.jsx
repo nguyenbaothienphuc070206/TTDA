@@ -1,0 +1,357 @@
+"use client";
+
+import { useEffect, useRef, useState } from "react";
+
+function dist(a, b) {
+  if (!a || !b) return 0;
+  const dx = Number(a.x) - Number(b.x);
+  const dy = Number(a.y) - Number(b.y);
+  if (!Number.isFinite(dx) || !Number.isFinite(dy)) return 0;
+  return Math.hypot(dx, dy);
+}
+
+function angleDeg(a, b, c) {
+  if (!a || !b || !c) return 0;
+
+  const abx = Number(a.x) - Number(b.x);
+  const aby = Number(a.y) - Number(b.y);
+  const cbx = Number(c.x) - Number(b.x);
+  const cby = Number(c.y) - Number(b.y);
+
+  if (![abx, aby, cbx, cby].every(Number.isFinite)) return 0;
+
+  const dot = abx * cbx + aby * cby;
+  const mag1 = Math.hypot(abx, aby);
+  const mag2 = Math.hypot(cbx, cby);
+  if (mag1 === 0 || mag2 === 0) return 0;
+
+  const cos = Math.min(1, Math.max(-1, dot / (mag1 * mag2)));
+  return (Math.acos(cos) * 180) / Math.PI;
+}
+
+function pickFeedback(landmarks) {
+  if (!Array.isArray(landmarks) || landmarks.length < 29) {
+    return "Đưa toàn thân vào khung hình để AI nhận diện (demo).";
+  }
+
+  const ls = landmarks[11];
+  const rs = landmarks[12];
+  const lh = landmarks[23];
+  const rh = landmarks[24];
+  const lk = landmarks[25];
+  const rk = landmarks[26];
+  const la = landmarks[27];
+  const ra = landmarks[28];
+
+  const shoulders = dist(ls, rs);
+  const stance = dist(la, ra);
+
+  const leftKnee = angleDeg(lh, lk, la);
+  const rightKnee = angleDeg(rh, rk, ra);
+
+  const tips = [];
+
+  if (shoulders > 0 && stance > 0) {
+    const ratio = stance / shoulders;
+
+    if (ratio < 0.85) {
+      tips.push("Mở rộng chân thêm một chút để tấn vững hơn.");
+    } else if (ratio > 1.9) {
+      tips.push("Thu chân lại một chút để giữ thăng bằng.");
+    }
+  }
+
+  const kneeAngles = [leftKnee, rightKnee].filter((x) => x > 0);
+  if (kneeAngles.length > 0) {
+    const avg = kneeAngles.reduce((a, b) => a + b, 0) / kneeAngles.length;
+
+    if (avg > 165) {
+      tips.push("Hạ tấn: gập gối nhẹ, giữ lưng thẳng. (Demo)");
+    } else if (avg < 75) {
+      tips.push("Không gập quá sâu, giữ gối an toàn. (Demo)");
+    } else {
+      tips.push("Tấn nhìn ổn — giữ nhịp thở đều và vai thả lỏng.");
+    }
+  }
+
+  if (tips.length === 0) {
+    return "Đang theo dõi… giữ lưng thẳng và thở đều.";
+  }
+
+  return tips.join(" ");
+}
+
+export default function PoseCoach() {
+  const videoRef = useRef(null);
+  const canvasRef = useRef(null);
+
+  const streamRef = useRef(null);
+  const landmarkerRef = useRef(null);
+  const drawingRef = useRef(null);
+  const rafRef = useRef(0);
+  const lastUiUpdateRef = useRef(0);
+
+  const [enabled, setEnabled] = useState(false);
+  const [status, setStatus] = useState("Chưa bật camera.");
+  const [feedback, setFeedback] = useState(
+    "Bật camera để AI góp ý tư thế/tấn. (Demo: không thay thế huấn luyện viên)"
+  );
+  const [error, setError] = useState("");
+
+  const stop = async () => {
+    setEnabled(false);
+    setStatus("Đã tắt camera.");
+
+    if (rafRef.current) {
+      cancelAnimationFrame(rafRef.current);
+      rafRef.current = 0;
+    }
+
+    const stream = streamRef.current;
+    streamRef.current = null;
+    if (stream) {
+      for (const track of stream.getTracks()) {
+        try {
+          track.stop();
+        } catch {
+          // ignore
+        }
+      }
+    }
+
+    const video = videoRef.current;
+    if (video) {
+      try {
+        video.pause();
+        video.srcObject = null;
+      } catch {
+        // ignore
+      }
+    }
+
+    const landmarker = landmarkerRef.current;
+    landmarkerRef.current = null;
+    try {
+      landmarker?.close?.();
+    } catch {
+      // ignore
+    }
+
+    drawingRef.current = null;
+
+    const canvas = canvasRef.current;
+    if (canvas) {
+      const ctx = canvas.getContext("2d");
+      ctx?.clearRect(0, 0, canvas.width, canvas.height);
+    }
+  };
+
+  const start = async () => {
+    setError("");
+
+    if (enabled) return;
+
+    if (typeof window === "undefined") {
+      setError("Chỉ chạy trên trình duyệt.");
+      return;
+    }
+
+    if (!navigator.mediaDevices?.getUserMedia) {
+      setError("Trình duyệt chưa hỗ trợ camera (getUserMedia).");
+      return;
+    }
+
+    setStatus("Đang xin quyền camera…");
+
+    let stream;
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          facingMode: "user",
+          width: { ideal: 1280 },
+          height: { ideal: 720 },
+        },
+        audio: false,
+      });
+    } catch {
+      setError(
+        "Không mở được camera. Hãy kiểm tra quyền camera (HTTPS/localhost) và thử lại."
+      );
+      setStatus("Chưa bật camera.");
+      return;
+    }
+
+    streamRef.current = stream;
+
+    const video = videoRef.current;
+    if (!video) {
+      setError("Thiếu thẻ video.");
+      await stop();
+      return;
+    }
+
+    video.srcObject = stream;
+    try {
+      await video.play();
+    } catch {
+      // Some browsers require a user gesture; button click is the gesture.
+    }
+
+    setStatus("Đang tải model pose…");
+
+    try {
+      const mod = await import("@mediapipe/tasks-vision");
+      const { PoseLandmarker, FilesetResolver, DrawingUtils } = mod;
+
+      const vision = await FilesetResolver.forVisionTasks(
+        "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm"
+      );
+
+      const landmarker = await PoseLandmarker.createFromOptions(vision, {
+        baseOptions: {
+          modelAssetPath:
+            "https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/1/pose_landmarker_lite.task",
+          delegate: "GPU",
+        },
+        runningMode: "VIDEO",
+        numPoses: 1,
+      });
+
+      landmarkerRef.current = landmarker;
+
+      const canvas = canvasRef.current;
+      const ctx = canvas?.getContext("2d");
+      if (!canvas || !ctx) {
+        setError("Thiếu canvas.");
+        await stop();
+        return;
+      }
+
+      drawingRef.current = {
+        DrawingUtils,
+        PoseLandmarker,
+        utils: new DrawingUtils(ctx),
+        ctx,
+      };
+
+      setEnabled(true);
+      setStatus("Đang theo dõi…");
+
+      const loop = () => {
+        const v = videoRef.current;
+        const c = canvasRef.current;
+        const lm = landmarkerRef.current;
+        const draw = drawingRef.current;
+
+        if (!v || !c || !lm || !draw) return;
+
+        if (v.readyState < 2 || v.videoWidth === 0 || v.videoHeight === 0) {
+          rafRef.current = requestAnimationFrame(loop);
+          return;
+        }
+
+        if (c.width !== v.videoWidth || c.height !== v.videoHeight) {
+          c.width = v.videoWidth;
+          c.height = v.videoHeight;
+        }
+
+        draw.ctx.clearRect(0, 0, c.width, c.height);
+
+        const t = performance.now();
+        const result = lm.detectForVideo(v, t);
+        const pose = Array.isArray(result?.landmarks) ? result.landmarks[0] : null;
+
+        if (pose) {
+          draw.utils.drawConnectors(pose, draw.PoseLandmarker.POSE_CONNECTIONS, {
+            color: "rgba(59, 130, 246, 0.85)",
+            lineWidth: 3,
+          });
+          draw.utils.drawLandmarks(pose, {
+            color: "rgba(34, 211, 238, 0.9)",
+            radius: 2,
+          });
+
+          if (t - lastUiUpdateRef.current > 450) {
+            lastUiUpdateRef.current = t;
+            setFeedback(pickFeedback(pose));
+          }
+        } else if (t - lastUiUpdateRef.current > 450) {
+          lastUiUpdateRef.current = t;
+          setFeedback("Không thấy pose — thử đứng xa hơn và đủ sáng.");
+        }
+
+        rafRef.current = requestAnimationFrame(loop);
+      };
+
+      rafRef.current = requestAnimationFrame(loop);
+    } catch {
+      setError("Không tải được AI pose (model/wasm). Kiểm tra mạng và thử lại.");
+      await stop();
+    }
+  };
+
+  useEffect(() => {
+    return () => {
+      stop();
+    };
+  }, []);
+
+  return (
+    <section className="rounded-3xl border border-white/10 bg-white/5 p-6 sm:p-8">
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div className="min-w-0">
+          <h2 className="text-lg font-semibold text-white">AI Pose Coach</h2>
+          <p className="mt-1 text-sm leading-6 text-slate-300">
+            Bật camera để AI vẽ khung xương và góp ý tư thế/tấn. (Demo)
+          </p>
+        </div>
+
+        <button
+          type="button"
+          onClick={enabled ? stop : start}
+          className={
+            enabled
+              ? "inline-flex h-11 items-center justify-center rounded-2xl border border-white/10 bg-white/5 px-4 text-sm font-semibold text-white transition hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-cyan-300/30"
+              : "inline-flex h-11 items-center justify-center rounded-2xl bg-gradient-to-r from-cyan-300 to-blue-500 px-4 text-sm font-semibold text-slate-950 transition hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-cyan-300/50"
+          }
+        >
+          {enabled ? "Tắt camera" : "Bật camera"}
+        </button>
+      </div>
+
+      <div className="mt-4 overflow-hidden rounded-2xl border border-white/10 bg-slate-950/40">
+        <div className="relative aspect-video">
+          <video
+            ref={videoRef}
+            className="absolute inset-0 h-full w-full object-cover"
+            playsInline
+            muted
+            autoPlay
+          />
+          <canvas
+            ref={canvasRef}
+            className="absolute inset-0 h-full w-full"
+          />
+        </div>
+      </div>
+
+      <div className="mt-4 grid gap-3">
+        <div className="rounded-2xl border border-white/10 bg-slate-950/30 p-4">
+          <div className="text-xs font-semibold text-slate-300">Trạng thái</div>
+          <div className="mt-1 text-sm font-semibold text-white">{status}</div>
+        </div>
+
+        <div className="rounded-2xl border border-white/10 bg-slate-950/30 p-4">
+          <div className="text-xs font-semibold text-slate-300">Gợi ý</div>
+          <div className="mt-1 text-sm leading-6 text-slate-200">{feedback}</div>
+        </div>
+
+        {error ? (
+          <div className="rounded-2xl border border-rose-500/20 bg-rose-500/10 p-4 text-sm text-rose-100">
+            {error}
+          </div>
+        ) : null}
+      </div>
+    </section>
+  );
+}

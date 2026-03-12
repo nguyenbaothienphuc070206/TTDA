@@ -9,10 +9,10 @@ export default function NotFound() {
     <div className="mx-auto w-full max-w-3xl px-4 py-16">
       <div className="rounded-[2.25rem] border border-white/10 bg-white/5 p-8 sm:p-12">
         <p className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-semibold text-slate-200">
-          404
+          404 • Môn sinh đang tìm đường
         </p>
         <h1 className="mt-5 text-2xl font-semibold tracking-tight text-white sm:text-3xl">
-          Không tìm thấy trang bạn cần
+          Chưa thấy trang bạn cần
         </h1>
         <p className="mt-3 text-sm leading-6 text-slate-300">
           Có thể đường dẫn bị sai hoặc bài học chưa tồn tại.
