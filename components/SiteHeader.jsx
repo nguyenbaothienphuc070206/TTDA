@@ -61,10 +61,19 @@ export default function SiteHeader() {
 
         <nav className="flex flex-wrap items-center gap-1">
           <NavItem href="/lo-trinh">Lộ trình</NavItem>
+          <NavItem href="/hoc-tap">Khóa học</NavItem>
+          <NavItem href="/video">Video</NavItem>
+          <NavItem href="/ky-thuat">Kỹ thuật</NavItem>
           <NavItem href="/lich-tap">Lịch tập</NavItem>
           <NavItem href="/dinh-duong">Dinh dưỡng</NavItem>
+          <NavItem href="/cua-hang">Cửa hàng</NavItem>
+          <NavItem href="/ho-so">Hồ sơ</NavItem>
 
-          <div className="hidden sm:flex items-center gap-3 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 ml-1">
+          <Link
+            href="/tien-do"
+            className="hidden sm:flex items-center gap-3 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 ml-1 transition hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-cyan-300/30"
+            aria-label="Xem tiến độ học tập"
+          >
             <span className="text-xs text-slate-300">Tiến độ</span>
             <span className="text-xs font-semibold text-cyan-200">
               {doneCount}/{total}
@@ -75,7 +84,7 @@ export default function SiteHeader() {
                 style={{ width: `${percent}%` }}
               />
             </div>
-          </div>
+          </Link>
         </nav>
       </div>
     </header>

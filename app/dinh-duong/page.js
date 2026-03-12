@@ -13,7 +13,8 @@ export default function NutritionPage() {
         </h1>
         <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-300">
           Tính calories/ngày và gợi ý món ăn dựa theo cân nặng, chiều cao, tuổi
-          và mức tập (mới/vừa/lâu).
+          và mức tập (mới/vừa/lâu). Có kèm chuỗi ăn mẫu 7/14/21/30 ngày để bạn
+          tham khảo.
         </p>
       </header>
 

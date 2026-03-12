@@ -1,6 +1,8 @@
 import Link from "next/link";
 
+import { BELTS } from "@/data/belts";
 import { LEVELS, LESSONS, getLessonsByLevel } from "@/data/lessons";
+import { NEWS } from "@/data/news";
 
 function ChipLink({ href, children }) {
   return (
@@ -163,6 +165,51 @@ function LevelPreview({ level }) {
   );
 }
 
+function BeltPreview({ belt }) {
+  return (
+    <Link
+      href="/hoc-tap"
+      className="group relative overflow-hidden rounded-3xl border border-white/10 bg-white/5 p-6 transition hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-cyan-300/30"
+    >
+      <div className="absolute inset-0 opacity-0 transition-opacity group-hover:opacity-100 bg-[radial-gradient(circle_at_top,rgba(34,211,238,0.10),transparent_55%)]" />
+      <div className="relative">
+        <div className="flex items-center justify-between gap-3">
+          <h3 className="text-lg font-semibold text-white">{belt.title}</h3>
+          <span className="rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-xs font-semibold text-slate-200">
+            {belt.short}
+          </span>
+        </div>
+        <p className="mt-2 text-sm leading-6 text-slate-300">{belt.description}</p>
+        <div className="mt-4 text-sm font-semibold text-cyan-200 transition group-hover:text-white">
+          Xem khóa học →
+        </div>
+      </div>
+    </Link>
+  );
+}
+
+function NewsCard({ item }) {
+  return (
+    <Link
+      href={item.href}
+      className="group relative overflow-hidden rounded-3xl border border-white/10 bg-white/5 p-5 transition hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-cyan-300/30"
+    >
+      <div className="absolute inset-0 opacity-0 transition-opacity group-hover:opacity-100 bg-[radial-gradient(circle_at_top,rgba(59,130,246,0.10),transparent_55%)]" />
+      <div className="relative">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <Pill>Tin tức</Pill>
+          <Pill>{item.date}</Pill>
+        </div>
+        <h3 className="mt-3 text-base font-semibold text-white">{item.title}</h3>
+        <p className="mt-1 text-sm leading-6 text-slate-300">{item.summary}</p>
+        <div className="mt-4 text-sm font-semibold text-cyan-200 transition group-hover:text-white">
+          Xem thêm →
+        </div>
+      </div>
+    </Link>
+  );
+}
+
 export default function Home() {
   const featured = [
     ...getLessonsByLevel("co-ban").slice(0, 2),
@@ -214,11 +261,81 @@ export default function Home() {
 
           <div className="mt-6 flex flex-wrap gap-2">
             <ChipLink href="#tinh-nang">Tính năng</ChipLink>
+            <ChipLink href="#vo-dao">Võ đạo</ChipLink>
+            <ChipLink href="#khoa-hoc">Khóa học</ChipLink>
+            <ChipLink href="#tin-tuc">Tin tức</ChipLink>
             <ChipLink href="#cach-hoc">Cách học</ChipLink>
             <ChipLink href="#bai-noi-bat">Bài nổi bật</ChipLink>
             <ChipLink href="#ke-hoach">Kế hoạch 4 tuần</ChipLink>
             <ChipLink href="#faq">FAQ</ChipLink>
           </div>
+        </div>
+      </section>
+
+      <section className="mt-10">
+        <SectionHeading
+          id="vo-dao"
+          title="Tinh thần võ đạo"
+          description="Tập để khỏe – tự tin – kỷ luật. Tập đúng kỹ thuật và giữ tâm thế bình tĩnh." 
+        />
+
+        <div className="mt-5 grid gap-3 lg:grid-cols-3">
+          <FeatureCard
+            title="Kỷ luật & đều đặn"
+            description="Tập đều quan trọng hơn tập nặng. Tăng dần nhẹ mỗi tuần để bền." 
+          />
+          <FeatureCard
+            title="Tôn trọng & tự vệ"
+            description="Mục tiêu là tự bảo vệ và kiểm soát bản thân, không phô trương hay gây hấn." 
+          />
+          <FeatureCard
+            title="An toàn là ưu tiên"
+            description="Khởi động kỹ, tập chậm, dừng khi đau nhói. Kỹ thuật khó nên có HLV." 
+          />
+        </div>
+      </section>
+
+      <section className="mt-12">
+        <SectionHeading
+          id="khoa-hoc"
+          title="Khóa học theo cấp đai"
+          description="Chia theo Lam/Hoàng/Huyền để bạn biết đang ở giai đoạn nào và học gì tiếp theo." 
+          right={
+            <Link
+              href="/hoc-tap"
+              className="text-sm font-semibold text-cyan-200 hover:text-white transition"
+            >
+              Vào dashboard →
+            </Link>
+          }
+        />
+
+        <div className="mt-5 grid gap-3 lg:grid-cols-3">
+          {BELTS.map((b) => (
+            <BeltPreview key={b.id} belt={b} />
+          ))}
+        </div>
+      </section>
+
+      <section className="mt-12">
+        <SectionHeading
+          id="tin-tuc"
+          title="Bảng tin mới nhất"
+          description="Cập nhật nhanh các tip an toàn, kế hoạch tập và dinh dưỡng." 
+          right={
+            <Link
+              href="/dinh-duong"
+              className="text-sm font-semibold text-cyan-200 hover:text-white transition"
+            >
+              Xem dinh dưỡng →
+            </Link>
+          }
+        />
+
+        <div className="mt-5 grid gap-3 lg:grid-cols-3">
+          {NEWS.slice(0, 3).map((n) => (
+            <NewsCard key={n.id} item={n} />
+          ))}
         </div>
       </section>
 

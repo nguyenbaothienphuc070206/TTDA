@@ -79,8 +79,16 @@ export default function SiteFooter() {
             <div className="mt-3 grid gap-2">
               <FooterLink href="/">Trang chủ</FooterLink>
               <FooterLink href="/lo-trinh">Lộ trình</FooterLink>
+              <FooterLink href="/hoc-tap">Khóa học</FooterLink>
+              <FooterLink href="/video">Video</FooterLink>
+              <FooterLink href="/ky-thuat">Thư viện kỹ thuật</FooterLink>
               <FooterLink href="/lich-tap">Lịch tập</FooterLink>
               <FooterLink href="/dinh-duong">Dinh dưỡng</FooterLink>
+              <FooterLink href="/tien-do">Tiến độ</FooterLink>
+              <FooterLink href="/cua-hang">Cửa hàng</FooterLink>
+              <FooterLink href="/ho-so">Hồ sơ</FooterLink>
+              <FooterLink href="/ai-coach">AI Coach</FooterLink>
+              <FooterLink href="/admin">Admin/Coach</FooterLink>
               <FooterLink href="/chinh-sach-bao-mat">Chính sách bảo mật</FooterLink>
               <FooterLink href="/dieu-khoan">Điều khoản</FooterLink>
             </div>

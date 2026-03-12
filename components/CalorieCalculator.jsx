@@ -9,6 +9,7 @@ import {
   estimateNutrition,
   mealSuggestions,
 } from "@/lib/nutrition";
+import { MEAL_PLAN_DURATIONS, generateMealPlan } from "@/lib/nutritionPlans";
 
 const NUTRITION_KEY = "vovinam_nutrition_v1";
 
@@ -57,6 +58,7 @@ function DotList({ items }) {
 
 export default function CalorieCalculator() {
   const [form, setForm] = useState(DEFAULT_FORM);
+  const [planDays, setPlanDays] = useState(7);
 
   useEffect(() => {
     const sync = () => {
@@ -131,6 +133,16 @@ export default function CalorieCalculator() {
       macros: result.macros,
     });
   }, [result, weightKg, form.stageId]);
+
+  const plan = useMemo(() => {
+    if (!result) return null;
+
+    return generateMealPlan({
+      days: planDays,
+      calories: result.targets.maintain,
+      stageId: form.stageId,
+    });
+  }, [result, planDays, form.stageId]);
 
   const stage = TRAINING_STAGES.find((s) => s.id === form.stageId) || TRAINING_STAGES[0];
 
@@ -340,6 +352,101 @@ export default function CalorieCalculator() {
                     </div>
                   </div>
                 </div>
+
+                {plan ? (
+                  <div className="mt-4 rounded-2xl border border-white/10 bg-white/5 p-4">
+                    <div className="flex flex-wrap items-center justify-between gap-3">
+                      <div>
+                        <div className="text-sm font-semibold text-white">Chuỗi ăn mẫu</div>
+                        <div className="mt-1 text-xs text-slate-300">
+                          Chọn 7/14/21/30 ngày để tham khảo lịch ăn.
+                        </div>
+                      </div>
+
+                      <div className="flex flex-wrap gap-2">
+                        {MEAL_PLAN_DURATIONS.map((d) => {
+                          const active = d === planDays;
+
+                          return (
+                            <button
+                              key={d}
+                              type="button"
+                              onClick={() => setPlanDays(d)}
+                              className={
+                                "inline-flex h-9 items-center justify-center rounded-2xl border px-3 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-cyan-300/30 " +
+                                (active
+                                  ? "border-cyan-300/30 bg-cyan-300/10 text-white"
+                                  : "border-white/10 bg-white/5 text-slate-200 hover:bg-white/10")
+                              }
+                            >
+                              {d === 30 ? "1 tháng" : `${d} ngày`}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    <div className="mt-3 rounded-2xl border border-white/10 bg-slate-950/30 p-4">
+                      <div className="text-xs font-semibold text-slate-300">Khẩu phần gợi ý</div>
+                      <ul className="mt-2 grid gap-1 text-sm text-slate-300">
+                        <li>{plan.portionHints.carb}</li>
+                        <li>{plan.portionHints.protein}</li>
+                        <li>{plan.portionHints.veg}</li>
+                        <li>{plan.portionHints.water}</li>
+                      </ul>
+                      {plan.stageNote ? (
+                        <p className="mt-3 text-xs leading-5 text-slate-300">{plan.stageNote}</p>
+                      ) : null}
+                    </div>
+
+                    <div className="mt-3 grid gap-2">
+                      {plan.items.map((item) => (
+                        <details
+                          key={item.day}
+                          className="group rounded-2xl border border-white/10 bg-slate-950/30 p-4"
+                        >
+                          <summary className="flex cursor-pointer list-none items-center justify-between gap-3 text-sm font-semibold text-white [&::-webkit-details-marker]:hidden">
+                            <span>Ngày {item.day}</span>
+                            <span
+                              aria-hidden="true"
+                              className="text-slate-300 transition group-open:rotate-180"
+                            >
+                              ▾
+                            </span>
+                          </summary>
+
+                          <div className="mt-3 grid gap-3 text-sm text-slate-300 sm:grid-cols-2">
+                            <div>
+                              <div className="text-xs font-semibold text-slate-300">Bữa sáng</div>
+                              <div className="mt-1 text-slate-200">{item.meals.breakfast}</div>
+                            </div>
+                            <div>
+                              <div className="text-xs font-semibold text-slate-300">Bữa trưa</div>
+                              <div className="mt-1 text-slate-200">{item.meals.lunch}</div>
+                            </div>
+                            <div>
+                              <div className="text-xs font-semibold text-slate-300">Bữa tối</div>
+                              <div className="mt-1 text-slate-200">{item.meals.dinner}</div>
+                            </div>
+                            <div>
+                              <div className="text-xs font-semibold text-slate-300">Snack</div>
+                              <div className="mt-1 text-slate-200">{item.meals.snack}</div>
+                            </div>
+                          </div>
+
+                          {item.note ? (
+                            <p className="mt-3 text-xs leading-5 text-slate-300">{item.note}</p>
+                          ) : null}
+                        </details>
+                      ))}
+                    </div>
+
+                    <p className="mt-3 text-xs leading-5 text-slate-300">
+                      Chuỗi ăn mẫu mang tính tham khảo; bạn có thể hoán đổi món tương đương
+                      theo khẩu vị, dị ứng, và điều kiện sức khỏe.
+                    </p>
+                  </div>
+                ) : null}
 
                 <div className="mt-4 grid gap-3 lg:grid-cols-2">
                   <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
