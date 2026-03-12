@@ -1,8 +1,13 @@
 import { NextResponse } from "next/server";
 
 import { sessionCookieName } from "@/lib/auth";
+import { isSameOrigin } from "@/lib/apiGuards";
 
-export async function POST() {
+export async function POST(request) {
+  if (!isSameOrigin(request)) {
+    return NextResponse.json({ error: "Origin không hợp lệ." }, { status: 403 });
+  }
+
   const res = NextResponse.json({ ok: true });
   res.headers.set("Cache-Control", "no-store");
 

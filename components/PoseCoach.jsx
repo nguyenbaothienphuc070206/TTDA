@@ -90,6 +90,8 @@ export default function PoseCoach() {
   const drawingRef = useRef(null);
   const rafRef = useRef(0);
   const lastUiUpdateRef = useRef(0);
+  const lastDetectRef = useRef(0);
+  const lastPoseRef = useRef(null);
 
   const [enabled, setEnabled] = useState(false);
   const [status, setStatus] = useState("Chưa bật camera.");
@@ -101,6 +103,9 @@ export default function PoseCoach() {
   const stop = async () => {
     setEnabled(false);
     setStatus("Đã tắt camera.");
+
+    lastDetectRef.current = 0;
+    lastPoseRef.current = null;
 
     if (rafRef.current) {
       cancelAnimationFrame(rafRef.current);
@@ -168,8 +173,9 @@ export default function PoseCoach() {
       stream = await navigator.mediaDevices.getUserMedia({
         video: {
           facingMode: "user",
-          width: { ideal: 1280 },
-          height: { ideal: 720 },
+          width: { ideal: 960 },
+          height: { ideal: 540 },
+          frameRate: { ideal: 24, max: 30 },
         },
         audio: false,
       });
@@ -207,15 +213,28 @@ export default function PoseCoach() {
         "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm"
       );
 
-      const landmarker = await PoseLandmarker.createFromOptions(vision, {
-        baseOptions: {
-          modelAssetPath:
-            "https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/1/pose_landmarker_lite.task",
-          delegate: "GPU",
-        },
-        runningMode: "VIDEO",
-        numPoses: 1,
-      });
+      let landmarker;
+      try {
+        landmarker = await PoseLandmarker.createFromOptions(vision, {
+          baseOptions: {
+            modelAssetPath:
+              "https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/1/pose_landmarker_lite.task",
+            delegate: "GPU",
+          },
+          runningMode: "VIDEO",
+          numPoses: 1,
+        });
+      } catch {
+        landmarker = await PoseLandmarker.createFromOptions(vision, {
+          baseOptions: {
+            modelAssetPath:
+              "https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/1/pose_landmarker_lite.task",
+            delegate: "CPU",
+          },
+          runningMode: "VIDEO",
+          numPoses: 1,
+        });
+      }
 
       landmarkerRef.current = landmarker;
 
@@ -255,12 +274,37 @@ export default function PoseCoach() {
           c.height = v.videoHeight;
         }
 
+        const t = performance.now();
+
+        // Throttle pose detection to reduce CPU/GPU load.
+        const DETECT_INTERVAL_MS = 90;
+        if (t - lastDetectRef.current >= DETECT_INTERVAL_MS) {
+          lastDetectRef.current = t;
+
+          let pose = null;
+          try {
+            const result = lm.detectForVideo(v, t);
+            pose = Array.isArray(result?.landmarks) ? result.landmarks[0] : null;
+          } catch {
+            pose = null;
+          }
+
+          lastPoseRef.current = pose;
+
+          if (pose) {
+            if (t - lastUiUpdateRef.current > 450) {
+              lastUiUpdateRef.current = t;
+              setFeedback(pickFeedback(pose));
+            }
+          } else if (t - lastUiUpdateRef.current > 450) {
+            lastUiUpdateRef.current = t;
+            setFeedback("Không thấy pose — thử đứng xa hơn và đủ sáng.");
+          }
+        }
+
         draw.ctx.clearRect(0, 0, c.width, c.height);
 
-        const t = performance.now();
-        const result = lm.detectForVideo(v, t);
-        const pose = Array.isArray(result?.landmarks) ? result.landmarks[0] : null;
-
+        const pose = lastPoseRef.current;
         if (pose) {
           draw.utils.drawConnectors(pose, draw.PoseLandmarker.POSE_CONNECTIONS, {
             color: "rgba(59, 130, 246, 0.85)",
@@ -270,14 +314,6 @@ export default function PoseCoach() {
             color: "rgba(34, 211, 238, 0.9)",
             radius: 2,
           });
-
-          if (t - lastUiUpdateRef.current > 450) {
-            lastUiUpdateRef.current = t;
-            setFeedback(pickFeedback(pose));
-          }
-        } else if (t - lastUiUpdateRef.current > 450) {
-          lastUiUpdateRef.current = t;
-          setFeedback("Không thấy pose — thử đứng xa hơn và đủ sáng.");
         }
 
         rafRef.current = requestAnimationFrame(loop);

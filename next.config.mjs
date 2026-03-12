@@ -22,6 +22,11 @@ const securityHeaders = [
   },
 ];
 
+const cacheNoStoreHeader = {
+  key: "Cache-Control",
+  value: "no-store",
+};
+
 if (isProd) {
   securityHeaders.push({
     key: "Strict-Transport-Security",
@@ -34,6 +39,9 @@ const securityHeadersAllowCamera = securityHeaders.map((h) =>
     ? { ...h, value: permissionsPolicyAllowCamera }
     : h
 );
+
+const adminHeaders = [...securityHeaders, cacheNoStoreHeader];
+const adminHeadersAllowCamera = [...securityHeadersAllowCamera, cacheNoStoreHeader];
 
 const nextConfig = {
   poweredByHeader: false,
@@ -48,12 +56,16 @@ const nextConfig = {
         headers: securityHeadersAllowCamera,
       },
       {
+        source: "/admin/:path*",
+        headers: adminHeaders,
+      },
+      {
         source: "/admin/diem-danh",
-        headers: securityHeadersAllowCamera,
+        headers: adminHeadersAllowCamera,
       },
       {
         source: "/admin/diem-danh/:path*",
-        headers: securityHeadersAllowCamera,
+        headers: adminHeadersAllowCamera,
       },
       {
         source: "/:path*",

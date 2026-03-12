@@ -1,10 +1,36 @@
 import { NextResponse } from "next/server";
 
 import { createSessionToken, roles, sessionCookieName } from "@/lib/auth";
+import { checkRateLimit, constantTimeEqual, isBodyTooLarge, isSameOrigin } from "@/lib/apiGuards";
 
 const ONE_WEEK_MS = 7 * 24 * 60 * 60 * 1000;
 
 export async function POST(request) {
+  if (!isSameOrigin(request)) {
+    return NextResponse.json({ error: "Origin không hợp lệ." }, { status: 403 });
+  }
+
+  if (isBodyTooLarge(request, 4_096)) {
+    return NextResponse.json({ error: "Body quá lớn." }, { status: 413 });
+  }
+
+  const rl = checkRateLimit({
+    request,
+    key: "auth_login",
+    limit: 10,
+    windowMs: 5 * 60 * 1000,
+  });
+
+  if (!rl.ok) {
+    const res = NextResponse.json(
+      { error: "Thao tác quá nhanh. Vui lòng thử lại sau." },
+      { status: 429 }
+    );
+    res.headers.set("Cache-Control", "no-store");
+    res.headers.set("Retry-After", String(rl.retryAfterSec));
+    return res;
+  }
+
   let body;
 
   try {
@@ -19,7 +45,7 @@ export async function POST(request) {
   }
 
   const role = body?.role;
-  const password = String(body?.password || "");
+  const password = String(body?.password || "").slice(0, 128);
 
   const r = roles();
   const isAdmin = role === r.ADMIN || role === "admin";
@@ -44,7 +70,7 @@ export async function POST(request) {
     );
   }
 
-  if (password !== expectedPassword) {
+  if (!constantTimeEqual(password, expectedPassword)) {
     return NextResponse.json({ error: "Sai mật khẩu." }, { status: 401 });
   }
 

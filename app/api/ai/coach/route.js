@@ -7,6 +7,7 @@ import {
   extractHighlights,
   searchDocuments,
 } from "@/lib/rag";
+import { checkRateLimit, isBodyTooLarge } from "@/lib/apiGuards";
 
 const DOCS = buildDocuments({ techniques: TECHNIQUES, videos: VIDEOS });
 
@@ -15,9 +16,44 @@ function asText(value) {
 }
 
 export async function POST(request) {
+  if (isBodyTooLarge(request, 30_000)) {
+    return NextResponse.json({ error: "Body quá lớn." }, { status: 413 });
+  }
+
+  const rl = checkRateLimit({
+    request,
+    key: "ai_coach",
+    limit: 60,
+    windowMs: 5 * 60 * 1000,
+  });
+
+  if (!rl.ok) {
+    const res = NextResponse.json(
+      { error: "Bạn hỏi quá nhanh. Vui lòng chờ một chút." },
+      { status: 429 }
+    );
+    res.headers.set("Cache-Control", "no-store");
+    res.headers.set("Retry-After", String(rl.retryAfterSec));
+    return res;
+  }
+
   try {
-    const body = await request.json();
-    const query = asText(body?.query);
+    let body;
+    try {
+      body = await request.json();
+    } catch {
+      return NextResponse.json({ error: "Body JSON không hợp lệ." }, { status: 400 });
+    }
+
+    const rawQuery = asText(body?.query);
+    if (rawQuery.length > 500) {
+      return NextResponse.json(
+        { error: "Câu hỏi quá dài. Hãy giữ dưới 500 ký tự." },
+        { status: 400 }
+      );
+    }
+
+    const query = rawQuery;
     const context = body?.context || null;
 
     if (query.length < 2) {
@@ -27,7 +63,7 @@ export async function POST(request) {
       );
     }
 
-    const videoId = asText(context?.videoId);
+    const videoId = asText(context?.videoId).slice(0, 64);
 
     const results = searchDocuments({
       query,
@@ -81,14 +117,18 @@ export async function POST(request) {
       "\nLưu ý: Đây là trả lời dựa trên dữ liệu mẫu trong project (RAG-lite). Nếu bạn muốn chatbot 'xịn' hơn, mình có thể tích hợp LLM qua biến môi trường."
     );
 
-    return NextResponse.json({
+    const res = NextResponse.json({
       answer: lines.join("\n"),
       sources,
     });
+    res.headers.set("Cache-Control", "no-store");
+    return res;
   } catch {
-    return NextResponse.json(
+    const res = NextResponse.json(
       { error: "Không xử lý được yêu cầu. Vui lòng thử lại." },
       { status: 500 }
     );
+    res.headers.set("Cache-Control", "no-store");
+    return res;
   }
 }
