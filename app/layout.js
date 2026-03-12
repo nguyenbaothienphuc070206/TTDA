@@ -3,6 +3,7 @@ import "./globals.css";
 
 import AnimatedBackground from "@/components/AnimatedBackground";
 import PwaRegister from "@/components/PwaRegister";
+import SifuReminderAgent from "@/components/SifuReminderAgent";
 import SiteFooter from "@/components/SiteFooter";
 import SiteHeader from "@/components/SiteHeader";
 
@@ -39,6 +40,7 @@ export default function RootLayout({ children }) {
       >
         <AnimatedBackground />
         <PwaRegister />
+        <SifuReminderAgent />
         <SiteHeader />
         <main className="flex-1">{children}</main>
         <SiteFooter />

@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 
 import AiCoachChat from "@/components/AiCoachChat";
+import OfflineVideoControls from "@/components/OfflineVideoControls";
 import TrackView from "@/components/TrackView";
 import { getVideoById } from "@/data/videos";
 
@@ -41,6 +42,10 @@ export default function VideoDetailPage({ params }) {
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen
             />
+          </div>
+
+          <div className="mt-4">
+            <OfflineVideoControls videoId={video.id} title={video.title} />
           </div>
 
           <div className="mt-4 rounded-2xl border border-white/10 bg-slate-950/30 p-4">

@@ -28,7 +28,16 @@ function todayInput() {
 }
 
 export default function ProfileDashboard() {
-  const [profile, setProfile] = useState(() => readProfile());
+  const [profile, setProfile] = useState(() => {
+    const base = readProfile();
+    if (typeof base.joinedAt === "number" && base.joinedAt > 0) return base;
+    return {
+      ...base,
+      joinedAt: Date.now(),
+    };
+  });
+  const [nowMs, setNowMs] = useState(() => Date.now());
+  const [reminderNotice, setReminderNotice] = useState("");
 
   const [beltEntry, setBeltEntry] = useState(() => ({
     beltId: readProfile().beltId,
@@ -45,12 +54,15 @@ export default function ProfileDashboard() {
     const sync = () => {
       setProfile(readProfile());
     };
-
-    sync();
     window.addEventListener("storage", sync);
     return () => {
       window.removeEventListener("storage", sync);
     };
+  }, []);
+
+  useEffect(() => {
+    const t = setInterval(() => setNowMs(Date.now()), 60_000);
+    return () => clearInterval(t);
   }, []);
 
   useEffect(() => {
@@ -60,6 +72,98 @@ export default function ProfileDashboard() {
   const currentBelt = useMemo(() => {
     return getBeltById(profile.beltId) || BELTS[0];
   }, [profile.beltId]);
+
+  const personalizedStatus = useMemo(() => {
+    const msPerDay = 24 * 60 * 60 * 1000;
+    const joinedAt = typeof profile.joinedAt === "number" ? profile.joinedAt : 0;
+    const baseNow = typeof nowMs === "number" && nowMs > 0 ? nowMs : joinedAt;
+
+    const days = joinedAt && baseNow >= joinedAt
+      ? Math.max(1, Math.floor((baseNow - joinedAt) / msPerDay) + 1)
+      : 1;
+
+    const currentIndex = BELTS.findIndex((b) => b.id === profile.beltId);
+    const nextBelt = currentIndex >= 0 && currentIndex < BELTS.length - 1 ? BELTS[currentIndex + 1] : null;
+
+    const encouragement = nextBelt
+      ? `Cố gắng lên ${nextBelt.title} nhé!`
+      : "Giữ phong độ và giúp người mới nhé!";
+
+    return {
+      days,
+      encouragement,
+    };
+  }, [nowMs, profile.beltId, profile.joinedAt]);
+
+  const reminders = profile.reminders && typeof profile.reminders === "object" ? profile.reminders : { enabled: false };
+
+  const sendTestReminder = async () => {
+    setReminderNotice("");
+
+    if (typeof window === "undefined" || !("Notification" in window)) {
+      setReminderNotice("Trình duyệt chưa hỗ trợ Notification API.");
+      return;
+    }
+
+    const perm = await Notification.requestPermission();
+    if (perm !== "granted") {
+      setReminderNotice("Bạn chưa cho phép thông báo. Hãy cấp quyền để nhận lời nhắc.");
+      return;
+    }
+
+    if (!("serviceWorker" in navigator)) {
+      setReminderNotice("Thiếu Service Worker (PWA). Thử refresh lại trang.");
+      return;
+    }
+
+    const reg = await navigator.serviceWorker.ready.catch(() => null);
+    if (!reg || typeof reg.showNotification !== "function") {
+      setReminderNotice("Chưa sẵn sàng để gửi thông báo. Thử refresh lại trang.");
+      return;
+    }
+
+    await reg.showNotification("Lời nhắc sư phụ", {
+      body: "Test: dành 5 phút ôn lại kỹ thuật hôm nay nhé.",
+      tag: "vovinam-sifu-test",
+      data: { url: "/ky-thuat" },
+      icon: "/favicon.ico",
+      badge: "/favicon.ico",
+    });
+  };
+
+  const toggleReminders = async () => {
+    setReminderNotice("");
+
+    if (reminders.enabled) {
+      setProfile((p) => ({
+        ...p,
+        reminders: {
+          ...p.reminders,
+          enabled: false,
+        },
+      }));
+      return;
+    }
+
+    if (typeof window === "undefined" || !("Notification" in window)) {
+      setReminderNotice("Trình duyệt chưa hỗ trợ Notification API.");
+      return;
+    }
+
+    const perm = await Notification.requestPermission();
+    if (perm !== "granted") {
+      setReminderNotice("Bạn chưa cho phép thông báo. Hãy cấp quyền để bật lời nhắc.");
+      return;
+    }
+
+    setProfile((p) => ({
+      ...p,
+      reminders: {
+        ...p.reminders,
+        enabled: true,
+      },
+    }));
+  };
 
   const sortedHistory = useMemo(() => {
     const list = Array.isArray(profile.beltHistory) ? profile.beltHistory : [];
@@ -163,6 +267,93 @@ export default function ProfileDashboard() {
 
   return (
     <div className="grid gap-4 lg:grid-cols-2">
+      <section className="rounded-3xl border border-white/10 bg-white/5 p-6 sm:p-8 lg:col-span-2">
+        <h2 className="text-xl font-semibold text-white">Trạng thái hôm nay</h2>
+        <p className="mt-2 text-sm leading-6 text-slate-300">
+          Hôm nay là ngày thứ <span className="font-semibold text-white">{personalizedStatus.days}</span> bạn gắn bó với Vovinam. {personalizedStatus.encouragement}
+        </p>
+        <div className="mt-4 grid gap-3 sm:grid-cols-3">
+          <div className="rounded-2xl border border-white/10 bg-slate-950/30 p-4">
+            <div className="text-xs font-semibold text-slate-300">Cấp đai hiện tại</div>
+            <div className="mt-2 text-sm font-semibold text-white">{currentBelt?.title}</div>
+          </div>
+          <div className="rounded-2xl border border-white/10 bg-slate-950/30 p-4">
+            <div className="text-xs font-semibold text-slate-300">Mục tiêu</div>
+            <div className="mt-2 text-sm font-semibold text-white">Đúng kỹ thuật & đều đặn</div>
+          </div>
+          <div className="rounded-2xl border border-white/10 bg-slate-950/30 p-4">
+            <div className="text-xs font-semibold text-slate-300">Gợi ý</div>
+            <div className="mt-2 text-sm leading-6 text-slate-300">Nếu có 5 phút: ôn lại 1 kỹ thuật bạn hay sai.</div>
+          </div>
+        </div>
+      </section>
+
+      <section className="rounded-3xl border border-white/10 bg-white/5 p-6 sm:p-8 lg:col-span-2">
+        <h2 className="text-xl font-semibold text-white">Lời nhắc sư phụ</h2>
+        <p className="mt-2 text-sm leading-6 text-slate-300">
+          Bật thông báo để nhận lời nhắc nhẹ nhàng khi bạn bỏ quá lâu chưa ôn lại kỹ thuật.
+        </p>
+
+        {reminderNotice ? (
+          <div className="mt-4 rounded-2xl border border-white/10 bg-slate-950/30 p-4 text-sm text-slate-200">
+            {reminderNotice}
+          </div>
+        ) : null}
+
+        <div className="mt-4 grid gap-3 sm:grid-cols-3">
+          <div className="rounded-2xl border border-white/10 bg-slate-950/30 p-4">
+            <div className="text-xs font-semibold text-slate-300">Trạng thái</div>
+            <div className="mt-2 text-sm font-semibold text-white">
+              {reminders.enabled ? "Đang bật" : "Chưa bật"}
+            </div>
+            <div className="mt-1 text-xs text-slate-400">Dùng Notification API + Service Worker.</div>
+          </div>
+
+          <button
+            type="button"
+            onClick={toggleReminders}
+            className="inline-flex h-12 items-center justify-center rounded-2xl bg-gradient-to-r from-cyan-300 to-blue-500 px-5 text-sm font-semibold text-slate-950 transition hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-cyan-300/50"
+          >
+            {reminders.enabled ? "Tắt lời nhắc" : "Bật lời nhắc"}
+          </button>
+
+          <button
+            type="button"
+            onClick={sendTestReminder}
+            className="inline-flex h-12 items-center justify-center rounded-2xl border border-white/10 bg-white/5 px-5 text-sm font-semibold text-white transition hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-cyan-300/30"
+          >
+            Gửi test
+          </button>
+        </div>
+
+        <div className="mt-4 rounded-2xl border border-white/10 bg-slate-950/30 p-4">
+          <div className="text-xs font-semibold text-slate-300">Ngưỡng nhắc</div>
+          <div className="mt-2 grid gap-3 sm:grid-cols-[1fr_auto] sm:items-center">
+            <input
+              type="number"
+              min={1}
+              max={14}
+              value={reminders.daysWithoutPractice || 3}
+              onChange={(e) => {
+                const v = Math.max(1, Math.min(14, Math.round(Number(e.target.value) || 3)));
+                setProfile((p) => ({
+                  ...p,
+                  reminders: {
+                    ...p.reminders,
+                    daysWithoutPractice: v,
+                  },
+                }));
+              }}
+              className="h-11 w-full rounded-2xl border border-white/10 bg-slate-950/60 px-4 text-sm text-white outline-none focus:ring-2 focus:ring-cyan-300/30"
+            />
+            <div className="text-sm font-semibold text-slate-200">ngày chưa ôn</div>
+          </div>
+          <p className="mt-2 text-xs leading-5 text-slate-400">
+            Lời nhắc dựa trên lần gần nhất bạn mở chi tiết kỹ thuật trong trang Wiki.
+          </p>
+        </div>
+      </section>
+
       <section className="rounded-3xl border border-white/10 bg-white/5 p-6 sm:p-8">
         <h2 className="text-xl font-semibold text-white">Thông tin học viên</h2>
         <p className="mt-2 text-sm leading-6 text-slate-300">
