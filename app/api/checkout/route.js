@@ -46,8 +46,12 @@ export async function POST(request) {
 
   const params = new URLSearchParams();
   params.set("mode", "payment");
-  params.set("success_url", `${baseUrl}/cua-hang?success=1`);
+  params.set("success_url", `${baseUrl}/cua-hang?success=1&session_id={CHECKOUT_SESSION_ID}`);
   params.set("cancel_url", `${baseUrl}/cua-hang?cancel=1`);
+
+  // Keep a compact copy of the cart so the client can rebuild the order after redirect.
+  // (Stripe metadata values are strings and have length limits; keep it short.)
+  params.set("metadata[items_json]", JSON.stringify(items));
 
   for (let i = 0; i < items.length; i += 1) {
     const item = items[i];

@@ -5,7 +5,7 @@ import { useSearchParams } from "next/navigation";
 
 import { PRODUCTS, formatVnd, getProductById } from "@/data/store";
 import { addToCart, clearCart, readCart, setCartItemQty } from "@/lib/cart";
-import { createLocalOrder } from "@/lib/orders";
+import { createLocalOrder, readOrders, writeOrders } from "@/lib/orders";
 
 function Pill({ children }) {
   return (
@@ -32,6 +32,7 @@ export default function Storefront() {
   const [cart, setCart] = useState(() => readCart());
   const [message, setMessage] = useState(null);
   const [isCheckingOut, setIsCheckingOut] = useState(false);
+  const [processedSessionId, setProcessedSessionId] = useState("");
 
   useEffect(() => {
     const sync = () => setCart(readCart());
@@ -48,19 +49,112 @@ export default function Storefront() {
   useEffect(() => {
     const success = searchParams?.get("success");
     const cancel = searchParams?.get("cancel");
+    const sessionId = String(searchParams?.get("session_id") || "").trim();
 
-    if (success === "1") {
+    if (cancel === "1") {
+      setMessage({ tone: "info", text: "Bạn đã hủy thanh toán." });
+      return;
+    }
+
+    if (success !== "1") {
+      return;
+    }
+
+    if (!sessionId) {
       setMessage({
         tone: "success",
-        text: "Thanh toán thành công. Nếu bạn muốn đồng bộ đơn hàng (webhook), mình có thể bổ sung tiếp.",
+        text: "Thanh toán thành công.",
       });
-    } else if (cancel === "1") {
-      setMessage({
-        tone: "info",
-        text: "Bạn đã hủy thanh toán.",
-      });
+      return;
     }
-  }, [searchParams]);
+
+    if (processedSessionId === sessionId) {
+      return;
+    }
+
+    setProcessedSessionId(sessionId);
+
+    const run = async () => {
+      setMessage({ tone: "info", text: "Đang xác nhận thanh toán Stripe…" });
+
+      try {
+        const res = await fetch(`/api/checkout/session?session_id=${encodeURIComponent(sessionId)}`);
+        const data = await res.json().catch(() => null);
+
+        if (!res.ok) {
+          const err =
+            data && typeof data.error === "string" ? data.error : "Không xác nhận được phiên thanh toán.";
+          setMessage({ tone: "error", text: err });
+          return;
+        }
+
+        const paymentStatus = String(data?.payment_status || "");
+        if (paymentStatus && paymentStatus !== "paid") {
+          setMessage({
+            tone: "info",
+            text: `Phiên thanh toán đang ở trạng thái: ${paymentStatus}.`,
+          });
+          return;
+        }
+
+        const orderId = `stripe_${sessionId}`;
+        const existed = readOrders().some((o) => o && o.id === orderId);
+
+        const rawItems = Array.isArray(data?.items) ? data.items : [];
+        const lineItems = rawItems
+          .map((it) => {
+            if (!it || typeof it !== "object") return null;
+            const productId = String(it.productId || "").trim();
+            const qtyNumber = Number(it.qty);
+            const qty = Number.isFinite(qtyNumber) ? Math.round(qtyNumber) : 0;
+            if (!productId || qty <= 0) return null;
+
+            const product = getProductById(productId);
+            if (!product) return null;
+
+            return {
+              productId: product.id,
+              name: product.name,
+              qty,
+              priceVnd: product.priceVnd,
+            };
+          })
+          .filter(Boolean);
+
+        const computedTotalVnd = lineItems.reduce((sum, l) => sum + l.priceVnd * l.qty, 0);
+        const stripeTotal = Number(data?.amount_total);
+        const totalVnd = Number.isFinite(stripeTotal)
+          ? Math.max(0, Math.round(stripeTotal))
+          : computedTotalVnd;
+
+        if (!existed) {
+          const next = [
+            {
+              id: orderId,
+              createdAt: Date.now(),
+              status: "paid_stripe",
+              items: lineItems,
+              totalVnd,
+            },
+            ...readOrders(),
+          ];
+          writeOrders(next);
+        }
+
+        clearCart();
+        setCart([]);
+
+        setMessage({
+          tone: "success",
+          text: `Thanh toán thành công. Đơn hàng đã được ghi nhận: ${orderId}.`,
+        });
+      } catch {
+        setMessage({ tone: "error", text: "Có lỗi mạng khi xác nhận thanh toán." });
+      }
+    };
+
+    run();
+  }, [searchParams, processedSessionId]);
 
   const lines = useMemo(() => {
     return cart

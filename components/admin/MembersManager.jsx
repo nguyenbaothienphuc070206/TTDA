@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import QRCode from "react-qr-code";
 
 import { BELTS, getBeltById } from "@/data/belts";
 import { readMembers, writeMembers } from "@/lib/adminData";
@@ -210,6 +211,25 @@ export default function MembersManager() {
                       <div className="mt-2 text-xs text-slate-300">ID: {m.id}</div>
                     </div>
                   </div>
+
+                  <details className="mt-3 rounded-2xl border border-white/10 bg-white/5 p-4">
+                    <summary className="cursor-pointer list-none text-sm font-semibold text-white">
+                      QR điểm danh
+                    </summary>
+                    <div className="mt-4 flex flex-wrap items-start gap-4">
+                      <div className="rounded-2xl bg-white p-3">
+                        <QRCode value={m.code} size={132} />
+                      </div>
+                      <div className="min-w-[220px] text-sm leading-6 text-slate-300">
+                        <div className="text-xs font-semibold text-slate-200">Cách dùng</div>
+                        <p className="mt-2">
+                          Mở trang <span className="font-semibold text-white">Điểm danh</span> và dùng nút
+                          <span className="font-semibold text-white"> Quét QR</span> để tự điền code.
+                        </p>
+                        <p className="mt-2 text-xs text-slate-400">Giá trị QR: {m.code}</p>
+                      </div>
+                    </div>
+                  </details>
                 </div>
               );
             })}

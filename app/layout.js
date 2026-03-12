@@ -2,6 +2,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
 import AnimatedBackground from "@/components/AnimatedBackground";
+import PwaRegister from "@/components/PwaRegister";
 import SiteFooter from "@/components/SiteFooter";
 import SiteHeader from "@/components/SiteHeader";
 
@@ -22,6 +23,11 @@ export const metadata = {
   },
   description:
     "App học Vovinam từ cơ bản đến nâng cao: lộ trình rõ ràng, bài tập từng bước, lưu tiến độ và lịch tập 7 ngày.",
+  manifest: "/manifest.webmanifest",
+};
+
+export const viewport = {
+  themeColor: "#020617",
 };
 
 export default function RootLayout({ children }) {
@@ -32,6 +38,7 @@ export default function RootLayout({ children }) {
         className={`${geistSans.variable} ${geistMono.variable} antialiased flex min-h-screen flex-col bg-slate-950 text-slate-50`}
       >
         <AnimatedBackground />
+        <PwaRegister />
         <SiteHeader />
         <main className="flex-1">{children}</main>
         <SiteFooter />

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import { readAttendance, readMembers, writeAttendance } from "@/lib/adminData";
 
@@ -36,6 +36,12 @@ export default function AttendanceManager() {
   const [code, setCode] = useState("");
   const [message, setMessage] = useState(null);
 
+  const [scannerOpen, setScannerOpen] = useState(false);
+  const [scannerError, setScannerError] = useState(null);
+  const videoRef = useRef(null);
+  const streamRef = useRef(null);
+  const rafRef = useRef(null);
+
   useEffect(() => {
     const sync = () => {
       setMembers(readMembers());
@@ -52,6 +58,98 @@ export default function AttendanceManager() {
       window.removeEventListener("storage", sync);
     };
   }, []);
+
+  useEffect(() => {
+    const stop = () => {
+      if (rafRef.current) {
+        cancelAnimationFrame(rafRef.current);
+        rafRef.current = null;
+      }
+
+      const stream = streamRef.current;
+      if (stream) {
+        stream.getTracks().forEach((t) => t.stop());
+        streamRef.current = null;
+      }
+
+      if (videoRef.current) {
+        videoRef.current.srcObject = null;
+      }
+    };
+
+    if (!scannerOpen) {
+      stop();
+      return undefined;
+    }
+
+    let active = true;
+
+    const start = async () => {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: "environment" },
+          audio: false,
+        });
+
+        if (!active) {
+          stream.getTracks().forEach((t) => t.stop());
+          return;
+        }
+
+        streamRef.current = stream;
+
+        const video = videoRef.current;
+        if (!video) {
+          return;
+        }
+
+        video.srcObject = stream;
+        await video.play().catch(() => {
+          // Some browsers require user gesture; ignore.
+        });
+
+        const Detector = window.BarcodeDetector;
+        const detector = new Detector({ formats: ["qr_code"] });
+
+        const scan = async () => {
+          if (!active) return;
+          const v = videoRef.current;
+          if (!v) return;
+
+          try {
+            const barcodes = await detector.detect(v);
+            const raw = barcodes && barcodes.length ? String(barcodes[0].rawValue || "") : "";
+            const value = raw.trim();
+
+            if (value) {
+              setCode(value);
+              setScannerOpen(false);
+              setMessage({ tone: "success", text: `Đã quét code: ${value}` });
+              return;
+            }
+          } catch {
+            // Ignore transient decode errors
+          }
+
+          rafRef.current = requestAnimationFrame(scan);
+        };
+
+        rafRef.current = requestAnimationFrame(scan);
+      } catch (err) {
+        const msg =
+          err && typeof err === "object" && "message" in err ? String(err.message) : "Không mở được camera.";
+        setScannerError(msg);
+        setScannerOpen(false);
+      }
+    };
+
+    start();
+
+    return () => {
+      active = false;
+      stop();
+    };
+  }, [scannerOpen]);
 
   const memberList = useMemo(() => {
     const list = Array.isArray(members) ? members : [];
@@ -187,6 +285,35 @@ export default function AttendanceManager() {
               className="mt-2 w-full rounded-xl border border-white/10 bg-slate-950/60 px-3 py-2 text-sm text-white outline-none focus:ring-2 focus:ring-cyan-300/30"
               placeholder="VD: HV-123456"
             />
+
+            <div className="mt-3 flex flex-wrap items-center gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setMessage(null);
+                  setScannerError(null);
+
+                  if (scannerOpen) {
+                    setScannerOpen(false);
+                    return;
+                  }
+
+                  const supported = typeof window !== "undefined" && "BarcodeDetector" in window;
+                  if (!supported) {
+                    setScannerError(
+                      "Trình duyệt chưa hỗ trợ BarcodeDetector để quét QR. Bạn vẫn có thể nhập code thủ công."
+                    );
+                    return;
+                  }
+
+                  setScannerOpen(true);
+                }}
+                className="inline-flex h-10 items-center justify-center rounded-2xl border border-white/10 bg-white/5 px-4 text-sm font-semibold text-white transition hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-cyan-300/30"
+              >
+                {scannerOpen ? "Tắt quét QR" : "Quét QR"}
+              </button>
+              <span className="text-xs text-slate-400">Dùng camera để quét mã điểm danh.</span>
+            </div>
           </label>
 
           <label className="block rounded-2xl border border-white/10 bg-white/5 p-3 sm:col-span-2">
@@ -205,6 +332,29 @@ export default function AttendanceManager() {
             </select>
           </label>
         </div>
+
+        {scannerOpen ? (
+          <div className="mt-4 rounded-3xl border border-white/10 bg-slate-950/30 p-4">
+            <div className="text-sm font-semibold text-white">Camera quét QR</div>
+            <p className="mt-2 text-xs leading-5 text-slate-300">
+              Hướng camera vào QR của hội viên. Khi quét xong, code sẽ tự điền.
+            </p>
+            <div className="mt-3 overflow-hidden rounded-2xl border border-white/10 bg-black">
+              <video ref={videoRef} className="h-56 w-full object-cover" playsInline muted />
+            </div>
+            {scannerError ? (
+              <div className="mt-3">
+                <MessageBox tone="error">{scannerError}</MessageBox>
+              </div>
+            ) : null}
+          </div>
+        ) : null}
+
+        {!scannerOpen && scannerError ? (
+          <div className="mt-4">
+            <MessageBox tone="error">{scannerError}</MessageBox>
+          </div>
+        ) : null}
 
         <button
           type="button"

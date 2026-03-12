@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import LessonDoneButton from "@/components/LessonDoneButton";
+import TrackView from "@/components/TrackView";
 import { LESSONS, LEVELS, getLessonBySlug } from "@/data/lessons";
 
 function Card({ title, children }) {
@@ -66,6 +67,7 @@ export default function LessonPage({ params }) {
 
   return (
     <div className="mx-auto w-full max-w-4xl px-4 py-10">
+      <TrackView type="lesson" id={lesson.slug} />
       <div className="mb-6 flex flex-wrap items-center gap-2 text-sm text-slate-300">
         <Link href="/lo-trinh" className="hover:text-white transition">
           ← Lộ trình

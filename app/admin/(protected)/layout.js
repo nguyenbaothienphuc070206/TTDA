@@ -35,6 +35,7 @@ export default function AdminLayout({ children }) {
           <NavLink href="/admin/diem-danh">Điểm danh</NavLink>
           <NavLink href="/admin/thi-len-dai">Thi lên đai</NavLink>
           <NavLink href="/admin/tai-chinh">Tài chính</NavLink>
+          <NavLink href="/admin/thong-ke">Thống kê</NavLink>
           <NavLink href="/admin/rbac">RBAC</NavLink>
         </nav>
       </header>
