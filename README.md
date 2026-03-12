@@ -1,36 +1,47 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+## Vovinam Learning (Next.js)
 
-## Getting Started
+Web app học Vovinam từ **cơ bản → trung cấp → nâng cao**.
 
-First, run the development server:
+Điểm chính:
+
+- UI tối, nổi bật (xanh/cyan + điểm nhấn vàng), có hiệu ứng nền + hover.
+- Có **lộ trình bài học**, **trang chi tiết bài**, **đánh dấu hoàn thành** (lưu local).
+- Có **lịch tập 7 ngày** gợi ý theo cấp độ (lưu local).
+
+> Lưu ý an toàn: Nội dung mang tính tham khảo & hỗ trợ tự luyện. Kỹ thuật khó nên có huấn luyện viên hướng dẫn.
+
+## Chạy dự án
+
+Trong thư mục `vovinam-app`, chạy:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Mở trình duyệt: http://localhost:3000
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+## Các trang chính
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- Trang chủ: `app/page.js`
+- Lộ trình: `app/lo-trinh/page.js`
+- Bài học (dynamic route): `app/bai-hoc/[slug]/page.js`
+- Lịch tập: `app/lich-tap/page.js`
 
-## Learn More
+## Sửa/Nâng cấp nội dung bài học
 
-To learn more about Next.js, take a look at the following resources:
+Toàn bộ dữ liệu bài học nằm trong:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- `data/lessons.js`
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Bạn có thể:
 
-## Deploy on Vercel
+- Thêm bài mới bằng cách thêm object vào mảng `LESSONS`.
+- Đổi thứ tự bài bằng cách đổi vị trí trong mảng.
+- Sửa nội dung từng bài: `goals`, `steps`, `mistakes`, `tips`.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Lưu tiến độ & lịch tập
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+App lưu ở localStorage:
+
+- Tiến độ hoàn thành: key `vovinam_done_v1`
+- Lịch tập: key `vovinam_schedule_v1`
