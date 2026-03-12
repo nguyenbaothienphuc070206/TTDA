@@ -24,6 +24,12 @@ export default function sitemap() {
       priority: 0.7,
     },
     {
+      url: `${baseUrl}/dinh-duong`,
+      lastModified,
+      changeFrequency: "monthly",
+      priority: 0.7,
+    },
+    {
       url: `${baseUrl}/chinh-sach-bao-mat`,
       lastModified,
       changeFrequency: "yearly",

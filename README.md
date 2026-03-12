@@ -7,6 +7,7 @@ Web app học Vovinam từ **cơ bản → trung cấp → nâng cao**.
 - UI tối, nổi bật (xanh/cyan + điểm nhấn vàng), có hiệu ứng nền + hover.
 - Có **lộ trình bài học**, **trang chi tiết bài**, **đánh dấu hoàn thành** (lưu local).
 - Có **lịch tập 7 ngày** gợi ý theo cấp độ (lưu local).
+- Có **tính calories** + **gợi ý ăn uống** theo cân nặng/chiều cao/mức tập.
 - Có trang **Chính sách bảo mật** và **Điều khoản**.
 
 > Lưu ý an toàn: Nội dung mang tính tham khảo & hỗ trợ tự luyện. Kỹ thuật khó nên có huấn luyện viên hướng dẫn.
@@ -34,6 +35,7 @@ npm start
 - Lộ trình: `app/lo-trinh/page.js`
 - Bài học (dynamic route): `app/bai-hoc/[slug]/page.js`
 - Lịch tập: `app/lich-tap/page.js`
+- Dinh dưỡng (calories): `app/dinh-duong/page.js`
 - Chính sách bảo mật: `app/chinh-sach-bao-mat/page.js`
 - Điều khoản: `app/dieu-khoan/page.js`
 

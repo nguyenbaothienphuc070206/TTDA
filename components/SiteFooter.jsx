@@ -80,6 +80,7 @@ export default function SiteFooter() {
               <FooterLink href="/">Trang chủ</FooterLink>
               <FooterLink href="/lo-trinh">Lộ trình</FooterLink>
               <FooterLink href="/lich-tap">Lịch tập</FooterLink>
+              <FooterLink href="/dinh-duong">Dinh dưỡng</FooterLink>
               <FooterLink href="/chinh-sach-bao-mat">Chính sách bảo mật</FooterLink>
               <FooterLink href="/dieu-khoan">Điều khoản</FooterLink>
             </div>

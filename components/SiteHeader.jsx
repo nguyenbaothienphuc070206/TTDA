@@ -62,6 +62,7 @@ export default function SiteHeader() {
         <nav className="flex flex-wrap items-center gap-1">
           <NavItem href="/lo-trinh">Lộ trình</NavItem>
           <NavItem href="/lich-tap">Lịch tập</NavItem>
+          <NavItem href="/dinh-duong">Dinh dưỡng</NavItem>
 
           <div className="hidden sm:flex items-center gap-3 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 ml-1">
             <span className="text-xs text-slate-300">Tiến độ</span>
