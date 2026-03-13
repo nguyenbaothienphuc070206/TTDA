@@ -1,21 +1,32 @@
 import { NextResponse } from "next/server";
 
-import { sessionCookieName, verifySessionToken } from "@/lib/auth";
+import { createSupabaseRouteHandlerClient } from "@/lib/supabase/routeHandlerClient";
+import { getAppRoleForUserId } from "@/lib/supabase/roles";
 
 export async function GET(request) {
-  const secret = process.env.AUTH_SECRET;
-  if (!secret) {
-    return NextResponse.json({ error: "Thiếu AUTH_SECRET." }, { status: 500 });
+  try {
+    const supabase = createSupabaseRouteHandlerClient();
+
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return NextResponse.json({ error: "Chưa đăng nhập." }, { status: 401 });
+    }
+
+    const role = await getAppRoleForUserId(supabase, user.id);
+
+    const res = NextResponse.json({
+      user: {
+        id: user.id,
+        email: user.email || null,
+      },
+      role,
+    });
+    res.headers.set("Cache-Control", "no-store");
+    return res;
+  } catch {
+    return NextResponse.json({ error: "Không đọc được session." }, { status: 500 });
   }
-
-  const token = request.cookies.get(sessionCookieName())?.value;
-  const payload = await verifySessionToken(token, secret);
-
-  if (!payload) {
-    return NextResponse.json({ error: "Chưa đăng nhập." }, { status: 401 });
-  }
-
-  const res = NextResponse.json({ session: payload });
-  res.headers.set("Cache-Control", "no-store");
-  return res;
 }

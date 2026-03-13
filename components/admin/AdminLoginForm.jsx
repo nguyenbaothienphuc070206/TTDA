@@ -1,7 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
+
+import { createSupabaseBrowserClient } from "@/lib/supabase/browserClient";
 
 function Message({ tone, children }) {
   const styles =
@@ -13,27 +15,55 @@ function Message({ tone, children }) {
 }
 
 export default function AdminLoginForm() {
-  const router = useRouter();
   const searchParams = useSearchParams();
 
   const reason = searchParams?.get("reason");
 
-  const [role, setRole] = useState("coach");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState("");
   const [error, setError] = useState("");
+  const [info, setInfo] = useState("");
   const [busy, setBusy] = useState(false);
 
-  const onSubmit = async (e) => {
+  const onGoogle = async () => {
+    setError("");
+    setInfo("");
+    setBusy(true);
+
+    try {
+      const supabase = createSupabaseBrowserClient();
+      const redirectTo = `${window.location.origin}/auth/callback?next=${encodeURIComponent(
+        "/admin"
+      )}`;
+
+      const { error: e } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo,
+        },
+      });
+
+      if (e) {
+        setError("Không thể đăng nhập bằng Google. Hãy kiểm tra cấu hình Supabase.");
+      }
+    } catch {
+      setError("Thiếu cấu hình Supabase env hoặc lỗi mạng.");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const onOtp = async (e) => {
     e.preventDefault();
     setError("");
+    setInfo("");
 
     setBusy(true);
 
     try {
-      const res = await fetch("/api/auth/login", {
+      const res = await fetch("/api/auth/otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ role, password }),
+        body: JSON.stringify({ email, next: "/admin" }),
       });
 
       const data = await res.json().catch(() => null);
@@ -44,10 +74,9 @@ export default function AdminLoginForm() {
         return;
       }
 
-      router.push("/admin");
-      router.refresh();
+      setInfo("Đã gửi link đăng nhập. Vui lòng kiểm tra email của bạn.");
     } catch {
-      setError("Có lỗi mạng khi đăng nhập.");
+      setError("Có lỗi mạng khi gửi email đăng nhập.");
     } finally {
       setBusy(false);
     }
@@ -59,14 +88,15 @@ export default function AdminLoginForm() {
         Admin / Coach
       </h1>
       <p className="mt-2 text-sm leading-6 text-slate-300">
-        Khu vực quản trị (demo). Cần đăng nhập để truy cập.
+        Khu vực quản trị. Đăng nhập bằng Google hoặc Email OTP.
       </p>
 
-      {reason === "missing_secret" ? (
+      {reason === "missing_supabase_env" ? (
         <div className="mt-4">
           <Message tone="error">
-            Thiếu cấu hình <span className="font-semibold">AUTH_SECRET</span>. Hãy thiết lập env rồi
-            thử lại.
+            Thiếu cấu hình Supabase env. Hãy thiết lập{" "}
+            <span className="font-semibold">NEXT_PUBLIC_SUPABASE_URL</span> và{" "}
+            <span className="font-semibold">NEXT_PUBLIC_SUPABASE_ANON_KEY</span>.
           </Message>
         </div>
       ) : null}
@@ -83,52 +113,69 @@ export default function AdminLoginForm() {
         </div>
       ) : null}
 
+      {reason === "admin_only" ? (
+        <div className="mt-4">
+          <Message tone="error">Module này chỉ dành cho Admin.</Message>
+        </div>
+      ) : null}
+
+      {reason === "auth_failed" ? (
+        <div className="mt-4">
+          <Message tone="error">Không thể hoàn tất đăng nhập. Vui lòng thử lại.</Message>
+        </div>
+      ) : null}
+
       {error ? (
         <div className="mt-4">
           <Message tone="error">{error}</Message>
         </div>
       ) : null}
 
-      <form onSubmit={onSubmit} className="mt-4 grid gap-3">
-        <label className="block rounded-2xl border border-white/10 bg-white/5 p-3">
-          <div className="text-xs font-semibold text-slate-200">Vai trò</div>
-          <select
-            value={role}
-            onChange={(e) => setRole(e.target.value)}
-            className="mt-2 w-full rounded-xl border border-white/10 bg-slate-950/60 px-3 py-2 text-sm text-white outline-none focus:ring-2 focus:ring-cyan-300/30"
-          >
-            <option value="coach">Coach</option>
-            <option value="admin">Admin</option>
-          </select>
-        </label>
+      {info ? (
+        <div className="mt-4">
+          <Message tone="info">{info}</Message>
+        </div>
+      ) : null}
 
+      <div className="mt-4 grid gap-3">
+        <button
+          type="button"
+          onClick={onGoogle}
+          disabled={busy}
+          className="inline-flex h-11 items-center justify-center rounded-2xl bg-gradient-to-r from-cyan-300 to-blue-500 px-4 text-sm font-semibold text-slate-950 transition hover:brightness-110 disabled:opacity-60 focus:outline-none focus:ring-2 focus:ring-cyan-300/50"
+        >
+          {busy ? "Đang chuyển hướng…" : "Tiếp tục với Google"}
+        </button>
+      </div>
+
+      <form onSubmit={onOtp} className="mt-4 grid gap-3">
         <label className="block rounded-2xl border border-white/10 bg-white/5 p-3">
-          <div className="text-xs font-semibold text-slate-200">Mật khẩu</div>
+          <div className="text-xs font-semibold text-slate-200">Email (OTP / Magic link)</div>
           <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            type="email"
+            inputMode="email"
+            autoComplete="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             className="mt-2 w-full rounded-xl border border-white/10 bg-slate-950/60 px-3 py-2 text-sm text-white outline-none focus:ring-2 focus:ring-cyan-300/30"
-            placeholder="••••••••"
+            placeholder="you@example.com"
           />
           <div className="mt-2 text-xs text-slate-300">
-            Gợi ý: thiết lập <span className="font-semibold">ADMIN_PASSWORD</span> /{" "}
-            <span className="font-semibold">COACH_PASSWORD</span> trong env.
+            Hệ thống sẽ gửi link đăng nhập qua email.
           </div>
         </label>
 
         <button
           type="submit"
           disabled={busy}
-          className="inline-flex h-11 items-center justify-center rounded-2xl bg-gradient-to-r from-cyan-300 to-blue-500 px-4 text-sm font-semibold text-slate-950 transition hover:brightness-110 disabled:opacity-60 focus:outline-none focus:ring-2 focus:ring-cyan-300/50"
+          className="inline-flex h-11 items-center justify-center rounded-2xl border border-white/10 bg-white/5 px-4 text-sm font-semibold text-white transition hover:bg-white/10 disabled:opacity-60 focus:outline-none focus:ring-2 focus:ring-cyan-300/30"
         >
-          {busy ? "Đang đăng nhập…" : "Đăng nhập"}
+          {busy ? "Đang gửi…" : "Gửi link đăng nhập"}
         </button>
       </form>
 
       <p className="mt-4 text-xs leading-5 text-slate-300">
-        Lưu ý: Demo này dùng cookie phiên (HMAC). Nếu triển khai thật: cần DB, audit log, và rotate
-        secret.
+        Lưu ý: Quyền truy cập Admin/Coach được kiểm tra bằng Supabase RLS + bảng <span className="font-semibold">user_roles</span>.
       </p>
     </div>
   );

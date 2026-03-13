@@ -11,13 +11,8 @@ function Box({ title, children }) {
   );
 }
 
-function formatTime(ms) {
-  if (!ms || typeof ms !== "number") return "—";
-  return new Date(ms).toLocaleString("vi-VN");
-}
-
 export default function RbacPanel() {
-  const [session, setSession] = useState(null);
+  const [me, setMe] = useState(null);
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -31,14 +26,14 @@ export default function RbacPanel() {
         if (!res.ok) {
           const msg = data && typeof data.error === "string" ? data.error : "Không đọc được session.";
           setError(msg);
-          setSession(null);
+          setMe(null);
           return;
         }
 
-        setSession(data?.session || null);
+        setMe(data || null);
       } catch {
         setError("Có lỗi mạng khi đọc session.");
-        setSession(null);
+        setMe(null);
       }
     };
 
@@ -50,7 +45,7 @@ export default function RbacPanel() {
       <section className="rounded-3xl border border-white/10 bg-white/5 p-6 sm:p-8">
         <h2 className="text-xl font-semibold text-white">RBAC</h2>
         <p className="mt-2 text-sm leading-6 text-slate-300">
-          Trạng thái phiên đăng nhập hiện tại (cookie HMAC). Middleware chặn truy cập admin nếu chưa đăng nhập.
+          Trạng thái đăng nhập hiện tại (Supabase Auth). Middleware chặn truy cập admin nếu chưa đăng nhập hoặc không đủ quyền.
         </p>
 
         {error ? (
@@ -59,16 +54,18 @@ export default function RbacPanel() {
           </div>
         ) : null}
 
-        {session ? (
+        {me?.user ? (
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
             <Box title="Role">
-              <span className="font-semibold text-white">{session.role}</span>
+              <span className="font-semibold text-white">{me.role}</span>
             </Box>
-            <Box title="Subject">
-              <span className="font-semibold text-white">{session.sub}</span>
+            <Box title="User ID">
+              <span className="font-semibold text-white">{me.user.id}</span>
             </Box>
-            <Box title="Issued At">{formatTime(session.iat)}</Box>
-            <Box title="Expires At">{formatTime(session.exp)}</Box>
+            <Box title="Email">
+              <span className="font-semibold text-white">{me.user.email || "—"}</span>
+            </Box>
+            <Box title="Ghi chú">Role đọc từ bảng user_roles (RLS).</Box>
           </div>
         ) : (
           <div className="mt-4 rounded-2xl border border-white/10 bg-slate-950/30 p-4 text-sm text-slate-300">

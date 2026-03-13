@@ -1,48 +1,74 @@
 import { NextResponse } from "next/server";
+import { createServerClient } from "@supabase/ssr";
 
-import { roles, sessionCookieName, verifySessionToken } from "@/lib/auth";
+import { APP_ROLES, getAppRoleForUserId } from "./lib/supabase/roles";
+
+function getSupabasePublicEnv() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  return { url, anonKey };
+}
+
+function redirectToLogin(request, reason) {
+  const url = request.nextUrl.clone();
+  url.pathname = "/admin/login";
+  url.searchParams.set("reason", reason);
+  return NextResponse.redirect(url);
+}
 
 export async function proxy(request) {
+  const { url, anonKey } = getSupabasePublicEnv();
   const pathname = request.nextUrl.pathname;
 
+  // Only enforce auth on /admin routes.
   if (!pathname.startsWith("/admin")) {
     return NextResponse.next();
   }
 
+  // Allow the login page itself.
   if (pathname === "/admin/login") {
     return NextResponse.next();
   }
 
-  const secret = process.env.AUTH_SECRET;
-
-  if (!secret) {
-    const url = request.nextUrl.clone();
-    url.pathname = "/admin/login";
-    url.searchParams.set("reason", "missing_secret");
-    return NextResponse.redirect(url);
+  if (!url || !anonKey) {
+    return redirectToLogin(request, "missing_supabase_env");
   }
 
-  const token = request.cookies.get(sessionCookieName())?.value;
-  const payload = await verifySessionToken(token, secret);
+  let response = NextResponse.next({ request });
 
-  if (!payload) {
-    const url = request.nextUrl.clone();
-    url.pathname = "/admin/login";
-    url.searchParams.set("reason", "unauthorized");
-    return NextResponse.redirect(url);
+  const supabase = createServerClient(url, anonKey, {
+    cookies: {
+      getAll() {
+        return request.cookies.getAll();
+      },
+      setAll(cookiesToSet) {
+        cookiesToSet.forEach(({ name, value, options }) => {
+          response.cookies.set(name, value, options);
+        });
+      },
+    },
+  });
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return redirectToLogin(request, "unauthorized");
   }
 
-  const r = roles();
-  const okRole = payload.role === r.ADMIN || payload.role === r.COACH;
+  const role = await getAppRoleForUserId(supabase, user.id);
 
-  if (!okRole) {
-    const url = request.nextUrl.clone();
-    url.pathname = "/admin/login";
-    url.searchParams.set("reason", "forbidden");
-    return NextResponse.redirect(url);
+  if (role !== APP_ROLES.ADMIN && role !== APP_ROLES.COACH) {
+    return redirectToLogin(request, "forbidden");
   }
 
-  return NextResponse.next();
+  // Admin-only modules.
+  if (pathname.startsWith("/admin/tai-chinh") && role !== APP_ROLES.ADMIN) {
+    return redirectToLogin(request, "admin_only");
+  }
+
+  return response;
 }
 
 export const config = {

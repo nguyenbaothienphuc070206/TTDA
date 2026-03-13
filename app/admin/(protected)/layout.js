@@ -1,6 +1,9 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 
 import AdminLogoutButton from "@/components/admin/AdminLogoutButton";
+import { createSupabaseServerComponentClient } from "@/lib/supabase/serverComponentClient";
+import { APP_ROLES, getAppRoleForUserId } from "@/lib/supabase/roles";
 
 function NavLink({ href, children }) {
   return (
@@ -13,7 +16,29 @@ function NavLink({ href, children }) {
   );
 }
 
-export default function AdminLayout({ children }) {
+export default async function AdminLayout({ children }) {
+  let supabase;
+
+  try {
+    supabase = createSupabaseServerComponentClient();
+  } catch {
+    redirect("/admin/login?reason=missing_supabase_env");
+  }
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect("/admin/login?reason=unauthorized");
+  }
+
+  const role = await getAppRoleForUserId(supabase, user.id);
+
+  if (role !== APP_ROLES.ADMIN && role !== APP_ROLES.COACH) {
+    redirect("/admin/login?reason=forbidden");
+  }
+
   return (
     <div className="mx-auto w-full max-w-6xl px-4 py-10">
       <header className="rounded-3xl border border-white/10 bg-white/5 p-6 sm:p-8">
