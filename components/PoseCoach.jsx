@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 
 function dist(a, b) {
@@ -92,17 +93,26 @@ export default function PoseCoach() {
   const lastUiUpdateRef = useRef(0);
   const lastDetectRef = useRef(0);
   const lastPoseRef = useRef(null);
+  const uploadUrlRef = useRef("");
 
   const [enabled, setEnabled] = useState(false);
   const [status, setStatus] = useState("Chưa bật camera.");
   const [feedback, setFeedback] = useState(
-    "Bật camera để AI góp ý tư thế/tấn. (Demo: không thay thế huấn luyện viên)"
+    "Bật camera hoặc tải ảnh/video để AI góp ý tư thế/tấn. (Demo: không thay thế huấn luyện viên)"
   );
   const [error, setError] = useState("");
+  const [uploadKind, setUploadKind] = useState("");
+  const [uploadUrl, setUploadUrl] = useState("");
 
-  const stop = async () => {
+  const stop = async ({ statusText } = {}) => {
+    const wasCamera = Boolean(streamRef.current);
+    const hadUpload = Boolean(uploadUrlRef.current);
+
     setEnabled(false);
-    setStatus("Đã tắt camera.");
+    setStatus(
+      statusText ||
+        (wasCamera ? "Đã tắt camera." : hadUpload ? "Đã dừng phân tích." : "Đã dừng.")
+    );
 
     lastDetectRef.current = 0;
     lastPoseRef.current = null;
@@ -151,10 +161,340 @@ export default function PoseCoach() {
     }
   };
 
+  const clearUpload = async () => {
+    setError("");
+    await stop({ statusText: "Chưa bật camera." });
+
+    const prev = uploadUrlRef.current;
+    uploadUrlRef.current = "";
+    if (prev) {
+      try {
+        URL.revokeObjectURL(prev);
+      } catch {
+        // ignore
+      }
+    }
+
+    setUploadKind("");
+    setUploadUrl("");
+    setFeedback(
+      "Bật camera hoặc tải ảnh/video để AI góp ý tư thế/tấn. (Demo: không thay thế huấn luyện viên)"
+    );
+
+    const video = videoRef.current;
+    if (video) {
+      try {
+        video.removeAttribute("src");
+        video.load();
+      } catch {
+        // ignore
+      }
+    }
+  };
+
+  const analyzeImageUrl = async (url) => {
+    setError("");
+    setStatus("Đang tải model pose…");
+    setFeedback("Đang phân tích ảnh…");
+
+    try {
+      const mod = await import("@mediapipe/tasks-vision");
+      const { PoseLandmarker, FilesetResolver, DrawingUtils } = mod;
+
+      const vision = await FilesetResolver.forVisionTasks(
+        "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm"
+      );
+
+      let landmarker;
+      try {
+        landmarker = await PoseLandmarker.createFromOptions(vision, {
+          baseOptions: {
+            modelAssetPath:
+              "https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/1/pose_landmarker_lite.task",
+            delegate: "GPU",
+          },
+          runningMode: "IMAGE",
+          numPoses: 1,
+        });
+      } catch {
+        landmarker = await PoseLandmarker.createFromOptions(vision, {
+          baseOptions: {
+            modelAssetPath:
+              "https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/1/pose_landmarker_lite.task",
+            delegate: "CPU",
+          },
+          runningMode: "IMAGE",
+          numPoses: 1,
+        });
+      }
+
+      const img = new Image();
+      img.src = url;
+      await new Promise((resolve, reject) => {
+        img.onload = () => resolve();
+        img.onerror = () => reject(new Error("Image load failed"));
+      });
+
+      const canvas = canvasRef.current;
+      const ctx = canvas?.getContext("2d");
+      if (!canvas || !ctx) {
+        setError("Thiếu canvas.");
+        setStatus("Chưa bật camera.");
+        try {
+          landmarker.close?.();
+        } catch {
+          // ignore
+        }
+        return;
+      }
+
+      canvas.width = img.naturalWidth || 960;
+      canvas.height = img.naturalHeight || 540;
+
+      const draw = new DrawingUtils(ctx);
+      let pose = null;
+      try {
+        const result = landmarker.detect(img);
+        pose = Array.isArray(result?.landmarks) ? result.landmarks[0] : null;
+      } catch {
+        pose = null;
+      }
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      if (pose) {
+        draw.drawConnectors(pose, PoseLandmarker.POSE_CONNECTIONS, {
+          color: "rgba(59, 130, 246, 0.85)",
+          lineWidth: 3,
+        });
+        draw.drawLandmarks(pose, {
+          color: "rgba(34, 211, 238, 0.9)",
+          radius: 2,
+        });
+        setFeedback(pickFeedback(pose));
+        setStatus("Đã phân tích ảnh.");
+      } else {
+        setFeedback("Không thấy pose — thử ảnh rõ nét, đủ sáng, toàn thân.");
+        setStatus("Không nhận diện được pose.");
+      }
+
+      try {
+        landmarker.close?.();
+      } catch {
+        // ignore
+      }
+    } catch {
+      setError("Không tải được AI pose (model/wasm). Kiểm tra mạng và thử lại.");
+      setStatus("Chưa bật camera.");
+    }
+  };
+
+  const startUploadVideo = async (url) => {
+    setError("");
+    if (enabled) return;
+
+    const video = videoRef.current;
+    if (!video) {
+      setError("Thiếu thẻ video.");
+      return;
+    }
+
+    setStatus("Đang tải video…");
+
+    try {
+      video.pause();
+      video.srcObject = null;
+      video.src = url;
+      video.loop = true;
+      video.muted = true;
+      video.playsInline = true;
+      await video.play();
+    } catch {
+      // ignore
+    }
+
+    setStatus("Đang tải model pose…");
+
+    try {
+      const mod = await import("@mediapipe/tasks-vision");
+      const { PoseLandmarker, FilesetResolver, DrawingUtils } = mod;
+
+      const vision = await FilesetResolver.forVisionTasks(
+        "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm"
+      );
+
+      let landmarker;
+      try {
+        landmarker = await PoseLandmarker.createFromOptions(vision, {
+          baseOptions: {
+            modelAssetPath:
+              "https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/1/pose_landmarker_lite.task",
+            delegate: "GPU",
+          },
+          runningMode: "VIDEO",
+          numPoses: 1,
+        });
+      } catch {
+        landmarker = await PoseLandmarker.createFromOptions(vision, {
+          baseOptions: {
+            modelAssetPath:
+              "https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/1/pose_landmarker_lite.task",
+            delegate: "CPU",
+          },
+          runningMode: "VIDEO",
+          numPoses: 1,
+        });
+      }
+
+      landmarkerRef.current = landmarker;
+
+      const canvas = canvasRef.current;
+      const ctx = canvas?.getContext("2d");
+      if (!canvas || !ctx) {
+        setError("Thiếu canvas.");
+        await stop();
+        return;
+      }
+
+      drawingRef.current = {
+        DrawingUtils,
+        PoseLandmarker,
+        utils: new DrawingUtils(ctx),
+        ctx,
+      };
+
+      setEnabled(true);
+      setStatus("Đang theo dõi…");
+
+      const loop = () => {
+        const v = videoRef.current;
+        const c = canvasRef.current;
+        const lm = landmarkerRef.current;
+        const draw = drawingRef.current;
+
+        if (!v || !c || !lm || !draw) return;
+
+        if (v.readyState < 2 || v.videoWidth === 0 || v.videoHeight === 0) {
+          rafRef.current = requestAnimationFrame(loop);
+          return;
+        }
+
+        if (c.width !== v.videoWidth || c.height !== v.videoHeight) {
+          c.width = v.videoWidth;
+          c.height = v.videoHeight;
+        }
+
+        const t = performance.now();
+
+        const DETECT_INTERVAL_MS = 90;
+        if (t - lastDetectRef.current >= DETECT_INTERVAL_MS) {
+          lastDetectRef.current = t;
+
+          let pose = null;
+          try {
+            const result = lm.detectForVideo(v, t);
+            pose = Array.isArray(result?.landmarks) ? result.landmarks[0] : null;
+          } catch {
+            pose = null;
+          }
+
+          lastPoseRef.current = pose;
+
+          if (pose) {
+            if (t - lastUiUpdateRef.current > 450) {
+              lastUiUpdateRef.current = t;
+              setFeedback(pickFeedback(pose));
+            }
+          } else if (t - lastUiUpdateRef.current > 450) {
+            lastUiUpdateRef.current = t;
+            setFeedback("Không thấy pose — thử đứng xa hơn và đủ sáng.");
+          }
+        }
+
+        draw.ctx.clearRect(0, 0, c.width, c.height);
+
+        const pose = lastPoseRef.current;
+        if (pose) {
+          draw.utils.drawConnectors(pose, draw.PoseLandmarker.POSE_CONNECTIONS, {
+            color: "rgba(59, 130, 246, 0.85)",
+            lineWidth: 3,
+          });
+          draw.utils.drawLandmarks(pose, {
+            color: "rgba(34, 211, 238, 0.9)",
+            radius: 2,
+          });
+        }
+
+        rafRef.current = requestAnimationFrame(loop);
+      };
+
+      rafRef.current = requestAnimationFrame(loop);
+    } catch {
+      setError("Không tải được AI pose (model/wasm). Kiểm tra mạng và thử lại.");
+      await stop();
+    }
+  };
+
+  const onPickFile = async (e) => {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+
+    setError("");
+
+    if (file.size > 25 * 1024 * 1024) {
+      setError("File quá lớn. Hãy chọn ảnh/video ngắn (≤ 25MB).");
+      return;
+    }
+
+    await stop({ statusText: "Đang chuẩn bị phân tích…" });
+
+    const prev = uploadUrlRef.current;
+    if (prev) {
+      try {
+        URL.revokeObjectURL(prev);
+      } catch {
+        // ignore
+      }
+    }
+
+    const url = URL.createObjectURL(file);
+    uploadUrlRef.current = url;
+    setUploadUrl(url);
+
+    if (String(file.type || "").startsWith("image/")) {
+      setUploadKind("image");
+      await analyzeImageUrl(url);
+      return;
+    }
+
+    if (String(file.type || "").startsWith("video/")) {
+      setUploadKind("video");
+      await startUploadVideo(url);
+      return;
+    }
+
+    uploadUrlRef.current = "";
+    setUploadKind("");
+    setUploadUrl("");
+    setError("Chỉ hỗ trợ ảnh/video.");
+  };
+
   const start = async () => {
     setError("");
 
     if (enabled) return;
+
+    // If user previously uploaded a file, clear it before starting camera.
+    if (uploadUrlRef.current) {
+      try {
+        URL.revokeObjectURL(uploadUrlRef.current);
+      } catch {
+        // ignore
+      }
+      uploadUrlRef.current = "";
+      setUploadKind("");
+      setUploadUrl("");
+    }
 
     if (typeof window === "undefined") {
       setError("Chỉ chạy trên trình duyệt.");
@@ -194,6 +534,14 @@ export default function PoseCoach() {
       setError("Thiếu thẻ video.");
       await stop();
       return;
+    }
+
+    try {
+      video.pause();
+      video.removeAttribute("src");
+      video.load();
+    } catch {
+      // ignore
     }
 
     video.srcObject = stream;
@@ -329,6 +677,16 @@ export default function PoseCoach() {
   useEffect(() => {
     return () => {
       stop();
+
+      const url = uploadUrlRef.current;
+      uploadUrlRef.current = "";
+      if (url) {
+        try {
+          URL.revokeObjectURL(url);
+        } catch {
+          // ignore
+        }
+      }
     };
   }, []);
 
@@ -338,7 +696,7 @@ export default function PoseCoach() {
         <div className="min-w-0">
           <h2 className="text-lg font-semibold text-white">AI Pose Coach</h2>
           <p className="mt-1 text-sm leading-6 text-slate-300">
-            Bật camera để AI vẽ khung xương và góp ý tư thế/tấn. (Demo)
+            Bật camera hoặc tải ảnh/video ngắn để AI vẽ khung xương và góp ý tư thế/tấn. (Demo)
           </p>
         </div>
 
@@ -351,19 +709,56 @@ export default function PoseCoach() {
               : "inline-flex h-11 items-center justify-center rounded-2xl bg-gradient-to-r from-cyan-300 to-blue-500 px-4 text-sm font-semibold text-slate-950 transition hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-cyan-300/50"
           }
         >
-          {enabled ? "Tắt camera" : "Bật camera"}
+          {enabled ? (streamRef.current ? "Tắt camera" : "Dừng phân tích") : "Bật camera"}
         </button>
+      </div>
+
+      <div className="mt-4 grid gap-2 sm:grid-cols-[1fr_auto] sm:items-end">
+        <label className="block">
+          <div className="text-xs font-semibold text-slate-200">Tải ảnh/video</div>
+          <input
+            type="file"
+            accept="image/*,video/*"
+            onChange={onPickFile}
+            className="mt-2 h-11 w-full rounded-2xl border border-white/10 bg-slate-950/60 px-3 text-sm text-slate-200 outline-none focus:ring-2 focus:ring-cyan-300/30"
+          />
+        </label>
+
+        {uploadUrl ? (
+          <button
+            type="button"
+            onClick={clearUpload}
+            className="inline-flex h-11 items-center justify-center rounded-2xl border border-white/10 bg-white/5 px-4 text-sm font-semibold text-white transition hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-cyan-300/30"
+          >
+            Xoá file
+          </button>
+        ) : null}
       </div>
 
       <div className="mt-4 overflow-hidden rounded-2xl border border-white/10 bg-slate-950/40">
         <div className="relative aspect-video">
           <video
             ref={videoRef}
-            className="absolute inset-0 h-full w-full object-cover"
+            className={
+              uploadKind === "image"
+                ? "pointer-events-none absolute inset-0 h-full w-full object-cover opacity-0"
+                : "absolute inset-0 h-full w-full object-cover"
+            }
             playsInline
             muted
             autoPlay
           />
+
+          {uploadKind === "image" && uploadUrl ? (
+            <Image
+              src={uploadUrl}
+              alt="Upload"
+              fill
+              unoptimized
+              sizes="(max-width: 1024px) 100vw, 50vw"
+              className="object-cover"
+            />
+          ) : null}
           <canvas
             ref={canvasRef}
             className="absolute inset-0 h-full w-full"

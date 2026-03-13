@@ -106,3 +106,40 @@ Sau khi tạo user trong Auth → Users, dùng snippet ở cuối `supabase/rls.
 - Đặt 1 user làm `admin`
 - Đặt user khác làm `coach`
 - Gán học viên cho coach qua bảng `coach_students`
+
+## AI Coach (RAG Vector + Streaming)
+
+AI Coach có 2 chế độ:
+
+- **Vector RAG (khuyến nghị)**: Supabase Vector + OpenAI embeddings (trả lời grounded theo tài liệu đã ingest).
+- **Fallback (RAG-lite)**: nếu chưa cấu hình OpenAI/Supabase Vector, vẫn trả lời dựa trên dữ liệu trong project.
+
+### 1) Tạo schema Vector + Memory
+
+Trong Supabase Dashboard → SQL Editor:
+
+1. Chạy `supabase/rls.sql` (nếu chưa chạy)
+2. Chạy `supabase/ai_rag.sql`
+
+### 2) Cấu hình env
+
+Trong `.env.local`:
+
+- `OPENAI_API_KEY`
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
+- `SUPABASE_SECRET_KEY`
+
+### 3) Ingest dữ liệu vào Vector DB
+
+Chạy script (ở thư mục `vovinam-app/`):
+
+```bash
+node scripts/ingest-ai-kb.mjs --from project --reset --yes
+```
+
+Hoặc ingest từ thư mục tài liệu của bạn (md/txt):
+
+```bash
+node scripts/ingest-ai-kb.mjs --dir ./knowledge --source manual --belt lam-dai
+```

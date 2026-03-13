@@ -13,8 +13,9 @@ export default function AiCoachPage() {
           AI Coach (RAG)
         </h1>
         <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-300">
-          Chatbot hỗ trợ hỏi nhanh kỹ thuật/võ đạo dựa trên thư viện dữ liệu trong project.
-          Đây là bản demo RAG-lite (không cần API key).
+          Chatbot hỗ trợ hỏi nhanh kỹ thuật/võ đạo theo dạng RAG.
+          Nếu có cấu hình OpenAI + Supabase Vector, AI sẽ trả lời grounded theo tài liệu đã ingest
+          (có streaming). Nếu chưa cấu hình, hệ thống sẽ fallback sang dữ liệu trong project.
         </p>
       </header>
 
