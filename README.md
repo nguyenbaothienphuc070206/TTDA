@@ -73,8 +73,8 @@ Khu vực `/admin` dùng **Supabase Auth** (Google OAuth hoặc Email OTP) và *
 
 1. Copy `.env.example` → `.env.local`
 2. Điền:
-	 - `NEXT_PUBLIC_SUPABASE_URL`
-	 - `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
+   - `NEXT_PUBLIC_SUPABASE_URL`
+   - `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
 
 > Không đưa bất kỳ key bí mật nào vào biến `NEXT_PUBLIC_*`.
 
@@ -96,8 +96,8 @@ Supabase Dashboard → Authentication → Providers:
 
 - Bật Google và/hoặc Email OTP.
 - Thêm Redirect URL:
-	- Local: `http://localhost:3000/auth/callback`
-	- Prod: `https://<your-domain>/auth/callback`
+  - Local: `http://localhost:3000/auth/callback`
+  - Prod: `https://<your-domain>/auth/callback`
 
 ### 4) Bootstrap role Admin/Coach
 
