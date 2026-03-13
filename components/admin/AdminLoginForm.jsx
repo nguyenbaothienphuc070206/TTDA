@@ -96,7 +96,7 @@ export default function AdminLoginForm() {
           <Message tone="error">
             Thiếu cấu hình Supabase env. Hãy thiết lập{" "}
             <span className="font-semibold">NEXT_PUBLIC_SUPABASE_URL</span> và{" "}
-            <span className="font-semibold">NEXT_PUBLIC_SUPABASE_ANON_KEY</span>.
+            <span className="font-semibold">NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY</span>.
           </Message>
         </div>
       ) : null}

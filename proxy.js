@@ -5,8 +5,15 @@ import { APP_ROLES, getAppRoleForUserId } from "./lib/supabase/roles";
 
 function getSupabasePublicEnv() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  return { url, anonKey };
+  const key =
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  if (String(key || "").startsWith("sb_secret_")) {
+    return { url, key: "" };
+  }
+
+  return { url, key };
 }
 
 function redirectToLogin(request, reason) {
@@ -17,7 +24,7 @@ function redirectToLogin(request, reason) {
 }
 
 export async function proxy(request) {
-  const { url, anonKey } = getSupabasePublicEnv();
+  const { url, key } = getSupabasePublicEnv();
   const pathname = request.nextUrl.pathname;
 
   // Only enforce auth on /admin routes.
@@ -30,13 +37,13 @@ export async function proxy(request) {
     return NextResponse.next();
   }
 
-  if (!url || !anonKey) {
+  if (!url || !key) {
     return redirectToLogin(request, "missing_supabase_env");
   }
 
   let response = NextResponse.next({ request });
 
-  const supabase = createServerClient(url, anonKey, {
+  const supabase = createServerClient(url, key, {
     cookies: {
       getAll() {
         return request.cookies.getAll();
