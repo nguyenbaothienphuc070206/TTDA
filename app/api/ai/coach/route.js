@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 
 import { TECHNIQUES } from "@/data/wiki";
 import { VIDEOS } from "@/data/videos";
+import { getLessonBySlug } from "@/data/lessons";
 import {
   buildDocuments,
   extractHighlights,
@@ -79,6 +80,53 @@ function toKbSource(row) {
     },
     text: content,
     beltId: row?.belt_id || null,
+  };
+}
+
+function beltFromLessonLevel(levelId) {
+  if (levelId === "co-ban") return "lam-dai";
+  if (levelId === "trung-cap") return "hoang-dai";
+  if (levelId === "nang-cao") return "huyen-dai";
+  return null;
+}
+
+function lessonToSource(lesson) {
+  if (!lesson) return null;
+
+  const beltId = beltFromLessonLevel(lesson.level);
+  const text = [
+    `BÀI HỌC: ${lesson.title}`,
+    lesson.summary ? `Tóm tắt: ${lesson.summary}` : "",
+    Array.isArray(lesson.goals) && lesson.goals.length
+      ? `Mục tiêu:\n- ${lesson.goals.join("\n- ")}`
+      : "",
+    Array.isArray(lesson.steps) && lesson.steps.length
+      ? `Các bước:\n- ${lesson.steps.join("\n- ")}`
+      : "",
+    Array.isArray(lesson.mistakes) && lesson.mistakes.length
+      ? `Lỗi thường gặp:\n- ${lesson.mistakes.join("\n- ")}`
+      : "",
+    Array.isArray(lesson.tips) && lesson.tips.length
+      ? `Mẹo tập:\n- ${lesson.tips.join("\n- ")}`
+      : "",
+  ]
+    .filter(Boolean)
+    .join("\n\n");
+
+  return {
+    id: `lesson:${lesson.slug}`,
+    type: "lesson",
+    title: lesson.title,
+    url: `/bai-hoc/${lesson.slug}`,
+    score: 1,
+    highlights: extractHighlights(text, 4),
+    meta: {
+      kind: "lesson",
+      slug: lesson.slug,
+      level: lesson.level,
+      beltId,
+    },
+    text,
   };
 }
 
@@ -267,14 +315,24 @@ export async function POST(request) {
     }
 
     const videoId = asText(context?.videoId).slice(0, 64);
+    const lessonSlug = asText(context?.lessonSlug).slice(0, 80);
 
     const userCtx = await resolveUserContext({ request, body });
     const beltId = normalizeBeltId(userCtx?.beltId);
 
     const { sources: rawSources, mode } = await retrieveSources({ query, videoId });
 
+    // If a lesson context exists, include it as a high-signal grounded source.
+    const lesson = lessonSlug ? getLessonBySlug(lessonSlug) : null;
+    const lessonSource = lessonToSource(lesson);
+    const mergedSources = lessonSource
+      ? [lessonSource, ...(rawSources || [])]
+      : rawSources;
+
     // Enforce belt gating (only if doc declares belt).
-    const sources = (rawSources || []).filter((s) => isBeltAllowed({ userBeltId: beltId, docBeltId: s?.meta?.beltId }));
+    const sources = (mergedSources || []).filter((s) =>
+      isBeltAllowed({ userBeltId: beltId, docBeltId: s?.meta?.beltId })
+    );
 
     const top = sources[0];
 

@@ -1,12 +1,12 @@
 # TTDA — Vovinam Learning (Next.js)
 
-Web app học Vovinam từ **cơ bản → trung cấp → nâng cao**.
+Web app học Vovinam theo **Lam đai → Hoàng đai → Huyền đai**.
 
 Điểm chính:
 
 - UI tối, nổi bật (xanh/cyan + điểm nhấn vàng), có hiệu ứng nền + hover.
 - Có **lộ trình bài học**, **trang chi tiết bài**, **đánh dấu hoàn thành** (lưu local).
-- Có **lịch tập 7 ngày** gợi ý theo cấp độ (lưu local).
+- Có **lịch tập 7 ngày** gợi ý theo cấp đai (lưu local).
 - Có **tính calories** + **gợi ý ăn uống** theo cân nặng/chiều cao/mức tập.
 - Có trang **Chính sách bảo mật** và **Điều khoản**.
 

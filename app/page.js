@@ -231,7 +231,7 @@ export default function Home() {
           </p>
 
           <h1 className="mt-5 text-3xl font-semibold tracking-tight text-white sm:text-5xl">
-            Học Vovinam từ cơ bản đến nâng cao
+            Học Vovinam theo cấp Lam → Hoàng → Huyền đai
           </h1>
           <p className="mt-4 max-w-2xl text-base leading-7 text-slate-300 sm:text-lg">
             Mỗi bài có mục tiêu, hướng dẫn từng bước, lỗi thường gặp và gợi ý tự
@@ -255,7 +255,7 @@ export default function Home() {
 
           <div className="mt-8 grid gap-3 sm:grid-cols-3">
             <Stat label="Tổng bài học" value={LESSONS.length} />
-            <Stat label="Cấp độ" value={LEVELS.length} />
+            <Stat label="Cấp đai" value={LEVELS.length} />
             <Stat label="Mục tiêu" value="Đúng kỹ thuật" />
           </div>
 
@@ -365,7 +365,7 @@ export default function Home() {
           />
           <FeatureCard
             title="Lịch tập 7 ngày"
-            description="Tạo lịch theo cấp độ + số buổi/tuần + thời lượng. Dễ duy trì thói quen." 
+            description="Tạo lịch theo cấp đai + số buổi/tuần + thời lượng. Dễ duy trì thói quen." 
           />
           <FeatureCard
             title="Thiết kế tập trung"
@@ -393,7 +393,7 @@ export default function Home() {
           <StepCard
             step="1"
             title="Bắt đầu từ nền tảng"
-            description="Đừng vội đá cao/nhanh. Nền tảng tốt giúp bạn lên nâng cao an toàn."
+            description="Đừng vội đá cao/nhanh. Nền tảng tốt giúp bạn lên Huyền đai an toàn."
             bullets={[
               "Tập tấn + di chuyển trước",
               "Tập tay thủ và thở đều",
@@ -452,9 +452,9 @@ export default function Home() {
       <section className="mt-10">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <h2 className="text-xl font-semibold text-white">Lộ trình theo cấp độ</h2>
+            <h2 className="text-xl font-semibold text-white">Lộ trình theo cấp đai</h2>
             <p className="mt-1 text-sm text-slate-300">
-              Bắt đầu từ “Cơ bản”, khi ổn thì lên “Trung cấp”, rồi “Nâng cao”.
+              Bắt đầu từ “Lam đai”, khi ổn thì lên “Hoàng đai”, rồi “Huyền đai”.
             </p>
           </div>
           <Link
@@ -502,7 +502,7 @@ export default function Home() {
             {
               w: "Tuần 3",
               title: "Kết hợp",
-              desc: "Phối hợp tay–chân, tăng độ bền. Nếu ổn có thể thử trung cấp.",
+              desc: "Phối hợp tay–chân, tăng độ bền. Nếu ổn có thể thử Hoàng đai.",
             },
             {
               w: "Tuần 4",
@@ -630,7 +630,7 @@ export default function Home() {
         <div className="mt-5 grid gap-3 lg:grid-cols-2">
           <FaqItem
             q="Mình mới hoàn toàn thì bắt đầu từ đâu?"
-            a="Vào trang Lộ trình, bắt đầu cấp độ Cơ bản. Tập 2–3 bài đầu thật chắc trước khi học bài mới."
+            a="Vào trang Lộ trình, bắt đầu Lam đai. Tập 2–3 bài đầu thật chắc trước khi học bài mới."
           />
           <FaqItem
             q="Mỗi buổi nên tập bao lâu?"
@@ -645,7 +645,7 @@ export default function Home() {
             a="Dừng lại, giảm độ hạ tấn/biên độ đá, kiểm tra hướng gối theo mũi chân. Nếu đau kéo dài, nên hỏi huấn luyện viên hoặc chuyên môn y tế."
           />
           <FaqItem
-            q="Khi nào nên lên Trung cấp/Nâng cao?"
+            q="Khi nào nên lên Hoàng/Huyền đai?"
             a="Khi bạn kiểm soát được tư thế, thăng bằng và nhịp thở; tập chậm vẫn đúng động tác và không đau. Không cần vội."
           />
           <FaqItem
@@ -663,7 +663,7 @@ export default function Home() {
               Bắt đầu buổi tập đầu tiên ngay hôm nay
             </h2>
             <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-300 sm:text-base">
-              Vào lộ trình, chọn bài phù hợp cấp độ và tập theo từng bước. Nhớ
+              Vào lộ trình, chọn bài phù hợp cấp đai và tập theo từng bước. Nhớ
               khởi động kỹ, tập chậm, và đánh dấu hoàn thành để theo dõi tiến độ.
             </p>
 

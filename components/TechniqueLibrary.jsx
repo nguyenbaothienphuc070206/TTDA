@@ -24,6 +24,27 @@ export default function TechniqueLibrary() {
   const [categoryId, setCategoryId] = useState("all");
   const [difficulty, setDifficulty] = useState("all");
 
+  const onAskAi = () => {
+    const q = String(query || "").trim();
+    const prompt = q
+      ? `Mình tìm không thấy kỹ thuật "${q}" trong thư viện. Kỹ thuật này có thể còn tên gọi khác không? Hãy gợi ý kỹ thuật tương tự và hướng dẫn cách tập an toàn.`
+      : `Mình đang xem thư viện kỹ thuật nhưng chưa thấy mục phù hợp. Hãy gợi ý vài kỹ thuật Vovinam dễ tập tại nhà, kèm lưu ý an toàn.`;
+
+    window.dispatchEvent(
+      new CustomEvent("vovinam-ai-ask", {
+        detail: {
+          query: prompt,
+          context: {
+            kind: "wiki",
+            userQuery: q || null,
+            categoryId,
+            difficulty,
+          },
+        },
+      })
+    );
+  };
+
   const filtered = useMemo(() => {
     return TECHNIQUES.filter((t) => {
       if (categoryId !== "all" && t.categoryId !== categoryId) return false;
@@ -42,7 +63,7 @@ export default function TechniqueLibrary() {
 
   return (
     <div className="grid gap-4">
-      <section className="rounded-3xl border border-white/10 bg-white/5 p-6 sm:p-8">
+      <section className="rounded-3xl border border-white/10 bg-white/5 p-6 sm:p-8 shadow-[var(--shadow-card)] fade-in-up">
         <div className="grid gap-3 lg:grid-cols-4">
           <label className="block lg:col-span-2">
             <div className="text-xs font-semibold text-slate-200">Tìm kiếm</div>
@@ -50,7 +71,7 @@ export default function TechniqueLibrary() {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Ví dụ: đá, tấn, khóa gỡ, phản đòn…"
-              className="mt-2 h-11 w-full rounded-2xl border border-white/10 bg-slate-950/60 px-4 text-sm text-white outline-none focus:ring-2 focus:ring-cyan-300/30"
+              className="mt-2 h-11 w-full rounded-2xl border border-white/10 bg-slate-950/60 px-4 text-sm text-white outline-none focus:ring-2 focus:ring-blue-400/30"
             />
           </label>
 
@@ -59,7 +80,7 @@ export default function TechniqueLibrary() {
             <select
               value={categoryId}
               onChange={(e) => setCategoryId(e.target.value)}
-              className="mt-2 h-11 w-full rounded-2xl border border-white/10 bg-slate-950/60 px-3 text-sm text-white outline-none focus:ring-2 focus:ring-cyan-300/30"
+              className="mt-2 h-11 w-full rounded-2xl border border-white/10 bg-slate-950/60 px-3 text-sm text-white outline-none focus:ring-2 focus:ring-blue-400/30"
             >
               <option value="all">Tất cả</option>
               {TECHNIQUE_CATEGORIES.map((c) => (
@@ -75,7 +96,7 @@ export default function TechniqueLibrary() {
             <select
               value={difficulty}
               onChange={(e) => setDifficulty(e.target.value)}
-              className="mt-2 h-11 w-full rounded-2xl border border-white/10 bg-slate-950/60 px-3 text-sm text-white outline-none focus:ring-2 focus:ring-cyan-300/30"
+              className="mt-2 h-11 w-full rounded-2xl border border-white/10 bg-slate-950/60 px-3 text-sm text-white outline-none focus:ring-2 focus:ring-blue-400/30"
             >
               <option value="all">Tất cả</option>
               <option value="easy">Dễ</option>
@@ -92,14 +113,32 @@ export default function TechniqueLibrary() {
           <button
             type="button"
             onClick={onReset}
-            className="inline-flex h-11 items-center justify-center rounded-2xl border border-white/10 bg-white/5 px-4 text-sm font-semibold text-white transition hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-cyan-300/30"
+            className="inline-flex h-11 items-center justify-center rounded-2xl border border-white/10 bg-white/5 px-4 text-sm font-semibold text-white transition hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-blue-400/30"
           >
             Reset lọc
           </button>
         </div>
       </section>
 
-      <div className="grid gap-3 lg:grid-cols-2">
+      <div className="grid gap-3 lg:grid-cols-2 stagger-fade">
+        {filtered.length === 0 ? (
+          <section className="lg:col-span-2 rounded-3xl border border-white/10 bg-white/5 p-6 sm:p-8 shadow-[var(--shadow-card)]">
+            <p className="text-sm leading-6 text-slate-300">
+              Sư phụ chưa tìm thấy kỹ thuật này, bạn thử kiểm tra lại chính tả hoặc hỏi AI Coach nhé!
+            </p>
+
+            <div className="mt-4">
+              <button
+                type="button"
+                onClick={onAskAi}
+                className="inline-flex h-11 items-center justify-center rounded-2xl bg-gradient-to-r from-blue-400 to-blue-600 px-4 text-sm font-semibold text-slate-950 transition hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-blue-400/50"
+              >
+                Hỏi AI Coach
+              </button>
+            </div>
+          </section>
+        ) : null}
+
         {filtered.map((t) => {
           const cat = TECHNIQUE_CATEGORIES.find((c) => c.id === t.categoryId);
 
@@ -107,7 +146,7 @@ export default function TechniqueLibrary() {
             <details
               key={t.slug}
               id={t.slug}
-              className="group rounded-3xl border border-white/10 bg-white/5 p-5 open:bg-white/10"
+              className="group rounded-3xl border border-white/10 bg-white/5 p-5 shadow-[var(--shadow-card)] transition will-change-transform hover:bg-white/10 hover:-translate-y-0.5 hover:scale-[1.01] hover:shadow-[var(--shadow-card-strong)] hover:border-blue-400/35 open:bg-white/10 open:border-blue-400/30"
               onToggle={(e) => {
                 if (e.currentTarget.open) {
                   trackView({ type: "technique", id: t.slug });
@@ -142,7 +181,7 @@ export default function TechniqueLibrary() {
                     </div>
                   </div>
 
-                  <div className="h-10 w-10 shrink-0 rounded-2xl border border-white/10 bg-gradient-to-br from-cyan-300/15 to-blue-500/10" />
+                  <div className="h-10 w-10 shrink-0 rounded-2xl border border-white/10 bg-gradient-to-br from-blue-400/15 to-blue-600/10" />
                 </div>
               </summary>
 
@@ -167,7 +206,7 @@ export default function TechniqueLibrary() {
                     <ul className="mt-2 grid gap-2 text-sm leading-6 text-slate-300">
                       {t.mistakes.map((m) => (
                         <li key={m} className="flex gap-2">
-                          <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-cyan-300/80" />
+                          <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-blue-300/80" />
                           <span>{m}</span>
                         </li>
                       ))}
@@ -179,7 +218,7 @@ export default function TechniqueLibrary() {
                     <ul className="mt-2 grid gap-2 text-sm leading-6 text-slate-300">
                       {t.safety.map((m) => (
                         <li key={m} className="flex gap-2">
-                          <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-cyan-300/80" />
+                          <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-blue-300/80" />
                           <span>{m}</span>
                         </li>
                       ))}

@@ -7,7 +7,7 @@ export const metadata = {
 export default function TechniqueLibraryPage() {
   return (
     <div className="mx-auto w-full max-w-6xl px-4 py-10">
-      <header className="mb-6 rounded-3xl border border-white/10 bg-white/5 p-6 sm:p-8">
+      <header className="mb-6 rounded-3xl border border-white/10 bg-white/5 p-6 sm:p-8 shadow-[var(--shadow-card)] fade-in-up">
         <h1 className="text-2xl font-semibold tracking-tight text-white sm:text-3xl">
           Thư viện kỹ thuật (Wiki Vovinam)
         </h1>

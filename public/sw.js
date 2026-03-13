@@ -1,19 +1,49 @@
 /* global self, caches, fetch, Response */
 
-const CACHE_NAME = "vovinam-static-v2";
+const STATIC_CACHE = "vovinam-static-v3";
+const PAGE_CACHE = "vovinam-pages-v3";
 
-const ASSET_PATHS = [
-  "/",
+// Keep the page cache small to avoid storage bloat.
+const MAX_PAGE_ENTRIES = 25;
+
+const STATIC_ASSET_PATHS = [
   "/favicon.ico",
   "/manifest.webmanifest",
 ];
 
+const PAGE_PATHS = ["/"];
+
+async function addAllBestEffort(cacheName, urls) {
+  if (!Array.isArray(urls) || urls.length === 0) return;
+
+  const cache = await caches.open(cacheName);
+  await Promise.all(
+    urls.map(async (url) => {
+      try {
+        await cache.add(url);
+      } catch {
+        // ignore
+      }
+    })
+  );
+}
+
+async function trimCache(cacheName, maxEntries) {
+  const limit = Math.max(1, Math.round(Number(maxEntries) || 1));
+  const cache = await caches.open(cacheName);
+  const keys = await cache.keys();
+  const extra = keys.length - limit;
+  if (extra <= 0) return;
+
+  await Promise.all(keys.slice(0, extra).map((req) => cache.delete(req)));
+}
+
 self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches
-      .open(CACHE_NAME)
-      .then((cache) => cache.addAll(ASSET_PATHS))
-      .then(() => self.skipWaiting())
+    Promise.all([
+      addAllBestEffort(STATIC_CACHE, STATIC_ASSET_PATHS),
+      addAllBestEffort(PAGE_CACHE, PAGE_PATHS),
+    ]).then(() => self.skipWaiting())
   );
 });
 
@@ -21,14 +51,20 @@ self.addEventListener("activate", (event) => {
   event.waitUntil(
     caches
       .keys()
-      .then((keys) => Promise.all(keys.map((k) => (k === CACHE_NAME ? null : caches.delete(k)))))
+      .then((keys) =>
+        Promise.all(
+          keys.map((k) =>
+            k === STATIC_CACHE || k === PAGE_CACHE ? null : caches.delete(k)
+          )
+        )
+      )
       .then(() => self.clients.claim())
   );
 });
 
 async function cacheUrls(urls) {
   if (!Array.isArray(urls) || urls.length === 0) return;
-  const cache = await caches.open(CACHE_NAME);
+  const cache = await caches.open(PAGE_CACHE);
 
   await Promise.all(
     urls.map(async (url) => {
@@ -54,11 +90,13 @@ async function cacheUrls(urls) {
       }
     })
   );
+
+  await trimCache(PAGE_CACHE, MAX_PAGE_ENTRIES);
 }
 
 async function uncacheUrls(urls) {
   if (!Array.isArray(urls) || urls.length === 0) return;
-  const cache = await caches.open(CACHE_NAME);
+  const cache = await caches.open(PAGE_CACHE);
 
   await Promise.all(
     urls.map(async (url) => {
@@ -141,12 +179,13 @@ function isCacheablePage(url) {
 }
 
 async function handleNavigate(request) {
-  const cache = await caches.open(CACHE_NAME);
+  const cache = await caches.open(PAGE_CACHE);
 
   try {
     const fresh = await fetch(request);
     if (fresh && fresh.ok) {
       cache.put(request, fresh.clone());
+      trimCache(PAGE_CACHE, MAX_PAGE_ENTRIES);
     }
     return fresh;
   } catch {
@@ -179,7 +218,7 @@ self.addEventListener("fetch", (event) => {
   if (!isCacheableAsset(url)) return;
 
   event.respondWith(
-    caches.open(CACHE_NAME).then(async (cache) => {
+    caches.open(STATIC_CACHE).then(async (cache) => {
       const cached = await cache.match(req);
       if (cached) return cached;
 

@@ -1,0 +1,63 @@
+{
+  "nav": {
+    "roadmap": "ロードマップ",
+    "course": "コース",
+    "videos": "動画",
+    "techniques": "技",
+    "schedule": "スケジュール",
+    "nutrition": "栄養",
+    "store": "ストア",
+    "profile": "プロフィール",
+    "progress": "進捗",
+    "progressAria": "学習の進捗を見る",
+    "brandTitle": "Vovinam",
+    "brandSubtitle": "青帯 → 黄帯 → 黒帯"
+  },
+  "theme": {
+    "label": "テーマ",
+    "dark": "ダーク",
+    "midnight": "ミッドナイト",
+    "toggleAria": "テーマを切り替える"
+  },
+  "language": {
+    "label": "言語",
+    "vi": "ベトナム語",
+    "en": "英語",
+    "ja": "日本語"
+  },
+  "footer": {
+    "ctaTitle": "毎週コツコツ練習しますか？",
+    "ctaDescription": "ロードマップを選んで、いちばん簡単なレッスンから始めましょう。進捗はこの端末に保存されます。",
+    "startLearning": "学習を始める",
+    "createSchedule": "スケジュール作成",
+    "brandName": "Vovinam Learning",
+    "brandSubtitle": "青帯 → 黄帯 → 黒帯",
+    "brandDescription": "ロードマップ型の学習アプリ。ステップ別レッスンと進捗管理ができます。",
+    "navTitle": "ナビゲーション",
+    "levelTitle": "レベル",
+    "safetyTitle": "安全の注意",
+    "safety1": "5〜10分の準備運動（足首・膝・股関節・肩）。",
+    "safety2": "まずはゆっくり正確に。スピードは後から。",
+    "safety3": "鋭い痛み／めまい：中止して休憩。無理はしない。",
+    "safety4": "難しい技は、可能ならコーチと練習。",
+    "emergencySupport": "緊急サポート",
+    "backToTop": "トップへ ↑",
+    "copyright": "Built with Next.js",
+    "links": {
+      "home": "ホーム",
+      "roadmap": "ロードマップ",
+      "course": "コース",
+      "videos": "動画",
+      "techniques": "技のライブラリ",
+      "schedule": "スケジュール",
+      "nutrition": "栄養",
+      "progress": "進捗",
+      "store": "ストア",
+      "profile": "プロフィール",
+      "aiCoach": "AI Coach",
+      "admin": "管理/コーチ",
+      "privacy": "プライバシーポリシー",
+      "terms": "利用規約"
+    }
+  }
+}

@@ -1,5 +1,9 @@
 /** @type {import('next').NextConfig} */
+import createNextIntlPlugin from "next-intl/plugin";
+
 const isProd = process.env.NODE_ENV === "production";
+
+const withNextIntl = createNextIntlPlugin("./i18n/request.js");
 
 const permissionsPolicyDefault =
   "camera=(), microphone=(), geolocation=(), payment=(), usb=(), fullscreen=*";
@@ -75,4 +79,4 @@ const nextConfig = {
   },
 };
 
-export default nextConfig;
+export default withNextIntl(nextConfig);

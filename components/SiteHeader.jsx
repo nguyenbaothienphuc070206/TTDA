@@ -3,9 +3,11 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
+import { useTranslations } from "next-intl";
 
 import { LESSONS } from "@/data/lessons";
 import { readDoneSlugs } from "@/lib/progress";
+import LanguageToggle from "@/components/LanguageToggle";
 import ThemeToggle from "@/components/ThemeToggle";
 
 function NavItem({ href, active, children }) {
@@ -14,7 +16,7 @@ function NavItem({ href, active, children }) {
       href={href}
       aria-current={active ? "page" : undefined}
       className={
-        "rounded-full px-3 py-1.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-cyan-300/40 " +
+        "rounded-full px-3 py-1.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-blue-400/40 " +
         (active
           ? "bg-white/10 text-white"
           : "text-slate-200 hover:bg-white/10 hover:text-white")
@@ -26,6 +28,7 @@ function NavItem({ href, active, children }) {
 }
 
 export default function SiteHeader() {
+  const t = useTranslations("nav");
   const total = useMemo(() => LESSONS.length, []);
   const [doneCount, setDoneCount] = useState(0);
   const pathname = usePathname() || "/";
@@ -59,48 +62,49 @@ export default function SiteHeader() {
       <div className="mx-auto flex w-full max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-3">
         <Link
           href="/"
-          className="group inline-flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-cyan-300/40 rounded-xl"
+          className="group inline-flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-blue-400/40 rounded-xl"
         >
-          <span className="inline-flex h-9 w-9 items-center justify-center rounded-2xl bg-gradient-to-br from-cyan-300 to-blue-500 text-slate-950 font-extrabold shadow-sm">
+          <span className="inline-flex h-9 w-9 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-400 to-blue-600 text-slate-950 font-extrabold shadow-sm">
             V
           </span>
           <span className="leading-tight">
             <span className="block text-sm font-semibold tracking-tight text-white">
-              Vovinam
+              {t("brandTitle")}
             </span>
             <span className="block text-xs text-slate-300">
-              Học từ cơ bản → nâng cao
+              {t("brandSubtitle")}
             </span>
           </span>
         </Link>
 
         <nav className="flex flex-wrap items-center gap-1">
-          <NavItem href="/lo-trinh" active={isActive("/lo-trinh")}>Lộ trình</NavItem>
-          <NavItem href="/hoc-tap" active={isActive("/hoc-tap")}>Khóa học</NavItem>
-          <NavItem href="/video" active={isActive("/video")}>Video</NavItem>
-          <NavItem href="/ky-thuat" active={isActive("/ky-thuat")}>Kỹ thuật</NavItem>
-          <NavItem href="/lich-tap" active={isActive("/lich-tap")}>Lịch tập</NavItem>
-          <NavItem href="/dinh-duong" active={isActive("/dinh-duong")}>Dinh dưỡng</NavItem>
-          <NavItem href="/cua-hang" active={isActive("/cua-hang")}>Cửa hàng</NavItem>
-          <NavItem href="/ho-so" active={isActive("/ho-so")}>Hồ sơ</NavItem>
+          <NavItem href="/lo-trinh" active={isActive("/lo-trinh")}>{t("roadmap")}</NavItem>
+          <NavItem href="/hoc-tap" active={isActive("/hoc-tap")}>{t("course")}</NavItem>
+          <NavItem href="/video" active={isActive("/video")}>{t("videos")}</NavItem>
+          <NavItem href="/ky-thuat" active={isActive("/ky-thuat")}>{t("techniques")}</NavItem>
+          <NavItem href="/lich-tap" active={isActive("/lich-tap")}>{t("schedule")}</NavItem>
+          <NavItem href="/dinh-duong" active={isActive("/dinh-duong")}>{t("nutrition")}</NavItem>
+          <NavItem href="/cua-hang" active={isActive("/cua-hang")}>{t("store")}</NavItem>
+          <NavItem href="/ho-so" active={isActive("/ho-so")}>{t("profile")}</NavItem>
 
           <Link
             href="/tien-do"
-            className="hidden sm:flex items-center gap-3 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 ml-1 transition hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-cyan-300/30"
-            aria-label="Xem tiến độ học tập"
+            className="hidden sm:flex items-center gap-3 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 ml-1 transition hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-blue-400/30"
+            aria-label={t("progressAria")}
           >
-            <span className="text-xs text-slate-300">Tiến độ</span>
-            <span className="text-xs font-semibold text-cyan-200">
+            <span className="text-xs text-slate-300">{t("progress")}</span>
+            <span className="text-xs font-semibold text-blue-200">
               {doneCount}/{total}
             </span>
             <div className="h-2 w-24 overflow-hidden rounded-full bg-white/10">
               <div
-                className="h-full bg-gradient-to-r from-cyan-300 to-blue-500 progress-bar"
+                className="h-full bg-gradient-to-r from-blue-400 to-blue-600 progress-bar"
                 style={{ width: `${percent}%` }}
               />
             </div>
           </Link>
 
+          <LanguageToggle />
           <ThemeToggle />
         </nav>
       </div>

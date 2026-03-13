@@ -8,7 +8,7 @@ export const metadata = {
 export default function AiCoachPage() {
   return (
     <div className="mx-auto w-full max-w-6xl px-4 py-10">
-      <header className="mb-6 rounded-3xl border border-white/10 bg-white/5 p-6 sm:p-8">
+      <header className="mb-6 rounded-3xl border border-white/10 bg-white/5 p-6 sm:p-8 shadow-[var(--shadow-card)] fade-in-up">
         <h1 className="text-2xl font-semibold tracking-tight text-white sm:text-3xl">
           AI Coach (RAG)
         </h1>
@@ -19,7 +19,7 @@ export default function AiCoachPage() {
         </p>
       </header>
 
-      <div className="grid gap-4 lg:grid-cols-2">
+      <div className="grid gap-4 lg:grid-cols-2 stagger-fade">
         <AiCoachChat />
         <PoseCoach />
       </div>

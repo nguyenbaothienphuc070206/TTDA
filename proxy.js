@@ -1,7 +1,15 @@
 import { NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
+import createMiddleware from "next-intl/middleware";
 
 import { APP_ROLES, getAppRoleForUserId } from "./lib/supabase/roles";
+import { routing } from "./i18n/routing";
+
+const intlMiddleware = createMiddleware({
+  locales: routing.locales,
+  defaultLocale: routing.defaultLocale,
+  localePrefix: "never",
+});
 
 function getSupabasePublicEnv() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -24,24 +32,25 @@ function redirectToLogin(request, reason) {
 }
 
 export async function proxy(request) {
+  const intlResponse = intlMiddleware(request);
   const { url, key } = getSupabasePublicEnv();
   const pathname = request.nextUrl.pathname;
 
   // Only enforce auth on /admin routes.
   if (!pathname.startsWith("/admin")) {
-    return NextResponse.next();
+    return intlResponse;
   }
 
   // Allow the login page itself.
   if (pathname === "/admin/login") {
-    return NextResponse.next();
+    return intlResponse;
   }
 
   if (!url || !key) {
     return redirectToLogin(request, "missing_supabase_env");
   }
 
-  let response = NextResponse.next({ request });
+  let response = intlResponse;
 
   const supabase = createServerClient(url, key, {
     cookies: {
@@ -79,5 +88,5 @@ export async function proxy(request) {
 }
 
 export const config = {
-  matcher: ["/admin/:path*"],
+  matcher: ["/((?!api|_next|.*\\..*).*)"],
 };

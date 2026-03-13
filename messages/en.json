@@ -1,0 +1,63 @@
+{
+  "nav": {
+    "roadmap": "Roadmap",
+    "course": "Course",
+    "videos": "Videos",
+    "techniques": "Techniques",
+    "schedule": "Schedule",
+    "nutrition": "Nutrition",
+    "store": "Store",
+    "profile": "Profile",
+    "progress": "Progress",
+    "progressAria": "View learning progress",
+    "brandTitle": "Vovinam",
+    "brandSubtitle": "Blue → Yellow → Black belt"
+  },
+  "theme": {
+    "label": "Theme",
+    "dark": "Dark",
+    "midnight": "Midnight",
+    "toggleAria": "Toggle theme"
+  },
+  "language": {
+    "label": "Language",
+    "vi": "Vietnamese",
+    "en": "English",
+    "ja": "Japanese"
+  },
+  "footer": {
+    "ctaTitle": "Ready to train consistently every week?",
+    "ctaDescription": "Pick a roadmap and start from the easiest lesson. Your progress is saved on this device.",
+    "startLearning": "Start learning",
+    "createSchedule": "Create a schedule",
+    "brandName": "Vovinam Learning",
+    "brandSubtitle": "Blue → Yellow → Black belt",
+    "brandDescription": "A roadmap-based app with step-by-step lessons and simple progress tracking.",
+    "navTitle": "Navigation",
+    "levelTitle": "Levels",
+    "safetyTitle": "Safety notes",
+    "safety1": "Warm up for 5–10 minutes (ankles, knees, hips, shoulders).",
+    "safety2": "Go slow—clean technique first, speed later.",
+    "safety3": "Sharp pain/dizziness: stop and rest—don't push through.",
+    "safety4": "Advanced techniques: train with a coach when possible.",
+    "emergencySupport": "Emergency support",
+    "backToTop": "Back to top ↑",
+    "copyright": "Built with Next.js",
+    "links": {
+      "home": "Home",
+      "roadmap": "Roadmap",
+      "course": "Course",
+      "videos": "Videos",
+      "techniques": "Technique library",
+      "schedule": "Schedule",
+      "nutrition": "Nutrition",
+      "progress": "Progress",
+      "store": "Store",
+      "profile": "Profile",
+      "aiCoach": "AI Coach",
+      "admin": "Admin/Coach",
+      "privacy": "Privacy policy",
+      "terms": "Terms"
+    }
+  }
+}

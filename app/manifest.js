@@ -3,7 +3,7 @@ export default function manifest() {
     name: "Vovinam Learning",
     short_name: "Vovinam",
     description:
-      "App học Vovinam từ cơ bản đến nâng cao: lộ trình rõ ràng, bài tập từng bước, lưu tiến độ và lịch tập 7 ngày.",
+      "App học Vovinam theo Lam/Hoàng/Huyền đai: lộ trình rõ ràng, bài tập từng bước, lưu tiến độ và lịch tập 7 ngày.",
     start_url: "/",
     display: "standalone",
     background_color: "#020617",

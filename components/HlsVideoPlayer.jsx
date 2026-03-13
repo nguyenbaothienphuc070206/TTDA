@@ -2,10 +2,38 @@
 
 import { useEffect, useRef, useState } from "react";
 
-export default function HlsVideoPlayer({ src, title, poster, className }) {
+export default function HlsVideoPlayer({ src, title, poster, className, apiRef }) {
   const videoRef = useRef(null);
   const hlsRef = useRef(null);
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    if (!apiRef || typeof apiRef !== "object") return;
+
+    apiRef.current = {
+      seekTo: (seconds) => {
+        const video = videoRef.current;
+        const t = Number(seconds);
+        if (!video || Number.isNaN(t)) return;
+
+        try {
+          video.currentTime = Math.max(0, t);
+          // Best-effort: resume playback after seeking.
+          video.play?.().catch?.(() => {});
+        } catch {
+          // ignore
+        }
+      },
+    };
+
+    return () => {
+      try {
+        apiRef.current = null;
+      } catch {
+        // ignore
+      }
+    };
+  }, [apiRef]);
 
   useEffect(() => {
     let cancelled = false;

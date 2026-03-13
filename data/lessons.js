@@ -1,24 +1,24 @@
 export const LEVELS = [
   {
     id: "co-ban",
-    title: "Cơ bản",
+    title: "Lam đai",
     short: "Nền tảng",
     description:
-      "Làm quen tư thế, di chuyển và đòn tay/chân căn bản. Tập chậm, đúng kỹ thuật trước khi tăng tốc.",
+      "Giai đoạn làm quen tư thế, di chuyển, đòn tay/chân căn bản và thói quen tập an toàn.",
   },
   {
     id: "trung-cap",
-    title: "Trung cấp",
+    title: "Hoàng đai",
     short: "Kết hợp",
     description:
-      "Bắt đầu phối hợp động tác, phản xạ, tự vệ cơ bản và tăng độ bền. Luôn ưu tiên an toàn khớp gối/hông.",
+      "Giai đoạn phối hợp kỹ thuật, phản xạ và tự vệ cơ bản; tăng sức bền và kiểm soát nhịp thở.",
   },
   {
     id: "nang-cao",
-    title: "Nâng cao",
+    title: "Huyền đai",
     short: "Ứng dụng",
     description:
-      "Tập chuỗi kỹ thuật, đối luyện, thăng bằng và sức mạnh. Nên có người hướng dẫn khi tập động tác khó.",
+      "Giai đoạn nâng cao ứng dụng, chuỗi kỹ thuật, đối luyện và phát triển sức mạnh – phục hồi.",
   },
 ];
 

@@ -111,7 +111,7 @@ export default function OfflineVideoControls({ videoId, title }) {
               type="button"
               disabled={busy}
               onClick={onRemove}
-              className="inline-flex h-10 items-center justify-center rounded-xl border border-white/10 bg-white/5 px-3 text-xs font-semibold text-white transition hover:bg-white/10 disabled:opacity-60 focus:outline-none focus:ring-2 focus:ring-cyan-300/30"
+              className="inline-flex h-10 items-center justify-center rounded-xl border border-white/10 bg-white/5 px-3 text-xs font-semibold text-white transition hover:bg-white/10 disabled:opacity-60 focus:outline-none focus:ring-2 focus:ring-blue-400/30"
             >
               {busy ? "Đang xử lý…" : "Xoá offline"}
             </button>
@@ -120,7 +120,7 @@ export default function OfflineVideoControls({ videoId, title }) {
               type="button"
               disabled={busy}
               onClick={onSave}
-              className="inline-flex h-10 items-center justify-center rounded-xl bg-gradient-to-r from-cyan-300 to-blue-500 px-3 text-xs font-semibold text-slate-950 transition hover:brightness-110 disabled:opacity-60 focus:outline-none focus:ring-2 focus:ring-cyan-300/50"
+              className="inline-flex h-10 items-center justify-center rounded-xl bg-gradient-to-r from-blue-400 to-blue-600 px-3 text-xs font-semibold text-slate-950 transition hover:brightness-110 disabled:opacity-60 focus:outline-none focus:ring-2 focus:ring-blue-400/50"
             >
               {busy ? "Đang lưu…" : "Lưu offline"}
             </button>

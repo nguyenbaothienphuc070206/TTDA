@@ -1,5 +1,6 @@
 import { LESSONS } from "@/data/lessons";
 import { VIDEOS } from "@/data/videos";
+import { TECHNIQUES } from "@/data/wiki";
 
 export default function sitemap() {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
@@ -104,5 +105,14 @@ export default function sitemap() {
     };
   });
 
-  return [...staticPages, ...lessonPages, ...videoPages];
+  const techniquePages = TECHNIQUES.map((t) => {
+    return {
+      url: `${baseUrl}/ky-thuat/${t.slug}`,
+      lastModified,
+      changeFrequency: "monthly",
+      priority: 0.5,
+    };
+  });
+
+  return [...staticPages, ...lessonPages, ...videoPages, ...techniquePages];
 }

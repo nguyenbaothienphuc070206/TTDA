@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { Bot, Sparkles } from "lucide-react";
 
 import { readProfile } from "@/lib/profile";
 
@@ -65,7 +66,7 @@ function MarkdownAnswer({ children }) {
           a: ({ href, children: c }) => (
             <a
               href={href}
-              className="text-cyan-200 underline underline-offset-4 hover:text-cyan-100"
+              className="text-blue-200 underline underline-offset-4 hover:text-blue-100"
               target={href?.startsWith("http") ? "_blank" : undefined}
               rel={href?.startsWith("http") ? "noreferrer" : undefined}
             >
@@ -79,6 +80,39 @@ function MarkdownAnswer({ children }) {
       >
         {content}
       </ReactMarkdown>
+    </div>
+  );
+}
+
+function ChatMessage({ message }) {
+  const role = message?.role;
+  const content = String(message?.content || "");
+  if (!content.trim()) return null;
+
+  const isUser = role === "user";
+
+  return (
+    <div className={"flex gap-2 " + (isUser ? "justify-end" : "justify-start")}>
+      {!isUser ? (
+        <span className="mt-0.5 inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-2xl border border-white/10 bg-gradient-to-br from-blue-500/20 to-blue-600/10 text-blue-100">
+          <Bot className="h-4 w-4" />
+        </span>
+      ) : null}
+
+      <div
+        className={
+          "max-w-[82%] rounded-3xl border p-3 " +
+          (isUser
+            ? "border-blue-400/25 bg-blue-500/15 text-slate-100"
+            : "border-white/10 bg-white/5 text-slate-200")
+        }
+      >
+        {isUser ? (
+          <p className="text-sm leading-6">{content}</p>
+        ) : (
+          <MarkdownAnswer>{content}</MarkdownAnswer>
+        )}
+      </div>
     </div>
   );
 }
@@ -100,7 +134,7 @@ function SourceItem({ source }) {
         {href ? (
           <Link
             href={href}
-            className="shrink-0 rounded-xl border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-semibold text-slate-200 transition hover:bg-white/10 hover:text-white focus:outline-none focus:ring-2 focus:ring-cyan-300/30"
+            className="shrink-0 rounded-xl border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-semibold text-slate-200 transition hover:bg-white/10 hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-400/30"
           >
             Mở
           </Link>
@@ -123,15 +157,29 @@ export default function AiCoachChat({ context }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [answer, setAnswer] = useState("");
+  const [chatHistory, setChatHistory] = useState([]);
   const [sources, setSources] = useState([]);
   const [recommendedVideos, setRecommendedVideos] = useState([]);
   const [sessionId, setSessionId] = useState("");
   const abortRef = useRef(null);
+  const scrollRef = useRef(null);
 
   useEffect(() => {
     const store = readChatStore();
     setSessionId(store.sessionId || "");
+    setChatHistory(Array.isArray(store.history) ? store.history : []);
   }, []);
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+
+    try {
+      el.scrollTo({ top: el.scrollHeight, behavior: "smooth" });
+    } catch {
+      // ignore
+    }
+  }, [chatHistory.length, answer]);
 
   const helperText = useMemo(() => {
     if (context?.videoId) {
@@ -176,6 +224,11 @@ export default function AiCoachChat({ context }) {
       const history = Array.isArray(store.history) ? store.history : [];
       let activeSessionId = sessionId || store.sessionId || "";
 
+      // Optimistic UI: show bubbles immediately.
+      setChatHistory(
+        [...history, { role: "user", content: q }, { role: "assistant", content: "" }].slice(-8)
+      );
+
       const res = await fetch("/api/ai/coach", {
         method: "POST",
         signal: ctrl.signal,
@@ -218,6 +271,18 @@ export default function AiCoachChat({ context }) {
           if (!t) return;
           finalAnswer += t;
           setAnswer(finalAnswer);
+
+          setChatHistory((prev) => {
+            const list = Array.isArray(prev) ? prev.slice() : [];
+            for (let i = list.length - 1; i >= 0; i -= 1) {
+              if (list[i]?.role === "assistant") {
+                const prevContent = String(list[i]?.content || "");
+                list[i] = { ...list[i], content: prevContent + t };
+                break;
+              }
+            }
+            return list;
+          });
         };
 
         while (true) {
@@ -268,6 +333,7 @@ export default function AiCoachChat({ context }) {
         // Update local history after streaming completes.
         const nextHistory = [...history, { role: "user", content: q }, { role: "assistant", content: finalAnswer }].slice(-8);
         writeChatStore({ history: nextHistory, sessionId: activeSessionId });
+        setChatHistory(nextHistory);
         return;
       }
 
@@ -287,6 +353,7 @@ export default function AiCoachChat({ context }) {
 
       const nextHistory = [...history, { role: "user", content: q }, { role: "assistant", content: String(data?.answer || "") }].slice(-8);
       writeChatStore({ history: nextHistory, sessionId: String(data?.sessionId || sessionId || "") });
+      setChatHistory(nextHistory);
     } catch {
       setError("Không kết nối được API. Vui lòng thử lại.");
     } finally {
@@ -294,40 +361,72 @@ export default function AiCoachChat({ context }) {
     }
   };
 
+  const hasChat = useMemo(() => {
+    return Array.isArray(chatHistory) && chatHistory.some((m) => String(m?.content || "").trim());
+  }, [chatHistory]);
+
   return (
-    <div className="rounded-3xl border border-white/10 bg-white/5 p-6 sm:p-8">
-      <h2 className="text-xl font-semibold text-white">AI Coach (RAG)</h2>
-      <p className="mt-2 text-sm leading-6 text-slate-300">{helperText}</p>
+    <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-white/5 p-6 sm:p-8 shadow-[var(--shadow-card)]">
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -inset-8 rounded-[2.75rem] bg-[radial-gradient(circle_at_bottom_right,rgba(59,130,246,0.18),transparent_60%)] blur-2xl"
+      />
 
-      <form onSubmit={onAsk} className="mt-4 grid gap-3 sm:grid-cols-[1fr_auto]">
-        <input
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Ví dụ: 'đá tống trước sai thường gặp?'"
-          className="h-11 w-full rounded-2xl border border-white/10 bg-slate-950/60 px-4 text-sm text-white outline-none focus:ring-2 focus:ring-cyan-300/30"
-        />
+      <div className="relative">
+        <div className="flex items-start gap-3">
+          <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-400 to-blue-600 text-slate-950">
+            <Bot className="h-5 w-5" />
+          </span>
+          <div className="min-w-0">
+            <h2 className="text-xl font-semibold text-white">AI Coach</h2>
+            <p className="mt-1 text-sm leading-6 text-slate-300">{helperText}</p>
+          </div>
+        </div>
 
-        <button
-          type="submit"
-          disabled={loading}
-          className="inline-flex h-11 items-center justify-center rounded-2xl bg-gradient-to-r from-cyan-300 to-blue-500 px-5 text-sm font-semibold text-slate-950 transition hover:brightness-110 disabled:opacity-60 focus:outline-none focus:ring-2 focus:ring-cyan-300/50"
+        <div
+          ref={scrollRef}
+          className="mt-4 max-h-[24rem] overflow-y-auto rounded-3xl border border-white/10 bg-slate-950/30 p-4 sm:max-h-[28rem]"
         >
-          {loading ? "Đang trả lời…" : "Hỏi"}
-        </button>
-      </form>
-
-      {error ? (
-        <div className="mt-4 rounded-2xl border border-rose-400/20 bg-rose-500/10 p-4 text-sm text-rose-100">
-          {error}
+          {hasChat ? (
+            <div className="grid gap-3">
+              {chatHistory.map((m, idx) => (
+                <ChatMessage key={`${m.role}-${idx}`} message={m} />
+              ))}
+            </div>
+          ) : (
+            <div className="flex items-start gap-3 text-slate-300">
+              <span className="mt-0.5 inline-flex h-9 w-9 items-center justify-center rounded-2xl border border-white/10 bg-white/5 text-blue-100">
+                <Sparkles className="h-5 w-5" />
+              </span>
+              <div className="text-sm leading-6">
+                Hỏi về kỹ thuật, lỗi thường gặp, mẹo tập an toàn… AI sẽ trả lời theo tài liệu có sẵn.
+              </div>
+            </div>
+          )}
         </div>
-      ) : null}
 
-      {answer ? (
-        <div className="mt-4 rounded-2xl border border-white/10 bg-slate-950/30 p-4">
-          <div className="text-xs font-semibold text-slate-300">Trả lời</div>
-          <MarkdownAnswer>{answer}</MarkdownAnswer>
-        </div>
-      ) : null}
+        <form onSubmit={onAsk} className="mt-4 grid gap-3 sm:grid-cols-[1fr_auto]">
+          <input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Ví dụ: 'đá tống trước sai thường gặp?'"
+            className="h-11 w-full rounded-2xl border border-white/10 bg-slate-950/60 px-4 text-sm text-white outline-none focus:ring-2 focus:ring-blue-400/30"
+          />
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="inline-flex h-11 items-center justify-center rounded-2xl bg-gradient-to-r from-blue-400 to-blue-600 px-5 text-sm font-semibold text-slate-950 transition hover:brightness-110 disabled:opacity-60 focus:outline-none focus:ring-2 focus:ring-blue-400/40"
+          >
+            {loading ? "Đang trả lời…" : "Hỏi"}
+          </button>
+        </form>
+
+        {error ? (
+          <div className="mt-4 rounded-2xl border border-rose-400/20 bg-rose-500/10 p-4 text-sm text-rose-100">
+            {error}
+          </div>
+        ) : null}
 
       {Array.isArray(recommendedVideos) && recommendedVideos.length > 0 ? (
         <div className="mt-4">
@@ -337,7 +436,7 @@ export default function AiCoachChat({ context }) {
               <Link
                 key={v.id}
                 href={v.url || `/video/${v.id}`}
-                className="rounded-2xl border border-white/10 bg-white/5 p-4 transition hover:bg-white/10"
+                className="rounded-2xl border border-white/10 bg-white/5 p-4 transition hover:border-blue-400/20 hover:bg-white/10"
               >
                 <div className="text-sm font-semibold text-white">{v.title}</div>
                 {v.summary ? (
@@ -359,6 +458,7 @@ export default function AiCoachChat({ context }) {
           </ul>
         </div>
       ) : null}
+      </div>
     </div>
   );
 }

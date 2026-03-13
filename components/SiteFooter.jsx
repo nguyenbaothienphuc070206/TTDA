@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 
 import { LEVELS } from "@/data/lessons";
 
@@ -6,7 +7,7 @@ function FooterLink({ href, children }) {
   return (
     <Link
       href={href}
-      className="text-sm text-slate-300 transition hover:text-white focus:outline-none focus:ring-2 focus:ring-cyan-300/30 rounded-lg"
+      className="text-sm text-slate-300 transition hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-400/30 rounded-lg"
     >
       {children}
     </Link>
@@ -21,8 +22,10 @@ function FooterTitle({ children }) {
   );
 }
 
-export default function SiteFooter() {
+export default async function SiteFooter() {
+  const t = await getTranslations("footer");
   const year = new Date().getFullYear();
+  const emergencySupportUrl = String(process.env.NEXT_PUBLIC_EMERGENCY_SUPPORT_URL || "").trim();
 
   return (
     <footer className="border-t border-white/10">
@@ -32,26 +35,25 @@ export default function SiteFooter() {
           <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <p className="text-lg font-semibold tracking-tight text-white">
-                Sẵn sàng luyện đều mỗi tuần?
+                {t("ctaTitle")}
               </p>
               <p className="mt-1 text-sm leading-6 text-slate-300">
-                Chọn lộ trình và bắt đầu từ bài dễ nhất. Tiến độ sẽ tự lưu trên
-                máy của bạn.
+                {t("ctaDescription")}
               </p>
             </div>
 
             <div className="flex flex-col gap-2 sm:flex-row">
               <Link
                 href="/lo-trinh"
-                className="inline-flex h-11 items-center justify-center rounded-2xl bg-gradient-to-r from-cyan-300 to-blue-500 px-4 text-sm font-semibold text-slate-950 transition hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-cyan-300/50"
+                className="inline-flex h-11 items-center justify-center rounded-2xl bg-gradient-to-r from-blue-400 to-blue-600 px-4 text-sm font-semibold text-slate-950 transition hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-blue-400/50"
               >
-                Bắt đầu học
+                {t("startLearning")}
               </Link>
               <Link
                 href="/lich-tap"
-                className="inline-flex h-11 items-center justify-center rounded-2xl border border-white/10 bg-white/5 px-4 text-sm font-semibold text-white transition hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-cyan-300/30"
+                className="inline-flex h-11 items-center justify-center rounded-2xl border border-white/10 bg-white/5 px-4 text-sm font-semibold text-white transition hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-blue-400/30"
               >
-                Tạo lịch tập
+                {t("createSchedule")}
               </Link>
             </div>
           </div>
@@ -60,42 +62,42 @@ export default function SiteFooter() {
         <div className="mt-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
           <div>
             <div className="inline-flex items-center gap-2">
-              <span className="inline-flex h-9 w-9 items-center justify-center rounded-2xl bg-gradient-to-br from-cyan-300 to-blue-500 text-slate-950 font-extrabold shadow-sm">
+              <span className="inline-flex h-9 w-9 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-400 to-blue-600 text-slate-950 font-extrabold shadow-sm">
                 V
               </span>
               <div className="leading-tight">
-                <p className="text-sm font-semibold text-white">Vovinam Learning</p>
-                <p className="text-xs text-slate-300">Cơ bản → nâng cao</p>
+                <p className="text-sm font-semibold text-white">{t("brandName")}</p>
+                <p className="text-xs text-slate-300">{t("brandSubtitle")}</p>
               </div>
             </div>
 
             <p className="mt-4 text-sm leading-6 text-slate-300">
-              App học theo lộ trình, hướng dẫn từng bước, dễ theo dõi tiến độ.
+              {t("brandDescription")}
             </p>
           </div>
 
           <div>
-            <FooterTitle>Điều hướng</FooterTitle>
+            <FooterTitle>{t("navTitle")}</FooterTitle>
             <div className="mt-3 grid gap-2">
-              <FooterLink href="/">Trang chủ</FooterLink>
-              <FooterLink href="/lo-trinh">Lộ trình</FooterLink>
-              <FooterLink href="/hoc-tap">Khóa học</FooterLink>
-              <FooterLink href="/video">Video</FooterLink>
-              <FooterLink href="/ky-thuat">Thư viện kỹ thuật</FooterLink>
-              <FooterLink href="/lich-tap">Lịch tập</FooterLink>
-              <FooterLink href="/dinh-duong">Dinh dưỡng</FooterLink>
-              <FooterLink href="/tien-do">Tiến độ</FooterLink>
-              <FooterLink href="/cua-hang">Cửa hàng</FooterLink>
-              <FooterLink href="/ho-so">Hồ sơ</FooterLink>
-              <FooterLink href="/ai-coach">AI Coach</FooterLink>
-              <FooterLink href="/admin">Admin/Coach</FooterLink>
-              <FooterLink href="/chinh-sach-bao-mat">Chính sách bảo mật</FooterLink>
-              <FooterLink href="/dieu-khoan">Điều khoản</FooterLink>
+              <FooterLink href="/">{t("links.home")}</FooterLink>
+              <FooterLink href="/lo-trinh">{t("links.roadmap")}</FooterLink>
+              <FooterLink href="/hoc-tap">{t("links.course")}</FooterLink>
+              <FooterLink href="/video">{t("links.videos")}</FooterLink>
+              <FooterLink href="/ky-thuat">{t("links.techniques")}</FooterLink>
+              <FooterLink href="/lich-tap">{t("links.schedule")}</FooterLink>
+              <FooterLink href="/dinh-duong">{t("links.nutrition")}</FooterLink>
+              <FooterLink href="/tien-do">{t("links.progress")}</FooterLink>
+              <FooterLink href="/cua-hang">{t("links.store")}</FooterLink>
+              <FooterLink href="/ho-so">{t("links.profile")}</FooterLink>
+              <FooterLink href="/ai-coach">{t("links.aiCoach")}</FooterLink>
+              <FooterLink href="/admin">{t("links.admin")}</FooterLink>
+              <FooterLink href="/chinh-sach-bao-mat">{t("links.privacy")}</FooterLink>
+              <FooterLink href="/dieu-khoan">{t("links.terms")}</FooterLink>
             </div>
           </div>
 
           <div>
-            <FooterTitle>Cấp độ</FooterTitle>
+            <FooterTitle>{t("levelTitle")}</FooterTitle>
             <div className="mt-3 grid gap-2">
               {LEVELS.map((level) => (
                 <FooterLink key={level.id} href={`/lo-trinh#${level.id}`}>
@@ -106,39 +108,52 @@ export default function SiteFooter() {
           </div>
 
           <div>
-            <FooterTitle>Lưu ý an toàn</FooterTitle>
+            <FooterTitle>{t("safetyTitle")}</FooterTitle>
             <ul className="mt-3 grid gap-2 text-sm leading-6 text-slate-300">
               <li className="flex gap-2">
-                <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-cyan-300/80" />
-                <span>Khởi động 5–10 phút (cổ chân, gối, hông, vai).</span>
+                <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-blue-400/80" />
+                <span>{t("safety1")}</span>
               </li>
               <li className="flex gap-2">
-                <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-cyan-300/80" />
-                <span>Tập chậm – đúng kỹ thuật trước khi tăng tốc.</span>
+                <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-blue-400/80" />
+                <span>{t("safety2")}</span>
               </li>
               <li className="flex gap-2">
-                <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-cyan-300/80" />
-                <span>Đau nhói/choáng: dừng lại và nghỉ, không cố.</span>
+                <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-blue-400/80" />
+                <span>{t("safety3")}</span>
               </li>
               <li className="flex gap-2">
-                <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-cyan-300/80" />
-                <span>Kỹ thuật khó: nên có huấn luyện viên hướng dẫn.</span>
+                <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-blue-400/80" />
+                <span>{t("safety4")}</span>
               </li>
             </ul>
+
+            {emergencySupportUrl ? (
+              <div className="mt-4">
+                <a
+                  href={emergencySupportUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex h-11 w-full items-center justify-center rounded-2xl border border-white/10 bg-white/5 px-4 text-sm font-semibold text-white transition hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-blue-400/30"
+                >
+                  {t("emergencySupport")}
+                </a>
+              </div>
+            ) : null}
           </div>
         </div>
 
         <div className="mt-10 flex flex-col gap-3 border-t border-white/10 pt-6 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-xs text-slate-400">
-            © {year} Vovinam Learning • Built with Next.js
+            © {year} {t("brandName")} • {t("copyright")}
           </p>
 
           <div className="flex flex-wrap items-center gap-3 text-xs">
             <a
               href="#top"
-              className="text-slate-300 transition hover:text-white focus:outline-none focus:ring-2 focus:ring-cyan-300/30 rounded-lg"
+              className="text-slate-300 transition hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-400/30 rounded-lg"
             >
-              Lên đầu trang ↑
+              {t("backToTop")}
             </a>
           </div>
         </div>

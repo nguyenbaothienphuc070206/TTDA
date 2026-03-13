@@ -691,7 +691,7 @@ export default function PoseCoach() {
   }, []);
 
   return (
-    <section className="rounded-3xl border border-white/10 bg-white/5 p-6 sm:p-8">
+    <section className="rounded-3xl border border-white/10 bg-white/5 p-6 sm:p-8 shadow-[var(--shadow-card)]">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
           <h2 className="text-lg font-semibold text-white">AI Pose Coach</h2>
@@ -705,8 +705,8 @@ export default function PoseCoach() {
           onClick={enabled ? stop : start}
           className={
             enabled
-              ? "inline-flex h-11 items-center justify-center rounded-2xl border border-white/10 bg-white/5 px-4 text-sm font-semibold text-white transition hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-cyan-300/30"
-              : "inline-flex h-11 items-center justify-center rounded-2xl bg-gradient-to-r from-cyan-300 to-blue-500 px-4 text-sm font-semibold text-slate-950 transition hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-cyan-300/50"
+              ? "inline-flex h-11 items-center justify-center rounded-2xl border border-white/10 bg-white/5 px-4 text-sm font-semibold text-white transition hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-blue-400/30"
+              : "inline-flex h-11 items-center justify-center rounded-2xl bg-gradient-to-r from-blue-400 to-blue-600 px-4 text-sm font-semibold text-slate-950 transition hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-blue-400/50"
           }
         >
           {enabled ? (streamRef.current ? "Tắt camera" : "Dừng phân tích") : "Bật camera"}
@@ -720,7 +720,7 @@ export default function PoseCoach() {
             type="file"
             accept="image/*,video/*"
             onChange={onPickFile}
-            className="mt-2 h-11 w-full rounded-2xl border border-white/10 bg-slate-950/60 px-3 text-sm text-slate-200 outline-none focus:ring-2 focus:ring-cyan-300/30"
+            className="mt-2 h-11 w-full rounded-2xl border border-white/10 bg-slate-950/60 px-3 text-sm text-slate-200 outline-none focus:ring-2 focus:ring-blue-400/30"
           />
         </label>
 
@@ -728,7 +728,7 @@ export default function PoseCoach() {
           <button
             type="button"
             onClick={clearUpload}
-            className="inline-flex h-11 items-center justify-center rounded-2xl border border-white/10 bg-white/5 px-4 text-sm font-semibold text-white transition hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-cyan-300/30"
+            className="inline-flex h-11 items-center justify-center rounded-2xl border border-white/10 bg-white/5 px-4 text-sm font-semibold text-white transition hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-blue-400/30"
           >
             Xoá file
           </button>
