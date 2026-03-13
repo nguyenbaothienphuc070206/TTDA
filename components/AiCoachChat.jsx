@@ -84,6 +84,8 @@ function MarkdownAnswer({ children }) {
 }
 
 function SourceItem({ source }) {
+  const href = String(source?.url || "").trim();
+
   return (
     <li className="rounded-2xl border border-white/10 bg-white/5 p-3">
       <div className="flex items-center justify-between gap-3">
@@ -95,12 +97,14 @@ function SourceItem({ source }) {
             {source.type} • score {source.score}
           </div>
         </div>
-        <Link
-          href={source.url}
-          className="shrink-0 rounded-xl border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-semibold text-slate-200 transition hover:bg-white/10 hover:text-white focus:outline-none focus:ring-2 focus:ring-cyan-300/30"
-        >
-          Mở
-        </Link>
+        {href ? (
+          <Link
+            href={href}
+            className="shrink-0 rounded-xl border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-semibold text-slate-200 transition hover:bg-white/10 hover:text-white focus:outline-none focus:ring-2 focus:ring-cyan-300/30"
+          >
+            Mở
+          </Link>
+        ) : null}
       </div>
 
       {Array.isArray(source.highlights) && source.highlights.length > 0 ? (
