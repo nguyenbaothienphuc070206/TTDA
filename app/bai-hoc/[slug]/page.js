@@ -43,8 +43,9 @@ function Steps({ items }) {
   );
 }
 
-export function generateMetadata({ params }) {
-  const lesson = getLessonBySlug(params.slug);
+export async function generateMetadata({ params }) {
+  const { slug } = await params;
+  const lesson = getLessonBySlug(slug);
 
   if (!lesson) {
     return { title: "Bài học" };
@@ -66,8 +67,9 @@ export function generateMetadata({ params }) {
   };
 }
 
-export default function LessonPage({ params }) {
-  const lesson = getLessonBySlug(params.slug);
+export default async function LessonPage({ params }) {
+  const { slug } = await params;
+  const lesson = getLessonBySlug(slug);
   if (!lesson) notFound();
 
   const jsonLd = {

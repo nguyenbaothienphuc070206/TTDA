@@ -7,8 +7,9 @@ import OfflineVideoControls from "@/components/OfflineVideoControls";
 import TrackView from "@/components/TrackView";
 import { getVideoById } from "@/data/videos";
 
-export function generateMetadata({ params }) {
-  const video = getVideoById(params.id);
+export async function generateMetadata({ params }) {
+  const { id } = await params;
+  const video = getVideoById(id);
   if (!video) return { title: "Video" };
 
   return {
@@ -27,8 +28,9 @@ export function generateMetadata({ params }) {
   };
 }
 
-export default function VideoDetailPage({ params }) {
-  const video = getVideoById(params.id);
+export default async function VideoDetailPage({ params }) {
+  const { id } = await params;
+  const video = getVideoById(id);
   if (!video) notFound();
 
   const jsonLd = {
