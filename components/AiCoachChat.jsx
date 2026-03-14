@@ -1,10 +1,11 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { Bot, Sparkles } from "lucide-react";
+import { Bot, Sparkles, ThumbsDown, ThumbsUp } from "lucide-react";
 
 import { readProfile } from "@/lib/profile";
 
@@ -21,8 +22,10 @@ function readChatStore() {
     const history = Array.isArray(data?.history)
       ? data.history
           .map((m) => ({
+            id: typeof m?.id === "string" ? m.id : "",
             role: m?.role === "assistant" ? "assistant" : m?.role === "user" ? "user" : "",
             content: String(m?.content || "").trim(),
+            feedback: m?.feedback === 1 || m?.feedback === -1 ? m.feedback : 0,
           }))
           .filter((m) => m.role && m.content)
       : [];
@@ -90,6 +93,8 @@ function ChatMessage({ message }) {
   if (!content.trim()) return null;
 
   const isUser = role === "user";
+  const messageId = typeof message?.id === "string" ? message.id : "";
+  const feedback = message?.feedback === 1 || message?.feedback === -1 ? message.feedback : 0;
 
   return (
     <div className={"flex gap-2 " + (isUser ? "justify-end" : "justify-start")}>
@@ -112,6 +117,37 @@ function ChatMessage({ message }) {
         ) : (
           <MarkdownAnswer>{content}</MarkdownAnswer>
         )}
+
+        {!isUser && messageId ? (
+          <div className="mt-2 flex items-center justify-end gap-1">
+            <button
+              type="button"
+              onClick={() => message?.onFeedback?.({ messageId, rating: 1 })}
+              className={
+                "inline-flex h-8 w-8 items-center justify-center rounded-xl border text-slate-200 transition focus:outline-none focus:ring-2 focus:ring-blue-400/30 " +
+                (feedback === 1
+                  ? "border-blue-400/30 bg-blue-500/15 text-blue-100"
+                  : "border-white/10 bg-white/5 hover:bg-white/10 hover:text-white")
+              }
+              aria-label="Phản hồi hữu ích"
+            >
+              <ThumbsUp className="h-4 w-4" />
+            </button>
+            <button
+              type="button"
+              onClick={() => message?.onFeedback?.({ messageId, rating: -1 })}
+              className={
+                "inline-flex h-8 w-8 items-center justify-center rounded-xl border text-slate-200 transition focus:outline-none focus:ring-2 focus:ring-blue-400/30 " +
+                (feedback === -1
+                  ? "border-blue-400/30 bg-blue-500/15 text-blue-100"
+                  : "border-white/10 bg-white/5 hover:bg-white/10 hover:text-white")
+              }
+              aria-label="Phản hồi không hữu ích"
+            >
+              <ThumbsDown className="h-4 w-4" />
+            </button>
+          </div>
+        ) : null}
       </div>
     </div>
   );
@@ -153,6 +189,7 @@ function SourceItem({ source }) {
 }
 
 export default function AiCoachChat({ context }) {
+  const pathname = usePathname() || "";
   const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -163,6 +200,31 @@ export default function AiCoachChat({ context }) {
   const [sessionId, setSessionId] = useState("");
   const abortRef = useRef(null);
   const scrollRef = useRef(null);
+
+  const sendFeedback = async ({ messageId, rating }) => {
+    const id = String(messageId || "").trim();
+    const r = Number(rating);
+    if (!id) return;
+    if (r !== 1 && r !== -1) return;
+
+    setChatHistory((prev) => {
+      const next = (Array.isArray(prev) ? prev : []).map((m) =>
+        String(m?.id || "") === id ? { ...m, feedback: r } : m
+      );
+      writeChatStore({ history: next.slice(-8), sessionId: sessionId || "" });
+      return next;
+    });
+
+    try {
+      await fetch("/api/ai/coach/feedback", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ messageId: id, rating: r, pagePath: pathname }),
+      });
+    } catch {
+      // ignore
+    }
+  };
 
   useEffect(() => {
     const store = readChatStore();
@@ -254,6 +316,7 @@ export default function AiCoachChat({ context }) {
         const decoder = new TextDecoder("utf-8");
         let buffer = "";
         let finalAnswer = "";
+        let finalAssistantMessageId = "";
 
         const applyMeta = (meta) => {
           const s = Array.isArray(meta?.sources) ? meta.sources : [];
@@ -324,6 +387,15 @@ export default function AiCoachChat({ context }) {
               pushDelta(payload?.text);
             }
 
+            if (evt === "done") {
+              const id = typeof payload?.assistantMessageId === "string" ? payload.assistantMessageId : "";
+              if (id) finalAssistantMessageId = id;
+              if (typeof payload?.sessionId === "string" && payload.sessionId) {
+                activeSessionId = payload.sessionId;
+                setSessionId(payload.sessionId);
+              }
+            }
+
             if (evt === "error") {
               setError(payload?.error || "Không xử lý được yêu cầu.");
             }
@@ -331,9 +403,16 @@ export default function AiCoachChat({ context }) {
         }
 
         // Update local history after streaming completes.
-        const nextHistory = [...history, { role: "user", content: q }, { role: "assistant", content: finalAnswer }].slice(-8);
+        const nextHistory = [
+          ...history,
+          { role: "user", content: q },
+          { role: "assistant", content: finalAnswer, id: finalAssistantMessageId || "" },
+        ].slice(-8);
+
+        // Attach feedback handler for rendering.
+        const nextUiHistory = nextHistory.map((m) => ({ ...m, onFeedback: sendFeedback }));
         writeChatStore({ history: nextHistory, sessionId: activeSessionId });
-        setChatHistory(nextHistory);
+        setChatHistory(nextUiHistory);
         return;
       }
 
@@ -351,9 +430,18 @@ export default function AiCoachChat({ context }) {
         setSessionId(data.sessionId);
       }
 
-      const nextHistory = [...history, { role: "user", content: q }, { role: "assistant", content: String(data?.answer || "") }].slice(-8);
+      const nextHistory = [
+        ...history,
+        { role: "user", content: q },
+        {
+          role: "assistant",
+          content: String(data?.answer || ""),
+          id: typeof data?.assistantMessageId === "string" ? data.assistantMessageId : "",
+        },
+      ].slice(-8);
+      const nextUiHistory = nextHistory.map((m) => ({ ...m, onFeedback: sendFeedback }));
       writeChatStore({ history: nextHistory, sessionId: String(data?.sessionId || sessionId || "") });
-      setChatHistory(nextHistory);
+      setChatHistory(nextUiHistory);
     } catch {
       setError("Không kết nối được API. Vui lòng thử lại.");
     } finally {
@@ -364,6 +452,12 @@ export default function AiCoachChat({ context }) {
   const hasChat = useMemo(() => {
     return Array.isArray(chatHistory) && chatHistory.some((m) => String(m?.content || "").trim());
   }, [chatHistory]);
+
+  useEffect(() => {
+    // Ensure stored history has feedback handler attached (non-serializable).
+    setChatHistory((prev) => (Array.isArray(prev) ? prev.map((m) => ({ ...m, onFeedback: sendFeedback })) : []));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-white/5 p-6 sm:p-8 shadow-[var(--shadow-card)]">

@@ -23,6 +23,11 @@ import path from "node:path";
 import { createClient } from "@supabase/supabase-js";
 
 import { createEmbedding, getOpenAiModels, hasOpenAi } from "../lib/ai/openai.js";
+import {
+  beltFromDifficulty,
+  formatTechniqueMarkdown,
+  formatVideoMarkdown,
+} from "../lib/ai/kbFormat.js";
 
 function parseArgs(argv) {
   const args = argv.slice(2);
@@ -181,13 +186,6 @@ function chunkText(text, { maxChars = 1100, overlapChars = 150 } = {}) {
   return chunks.filter(Boolean);
 }
 
-function beltFromDifficulty(difficulty) {
-  if (difficulty === "easy") return "lam-dai";
-  if (difficulty === "medium") return "hoang-dai";
-  if (difficulty === "hard") return "huyen-dai";
-  return null;
-}
-
 function getSupabaseClient() {
   const url = String(process.env.NEXT_PUBLIC_SUPABASE_URL || "").trim();
   const key = String(process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY || "").trim();
@@ -258,21 +256,14 @@ async function buildProjectDocs({ limit }) {
 
   for (const t of TECHNIQUES || []) {
     const cat = categoryById.get(t.categoryId);
+    const belt_id = beltFromDifficulty(t.difficulty);
     items.push({
       source: "technique",
       source_id: String(t.slug),
       title: String(t.title),
       url: `/ky-thuat#${t.slug}`,
-      belt_id: beltFromDifficulty(t.difficulty),
-      content: [
-        `KỸ THUẬT: ${t.title}`,
-        cat?.title ? `Nhóm: ${cat.title}` : "",
-        t.summary ? `Tóm tắt: ${t.summary}` : "",
-        Array.isArray(t.steps) && t.steps.length ? `Các bước:\n- ${t.steps.join("\n- ")}` : "",
-        Array.isArray(t.mistakes) && t.mistakes.length ? `Lỗi thường gặp:\n- ${t.mistakes.join("\n- ")}` : "",
-        Array.isArray(t.safety) && t.safety.length ? `An toàn:\n- ${t.safety.join("\n- ")}` : "",
-        Array.isArray(t.tags) && t.tags.length ? `Tags: ${t.tags.join(", ")}` : "",
-      ].filter(Boolean).join("\n\n"),
+      belt_id,
+      content: formatTechniqueMarkdown({ technique: t, category: cat || null }),
       metadata: {
         kind: "project",
         categoryId: t.categoryId,
@@ -289,12 +280,7 @@ async function buildProjectDocs({ limit }) {
       title: String(v.title),
       url: `/video/${v.id}`,
       belt_id: v.beltId || null,
-      content: [
-        `VIDEO: ${v.title}`,
-        v.summary ? `Tóm tắt: ${v.summary}` : "",
-        Array.isArray(v.transcript) && v.transcript.length ? `Transcript:\n- ${v.transcript.join("\n- ")}` : "",
-        Array.isArray(v.tags) && v.tags.length ? `Tags: ${v.tags.join(", ")}` : "",
-      ].filter(Boolean).join("\n\n"),
+      content: formatVideoMarkdown({ video: v }),
       metadata: {
         kind: "project",
         minutes: v.minutes || null,

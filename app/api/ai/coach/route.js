@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { TECHNIQUES } from "@/data/wiki";
+import { TECHNIQUES, TECHNIQUE_CATEGORIES } from "@/data/wiki";
 import { VIDEOS } from "@/data/videos";
 import { getLessonBySlug } from "@/data/lessons";
 import {
@@ -9,14 +9,22 @@ import {
   searchDocuments,
 } from "@/lib/rag";
 import { BELT_ORDER, normalizeBeltId, isBeltAllowed } from "@/lib/ai/belts";
-import { AI_COACH_NOT_FOUND_MESSAGE, buildAiCoachSystemPrompt } from "@/lib/ai/prompt";
+import {
+  AI_COACH_NOT_FOUND_MESSAGE,
+  buildAiCoachFewShotMessages,
+  buildAiCoachSystemPrompt,
+} from "@/lib/ai/prompt";
 import { createEmbedding, chatCompletion, hasOpenAi, streamChatCompletion } from "@/lib/ai/openai";
 import { recommendVideos } from "@/lib/ai/recommendVideos";
 import { checkRateLimit, isBodyTooLarge } from "@/lib/apiGuards";
 import { createSupabaseRouteHandlerClient } from "@/lib/supabase/routeHandlerClient";
 import { createSupabaseServiceClient } from "@/lib/supabase/serviceClient";
 
-const DOCS = buildDocuments({ techniques: TECHNIQUES, videos: VIDEOS });
+const DOCS = buildDocuments({
+  techniques: TECHNIQUES,
+  videos: VIDEOS,
+  categories: TECHNIQUE_CATEGORIES,
+});
 
 function asText(value) {
   return String(value || "").trim();
@@ -357,10 +365,12 @@ export async function POST(request) {
 
     const system = buildAiCoachSystemPrompt({ beltId });
     const contextBlock = buildContextBlock(sources, beltId);
+    const fewShot = buildAiCoachFewShotMessages();
 
     const messages = [
       { role: "system", content: system },
       { role: "system", content: contextBlock },
+      ...(Array.isArray(fewShot) ? fewShot : []),
       // Lightweight memory: include last turns if provided.
       ...(history.length > 0
         ? [{ role: "system", content: `LỊCH SỬ GẦN ĐÂY (để giữ mạch hội thoại):\n${history.map((h) => `${h.role.toUpperCase()}: ${h.content}`).join("\n")}` }]
@@ -376,6 +386,7 @@ export async function POST(request) {
     const canStore = Boolean(userCtx?.user && userCtx?.supabase);
 
     let storedSessionId = sessionId;
+    let storedUserMessageId = "";
     if (canStore && !storedSessionId) {
       try {
         const { data } = await userCtx.supabase
@@ -391,13 +402,19 @@ export async function POST(request) {
 
     if (canStore && storedSessionId) {
       try {
-        await userCtx.supabase.from("ai_chat_messages").insert({
+        const { data } = await userCtx.supabase
+          .from("ai_chat_messages")
+          .insert({
           session_id: storedSessionId,
           user_id: userCtx.user.id,
           role: "user",
           content: query,
           meta: { videoId: videoId || null, beltId },
-        });
+        })
+          .select("id")
+          .single();
+
+        storedUserMessageId = data?.id || "";
       } catch {
         // ignore
       }
@@ -416,6 +433,29 @@ export async function POST(request) {
         "\n_(Ghi chú: Chưa cấu hình OPENAI_API_KEY nên đây là trả lời RAG-lite dựa trên dữ liệu trong project.)_",
       ].join("\n");
 
+      let assistantMessageId = "";
+      if (canStore && storedSessionId) {
+        try {
+          const { data } = await userCtx.supabase
+            .from("ai_chat_messages")
+            .insert({
+              session_id: storedSessionId,
+              user_id: userCtx.user.id,
+              role: "assistant",
+              content: md,
+              meta: {
+                sources: sources.slice(0, 5).map((s) => ({ id: s.id, url: s.url, score: s.score })),
+                userMessageId: storedUserMessageId || null,
+              },
+            })
+            .select("id")
+            .single();
+          assistantMessageId = data?.id || "";
+        } catch {
+          assistantMessageId = "";
+        }
+      }
+
       const res = NextResponse.json({
         answer: md,
         sources: sources.map((s) => ({
@@ -433,6 +473,8 @@ export async function POST(request) {
           url: `/video/${v.id}`,
         })),
         sessionId: storedSessionId || null,
+        userMessageId: storedUserMessageId || null,
+        assistantMessageId: assistantMessageId || null,
         mode,
       });
       res.headers.set("Cache-Control", "no-store");
@@ -442,17 +484,27 @@ export async function POST(request) {
     if (!doStream) {
       const answer = await chatCompletion({ messages });
 
+      let assistantMessageId = "";
       if (canStore && storedSessionId) {
         try {
-          await userCtx.supabase.from("ai_chat_messages").insert({
+          const { data } = await userCtx.supabase
+            .from("ai_chat_messages")
+            .insert({
             session_id: storedSessionId,
             user_id: userCtx.user.id,
             role: "assistant",
             content: answer,
-            meta: { sources: sources.slice(0, 5).map((s) => ({ id: s.id, url: s.url, score: s.score })) },
-          });
+            meta: {
+              sources: sources.slice(0, 5).map((s) => ({ id: s.id, url: s.url, score: s.score })),
+              userMessageId: storedUserMessageId || null,
+            },
+          })
+            .select("id")
+            .single();
+          assistantMessageId = data?.id || "";
         } catch {
           // ignore
+          assistantMessageId = "";
         }
       }
 
@@ -473,6 +525,8 @@ export async function POST(request) {
           url: `/video/${v.id}`,
         })),
         sessionId: storedSessionId || null,
+        userMessageId: storedUserMessageId || null,
+        assistantMessageId: assistantMessageId || null,
         mode,
       });
       res.headers.set("Cache-Control", "no-store");
@@ -482,6 +536,7 @@ export async function POST(request) {
     // Streaming (SSE)
     const encoder = new TextEncoder();
     let full = "";
+    let assistantMessageId = "";
 
     const stream = new ReadableStream({
       async start(controller) {
@@ -516,19 +571,38 @@ export async function POST(request) {
 
           if (canStore && storedSessionId) {
             try {
-              await userCtx.supabase.from("ai_chat_messages").insert({
+              const { data } = await userCtx.supabase
+                .from("ai_chat_messages")
+                .insert({
                 session_id: storedSessionId,
                 user_id: userCtx.user.id,
                 role: "assistant",
                 content: full,
-                meta: { sources: sources.slice(0, 5).map((s) => ({ id: s.id, url: s.url, score: s.score })) },
-              });
+                meta: {
+                  sources: sources.slice(0, 5).map((s) => ({ id: s.id, url: s.url, score: s.score })),
+                  userMessageId: storedUserMessageId || null,
+                },
+              })
+                .select("id")
+                .single();
+
+              assistantMessageId = data?.id || "";
             } catch {
               // ignore
+              assistantMessageId = "";
             }
           }
 
-          controller.enqueue(encoder.encode(sseEvent("done", { ok: true })));
+          controller.enqueue(
+            encoder.encode(
+              sseEvent("done", {
+                ok: true,
+                sessionId: storedSessionId || null,
+                userMessageId: storedUserMessageId || null,
+                assistantMessageId: assistantMessageId || null,
+              })
+            )
+          );
           controller.close();
         } catch (e) {
           controller.enqueue(

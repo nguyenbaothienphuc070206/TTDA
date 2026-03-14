@@ -198,3 +198,70 @@ on public.ai_chat_messages
 for select
 to authenticated
 using (public.is_admin() or (public.is_coach() and public.can_coach_student(user_id)));
+
+-- 3) Feedback (👍/👎) for continuous improvement
+create table if not exists public.ai_chat_feedback (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users (id) on delete cascade,
+  message_id uuid not null references public.ai_chat_messages (id) on delete cascade,
+  rating smallint not null check (rating in (-1, 1)),
+  note text null,
+  meta jsonb not null default '{}'::jsonb,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create unique index if not exists ai_chat_feedback_user_message_uniq
+  on public.ai_chat_feedback (user_id, message_id);
+
+create index if not exists ai_chat_feedback_message_idx
+  on public.ai_chat_feedback (message_id, created_at desc);
+
+alter table public.ai_chat_feedback enable row level security;
+
+-- Feedback: user owns own data
+drop policy if exists "ai_chat_feedback_select_own" on public.ai_chat_feedback;
+create policy "ai_chat_feedback_select_own"
+on public.ai_chat_feedback
+for select
+to authenticated
+using (user_id = auth.uid());
+
+drop policy if exists "ai_chat_feedback_insert_own" on public.ai_chat_feedback;
+create policy "ai_chat_feedback_insert_own"
+on public.ai_chat_feedback
+for insert
+to authenticated
+with check (
+  user_id = auth.uid()
+  and exists (
+    select 1
+    from public.ai_chat_messages m
+    join public.ai_chat_sessions s on s.id = m.session_id
+    where m.id = message_id
+      and s.user_id = auth.uid()
+  )
+);
+
+drop policy if exists "ai_chat_feedback_update_own" on public.ai_chat_feedback;
+create policy "ai_chat_feedback_update_own"
+on public.ai_chat_feedback
+for update
+to authenticated
+using (user_id = auth.uid())
+with check (user_id = auth.uid());
+
+drop policy if exists "ai_chat_feedback_delete_own" on public.ai_chat_feedback;
+create policy "ai_chat_feedback_delete_own"
+on public.ai_chat_feedback
+for delete
+to authenticated
+using (user_id = auth.uid());
+
+-- Coach/Admin read access (optional analytics/support)
+drop policy if exists "ai_chat_feedback_select_coach" on public.ai_chat_feedback;
+create policy "ai_chat_feedback_select_coach"
+on public.ai_chat_feedback
+for select
+to authenticated
+using (public.is_admin() or (public.is_coach() and public.can_coach_student(user_id)));

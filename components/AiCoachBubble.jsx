@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { Bot, Sparkles, X } from "lucide-react";
+import { Bot, Sparkles, ThumbsDown, ThumbsUp, X } from "lucide-react";
 
 import { LESSONS, getLessonBySlug } from "@/data/lessons";
 import { readDoneSlugs } from "@/lib/progress";
@@ -24,6 +24,7 @@ function readChatStore() {
     const history = Array.isArray(data?.history)
       ? data.history
           .map((m) => ({
+            id: typeof m?.id === "string" ? m.id : "",
             role:
               m?.role === "assistant"
                 ? "assistant"
@@ -31,6 +32,7 @@ function readChatStore() {
                   ? "user"
                   : "",
             content: String(m?.content || "").trim(),
+            feedback: m?.feedback === 1 || m?.feedback === -1 ? m.feedback : 0,
           }))
           .filter((m) => m.role && m.content)
       : [];
@@ -100,6 +102,8 @@ function ChatMessage({ message }) {
   if (!content.trim()) return null;
 
   const isUser = role === "user";
+  const messageId = typeof message?.id === "string" ? message.id : "";
+  const feedback = message?.feedback === 1 || message?.feedback === -1 ? message.feedback : 0;
 
   return (
     <div className={"flex gap-2 " + (isUser ? "justify-end" : "justify-start")}>
@@ -122,6 +126,37 @@ function ChatMessage({ message }) {
         ) : (
           <MarkdownAnswer className="mt-0">{content}</MarkdownAnswer>
         )}
+
+        {!isUser && messageId ? (
+          <div className="mt-2 flex items-center justify-end gap-1">
+            <button
+              type="button"
+              onClick={() => message?.onFeedback?.({ messageId, rating: 1 })}
+              className={
+                "inline-flex h-8 w-8 items-center justify-center rounded-xl border text-slate-200 transition focus:outline-none focus:ring-2 focus:ring-blue-400/30 " +
+                (feedback === 1
+                  ? "border-blue-400/30 bg-blue-500/15 text-blue-100"
+                  : "border-white/10 bg-white/5 hover:bg-white/10 hover:text-white")
+              }
+              aria-label="Phản hồi hữu ích"
+            >
+              <ThumbsUp className="h-4 w-4" />
+            </button>
+            <button
+              type="button"
+              onClick={() => message?.onFeedback?.({ messageId, rating: -1 })}
+              className={
+                "inline-flex h-8 w-8 items-center justify-center rounded-xl border text-slate-200 transition focus:outline-none focus:ring-2 focus:ring-blue-400/30 " +
+                (feedback === -1
+                  ? "border-blue-400/30 bg-blue-500/15 text-blue-100"
+                  : "border-white/10 bg-white/5 hover:bg-white/10 hover:text-white")
+              }
+              aria-label="Phản hồi không hữu ích"
+            >
+              <ThumbsDown className="h-4 w-4" />
+            </button>
+          </div>
+        ) : null}
       </div>
     </div>
   );
@@ -197,6 +232,38 @@ export default function AiCoachBubble() {
     setSessionId(store.sessionId || "");
   }, []);
 
+  const sendFeedback = async ({ messageId, rating }) => {
+    const id = String(messageId || "").trim();
+    const r = Number(rating);
+    if (!id) return;
+    if (r !== 1 && r !== -1) return;
+
+    setChatHistory((prev) => {
+      const next = (Array.isArray(prev) ? prev : []).map((m) =>
+        String(m?.id || "") === id ? { ...m, feedback: r } : m
+      );
+
+      const store = readChatStore();
+      writeChatStore({ history: next.slice(-8), sessionId: sessionId || store.sessionId || "" });
+      return next;
+    });
+
+    try {
+      await fetch("/api/ai/coach/feedback", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ messageId: id, rating: r, pagePath: pathname }),
+      });
+    } catch {
+      // ignore
+    }
+  };
+
+  const attachFeedbackHandler = (history) => {
+    const list = Array.isArray(history) ? history : [];
+    return list.map((m) => ({ ...m, onFeedback: sendFeedback }));
+  };
+
   useEffect(() => {
     const sync = () => {
       const done = readDoneSlugs();
@@ -271,8 +338,10 @@ export default function AiCoachBubble() {
 
       // Optimistic UI: show bubbles immediately.
       setChatHistory(
-        [...history, { role: "user", content: question }, { role: "assistant", content: "" }].slice(
-          -8
+        attachFeedbackHandler(
+          [...history, { role: "user", content: question }, { role: "assistant", content: "" }].slice(
+            -8
+          )
         )
       );
 
@@ -309,6 +378,7 @@ export default function AiCoachBubble() {
         const decoder = new TextDecoder("utf-8");
         let buffer = "";
         let finalAnswer = "";
+        let finalAssistantMessageId = "";
 
         const applyMeta = (meta) => {
           const s = Array.isArray(meta?.sources) ? meta.sources : [];
@@ -375,6 +445,14 @@ export default function AiCoachBubble() {
 
             if (evt === "meta") applyMeta(payload);
             if (evt === "delta") pushDelta(payload?.text);
+            if (evt === "done") {
+              const id = typeof payload?.assistantMessageId === "string" ? payload.assistantMessageId : "";
+              if (id) finalAssistantMessageId = id;
+              if (typeof payload?.sessionId === "string" && payload.sessionId) {
+                activeSessionId = payload.sessionId;
+                setSessionId(payload.sessionId);
+              }
+            }
             if (evt === "error") {
               setError(payload?.error || "Không xử lý được yêu cầu.");
             }
@@ -384,10 +462,10 @@ export default function AiCoachBubble() {
         const nextHistory = [
           ...history,
           { role: "user", content: question },
-          { role: "assistant", content: finalAnswer },
+          { role: "assistant", content: finalAnswer, id: finalAssistantMessageId || "" },
         ].slice(-8);
         writeChatStore({ history: nextHistory, sessionId: activeSessionId });
-        setChatHistory(nextHistory);
+        setChatHistory(attachFeedbackHandler(nextHistory));
         return;
       }
 
@@ -410,13 +488,17 @@ export default function AiCoachBubble() {
       const nextHistory = [
         ...history,
         { role: "user", content: question },
-        { role: "assistant", content: String(data?.answer || "") },
+        {
+          role: "assistant",
+          content: String(data?.answer || ""),
+          id: typeof data?.assistantMessageId === "string" ? data.assistantMessageId : "",
+        },
       ].slice(-8);
       writeChatStore({
         history: nextHistory,
         sessionId: String(data?.sessionId || sessionId || ""),
       });
-      setChatHistory(nextHistory);
+      setChatHistory(attachFeedbackHandler(nextHistory));
     } catch {
       setError("Không kết nối được API. Vui lòng thử lại.");
     } finally {
@@ -436,7 +518,7 @@ export default function AiCoachBubble() {
       const ctx = detail?.context && typeof detail.context === "object" ? detail.context : null;
 
       const store = readChatStore();
-      setChatHistory(Array.isArray(store.history) ? store.history : []);
+      setChatHistory(attachFeedbackHandler(Array.isArray(store.history) ? store.history : []));
 
       setOpen(true);
       setQuery(q);
@@ -630,7 +712,7 @@ export default function AiCoachBubble() {
           type="button"
           onClick={() => {
             const store = readChatStore();
-            setChatHistory(Array.isArray(store.history) ? store.history : []);
+            setChatHistory(attachFeedbackHandler(Array.isArray(store.history) ? store.history : []));
             setOpen(true);
           }}
           className="relative inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-400 to-blue-600 text-slate-950 shadow-[var(--shadow-card)] transition hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-blue-300/40"
