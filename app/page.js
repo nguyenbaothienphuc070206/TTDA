@@ -189,6 +189,8 @@ function BeltPreview({ belt }) {
 }
 
 function NewsCard({ item }) {
+  const kind = typeof item?.kind === "string" ? item.kind : "";
+
   return (
     <Link
       href={item.href}
@@ -197,7 +199,7 @@ function NewsCard({ item }) {
       <div className="absolute inset-0 opacity-0 transition-opacity group-hover:opacity-100 bg-[radial-gradient(circle_at_top,rgba(59,130,246,0.10),transparent_55%)]" />
       <div className="relative">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <Pill>Tin tức</Pill>
+          <Pill>{kind || "Sự kiện"}</Pill>
           <Pill>{item.date}</Pill>
         </div>
         <h3 className="mt-3 text-base font-semibold text-white">{item.title}</h3>
@@ -263,7 +265,7 @@ export default function Home() {
             <ChipLink href="#tinh-nang">Tính năng</ChipLink>
             <ChipLink href="#vo-dao">Võ đạo</ChipLink>
             <ChipLink href="#khoa-hoc">Khóa học</ChipLink>
-            <ChipLink href="#tin-tuc">Tin tức</ChipLink>
+            <ChipLink href="#tin-tuc">Thi đấu</ChipLink>
             <ChipLink href="#cach-hoc">Cách học</ChipLink>
             <ChipLink href="#bai-noi-bat">Bài nổi bật</ChipLink>
             <ChipLink href="#ke-hoach">Kế hoạch 4 tuần</ChipLink>
@@ -320,14 +322,14 @@ export default function Home() {
       <section className="mt-12">
         <SectionHeading
           id="tin-tuc"
-          title="Bảng tin mới nhất"
-          description="Cập nhật nhanh các tip an toàn, kế hoạch tập và dinh dưỡng." 
+          title="Lịch thi đấu & sự kiện"
+          description="Feed nhỏ cập nhật lịch thi đấu, đăng ký và nhắc lịch quan trọng." 
           right={
             <Link
-              href="/dinh-duong"
+              href="/lich-tap"
               className="text-sm font-semibold text-cyan-200 hover:text-white transition"
             >
-              Xem dinh dưỡng →
+              Tạo lịch tập →
             </Link>
           }
         />

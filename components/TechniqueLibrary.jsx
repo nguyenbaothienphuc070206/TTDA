@@ -1,9 +1,11 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import Link from "next/link";
+import { useEffect, useMemo, useState } from "react";
 
 import { TECHNIQUE_CATEGORIES, TECHNIQUES } from "@/data/wiki";
 import { trackView } from "@/lib/analytics";
+import { readProfile } from "@/lib/profile";
 
 function matches(text, q) {
   const t = String(text || "").toLowerCase();
@@ -23,6 +25,24 @@ export default function TechniqueLibrary() {
   const [query, setQuery] = useState("");
   const [categoryId, setCategoryId] = useState("all");
   const [difficulty, setDifficulty] = useState("all");
+  const [planId, setPlanId] = useState("free");
+
+  const isPremium = planId === "premium";
+
+  useEffect(() => {
+    const sync = () => {
+      const p = readProfile();
+      setPlanId(p?.planId === "premium" ? "premium" : "free");
+    };
+
+    sync();
+    window.addEventListener("vovinam-profile", sync);
+    window.addEventListener("storage", sync);
+    return () => {
+      window.removeEventListener("vovinam-profile", sync);
+      window.removeEventListener("storage", sync);
+    };
+  }, []);
 
   const onAskAi = () => {
     const q = String(query || "").trim();
@@ -64,6 +84,23 @@ export default function TechniqueLibrary() {
   return (
     <div className="grid gap-4">
       <section className="rounded-3xl border border-white/10 bg-white/5 p-6 sm:p-8 shadow-[var(--shadow-card)] fade-in-up">
+        {!isPremium ? (
+          <div className="mb-4 rounded-2xl border border-white/10 bg-slate-950/30 p-4">
+            <div className="text-sm font-semibold text-white">Freemium</div>
+            <p className="mt-1 text-sm leading-6 text-slate-300">
+              Lam đai mở miễn phí. Kỹ thuật Hoàng/Huyền đai sẽ khóa và cần Premium.
+            </p>
+            <div className="mt-3">
+              <Link
+                href="/ho-so"
+                className="inline-flex h-10 items-center justify-center rounded-2xl bg-gradient-to-r from-blue-400 to-blue-600 px-4 text-sm font-semibold text-slate-950 transition hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-blue-400/50"
+              >
+                Mở khóa Premium
+              </Link>
+            </div>
+          </div>
+        ) : null}
+
         <div className="grid gap-3 lg:grid-cols-4">
           <label className="block lg:col-span-2">
             <div className="text-xs font-semibold text-slate-200">Tìm kiếm</div>
@@ -141,6 +178,53 @@ export default function TechniqueLibrary() {
 
         {filtered.map((t) => {
           const cat = TECHNIQUE_CATEGORIES.find((c) => c.id === t.categoryId);
+          const isLocked = (t.difficulty === "medium" || t.difficulty === "hard") && !isPremium;
+
+          if (isLocked) {
+            return (
+              <div
+                key={t.slug}
+                className="group rounded-3xl border border-white/10 bg-white/5 p-5 shadow-[var(--shadow-card)]"
+              >
+                <div className="flex items-start justify-between gap-4">
+                  <div className="min-w-0">
+                    <h3 className="text-base sm:text-lg font-semibold text-white">
+                      {t.title}
+                    </h3>
+                    <p className="mt-1 text-sm leading-6 text-slate-300">
+                      {t.summary}
+                    </p>
+
+                    <div className="mt-3 flex flex-wrap items-center gap-2 text-xs">
+                      <span className="rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-slate-200">
+                        {cat?.title || "Kỹ thuật"}
+                      </span>
+                      <span className="rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-slate-300">
+                        Độ khó: {difficultyLabel(t.difficulty)}
+                      </span>
+                      <span className="rounded-full border border-blue-400/20 bg-blue-500/10 px-2.5 py-1 text-blue-100">
+                        Premium
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="h-10 w-10 shrink-0 rounded-2xl border border-white/10 bg-gradient-to-br from-blue-400/10 to-blue-600/5" />
+                </div>
+
+                <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                  <p className="text-xs leading-5 text-slate-400">
+                    Mở Premium để xem chi tiết các bước, lỗi thường gặp và an toàn.
+                  </p>
+                  <Link
+                    href="/ho-so"
+                    className="inline-flex h-10 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-r from-blue-400 to-blue-600 px-4 text-sm font-semibold text-slate-950 transition hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-blue-400/50"
+                  >
+                    Mở khóa
+                  </Link>
+                </div>
+              </div>
+            );
+          }
 
           return (
             <details

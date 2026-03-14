@@ -6,6 +6,8 @@ export const PRODUCTS = [
     category: "võ phục",
     summary: "Vải thoáng, form dễ mặc, phù hợp người mới.",
     badges: ["Bán chạy"],
+    partnerName: "Đối tác",
+    affiliateUrl: "https://example.com/?product=vo-phuc-basic",
   },
   {
     id: "dai-lam",
@@ -14,6 +16,8 @@ export const PRODUCTS = [
     category: "phù hiệu/đai",
     summary: "Đai tập cơ bản, dùng cho giai đoạn nền tảng.",
     badges: ["Phổ biến"],
+    partnerName: "Đối tác",
+    affiliateUrl: "https://example.com/?product=dai-lam",
   },
   {
     id: "bao-ho-ong-quyen",
@@ -22,6 +26,8 @@ export const PRODUCTS = [
     category: "bảo hộ",
     summary: "Êm, chắc, hỗ trợ tập đá an toàn hơn.",
     badges: ["An toàn"],
+    partnerName: "Đối tác",
+    affiliateUrl: "https://example.com/?product=bao-ho-ong-quyen",
   },
   {
     id: "con-nhua",
@@ -30,6 +36,8 @@ export const PRODUCTS = [
     category: "binh khí",
     summary: "Nhẹ, bền, phù hợp tập kỹ thuật cơ bản.",
     badges: [],
+    partnerName: "Đối tác",
+    affiliateUrl: "https://example.com/?product=con-nhua",
   },
 ];
 

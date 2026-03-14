@@ -5,11 +5,12 @@ import { usePathname } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { Bot, Sparkles, ThumbsDown, ThumbsUp, X } from "lucide-react";
+import { Sparkles, ThumbsDown, ThumbsUp, X } from "lucide-react";
 
 import { LESSONS, getLessonBySlug } from "@/data/lessons";
 import { readDoneSlugs } from "@/lib/progress";
 import { readProfile } from "@/lib/profile";
+import MascotIcon from "@/components/MascotIcon";
 
 const CHAT_STORE_KEY = "vovinam_ai_chat_v1";
 
@@ -109,7 +110,7 @@ function ChatMessage({ message }) {
     <div className={"flex gap-2 " + (isUser ? "justify-end" : "justify-start")}>
       {!isUser ? (
         <span className="mt-0.5 inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-2xl border border-white/10 bg-gradient-to-br from-blue-500/20 to-cyan-300/10 text-blue-100">
-          <Bot className="h-4 w-4" />
+          <MascotIcon className="h-5 w-5" />
         </span>
       ) : null}
 
@@ -220,16 +221,34 @@ export default function AiCoachBubble() {
   const [sources, setSources] = useState([]);
   const [recommendedVideos, setRecommendedVideos] = useState([]);
   const [sessionId, setSessionId] = useState("");
+  const [planId, setPlanId] = useState("free");
   const [activeContext, setActiveContext] = useState(null);
   const abortRef = useRef(null);
   const inputRef = useRef(null);
   const scrollRef = useRef(null);
+
+  const isPremium = planId === "premium";
 
   const [doneSlugs, setDoneSlugs] = useState([]);
 
   useEffect(() => {
     const store = readChatStore();
     setSessionId(store.sessionId || "");
+  }, []);
+
+  useEffect(() => {
+    const sync = () => {
+      const p = readProfile();
+      setPlanId(p?.planId === "premium" ? "premium" : "free");
+    };
+
+    sync();
+    window.addEventListener("vovinam-profile", sync);
+    window.addEventListener("storage", sync);
+    return () => {
+      window.removeEventListener("vovinam-profile", sync);
+      window.removeEventListener("storage", sync);
+    };
   }, []);
 
   const sendFeedback = async ({ messageId, rating }) => {
@@ -304,6 +323,11 @@ export default function AiCoachBubble() {
   }, [nextLesson, routeCtx.kind, routeCtx.lessonSlug, routeCtx.videoId]);
 
   const ask = async ({ q, contextOverride }) => {
+    if (!isPremium) {
+      setOpen(true);
+      return;
+    }
+
     const question = String(q || "").trim();
     if (question.length < 2) {
       setError("Bạn nhập câu hỏi dài hơn một chút nhé.");
@@ -523,6 +547,8 @@ export default function AiCoachBubble() {
       setOpen(true);
       setQuery(q);
 
+      if (!isPremium) return;
+
       // One-click quick actions should auto-submit.
       setTimeout(() => {
         ask({ q, contextOverride: ctx });
@@ -534,7 +560,7 @@ export default function AiCoachBubble() {
       window.removeEventListener("vovinam-ai-ask", onAskEvent);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pathname, routeCtx, sessionId]);
+  }, [pathname, routeCtx, sessionId, isPremium]);
 
   useEffect(() => {
     if (!open) return;
@@ -590,11 +616,11 @@ export default function AiCoachBubble() {
             className="pointer-events-none absolute -inset-8 rounded-[2.75rem] bg-[radial-gradient(circle_at_bottom_right,rgba(59,130,246,0.25),transparent_60%)] blur-2xl"
           />
 
-          <div className="relative w-[22rem] max-w-[calc(100vw-2rem)] overflow-hidden rounded-[2rem] border border-white/10 bg-[color:var(--header-bg)] shadow-[var(--shadow-card-strong)] backdrop-blur">
+          <div className="relative w-[22rem] max-w-[calc(100vw-2rem)] max-h-[calc(100vh-6rem)] overflow-hidden rounded-[2rem] border border-white/10 bg-[color:var(--header-bg)] shadow-[var(--shadow-card-strong)] backdrop-blur flex flex-col">
             <div className="flex items-center justify-between gap-3 border-b border-white/10 px-4 py-3">
               <div className="flex items-center gap-2">
                 <span className="inline-flex h-9 w-9 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-400 to-blue-600 text-slate-950">
-                  <Bot className="h-5 w-5" />
+                  <MascotIcon className="h-6 w-6" />
                 </span>
                 <div className="leading-tight">
                   <div className="text-sm font-semibold text-white">AI Coach</div>
@@ -612,99 +638,123 @@ export default function AiCoachBubble() {
               </button>
             </div>
 
-            <div className="p-4">
-              <div
-                ref={scrollRef}
-                className="max-h-[46vh] overflow-auto pr-1"
-              >
-                {hasChat ? (
-                  <div className="grid gap-2">
-                    {chatHistory.map((m, idx) => (
-                      <ChatMessage
-                        // idx is OK here: history is append-only within the last 8 turns.
-                        key={`${m.role}-${idx}`}
-                        message={m}
-                      />
-                    ))}
-                  </div>
-                ) : (
-                  <div className="rounded-3xl border border-white/10 bg-white/5 p-3 text-sm leading-6 text-slate-300">
-                    Hỏi về kỹ thuật, lỗi thường gặp, mẹo tập an toàn…
-                  </div>
-                )}
-              </div>
-
-              {error ? (
-                <div className="mt-3 rounded-2xl border border-rose-400/20 bg-rose-500/10 p-3 text-sm text-rose-100">
-                  {error}
+            {!isPremium ? (
+              <div className="p-4 flex flex-col gap-3">
+                <div className="rounded-3xl border border-white/10 bg-slate-950/30 p-4 text-sm leading-6 text-slate-200">
+                  <div className="text-xs font-semibold text-slate-300">AI Coach là Premium</div>
+                  <p className="mt-2 text-slate-300">
+                    Nâng cấp để mở khóa AI Coach (RAG) và nội dung Hoàng/Huyền đai.
+                  </p>
+                  <ul className="mt-3 grid gap-1 text-slate-300">
+                    <li>• Trả lời grounded theo tài liệu</li>
+                    <li>• Gợi ý sửa lỗi + an toàn theo cấp</li>
+                    <li>• Video/kỹ thuật nâng cao</li>
+                  </ul>
                 </div>
-              ) : null}
 
-              {nextStepHint && answer ? (
-                <div className="mt-3 rounded-2xl border border-white/10 bg-white/5 p-3">
-                  <div className="text-xs font-semibold text-slate-300">{nextStepHint.title}</div>
-                  <p className="mt-1 text-xs leading-5 text-slate-300">{nextStepHint.text}</p>
-                  {nextStepHint.href ? (
-                    <Link
-                      href={nextStepHint.href}
-                      className="mt-2 inline-flex items-center justify-center rounded-xl border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-semibold text-slate-200 transition hover:bg-white/10 hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-300/30"
-                    >
-                      Mở bài
-                    </Link>
+                <Link
+                  href="/ho-so"
+                  className="inline-flex h-11 items-center justify-center rounded-2xl bg-gradient-to-r from-blue-400 to-blue-600 px-4 text-sm font-semibold text-slate-950 transition hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-blue-300/40"
+                >
+                  Nâng cấp Premium
+                </Link>
+                <p className="text-xs leading-5 text-slate-400">Demo: bật Premium trong Hồ sơ.</p>
+              </div>
+            ) : (
+              <div className="p-4 flex flex-col flex-1 min-h-0">
+                <div ref={scrollRef} className="ai-scrollbar flex-1 min-h-0 overflow-auto pr-1">
+                  {hasChat ? (
+                    <div className="grid gap-2">
+                      {chatHistory.map((m, idx) => (
+                        <ChatMessage
+                          // idx is OK here: history is append-only within the last 8 turns.
+                          key={`${m.role}-${idx}`}
+                          message={m}
+                        />
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="rounded-3xl border border-white/10 bg-white/5 p-3 text-sm leading-6 text-slate-300">
+                      Hỏi về kỹ thuật, lỗi thường gặp, mẹo tập an toàn…
+                    </div>
+                  )}
+
+                  {error ? (
+                    <div className="mt-3 rounded-2xl border border-rose-400/20 bg-rose-500/10 p-3 text-sm text-rose-100">
+                      {error}
+                    </div>
+                  ) : null}
+
+                  {nextStepHint && answer ? (
+                    <div className="mt-3 rounded-2xl border border-white/10 bg-white/5 p-3">
+                      <div className="text-xs font-semibold text-slate-300">{nextStepHint.title}</div>
+                      <p className="mt-1 text-xs leading-5 text-slate-300">{nextStepHint.text}</p>
+                      {nextStepHint.href ? (
+                        <Link
+                          href={nextStepHint.href}
+                          className="mt-2 inline-flex items-center justify-center rounded-xl border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-semibold text-slate-200 transition hover:bg-white/10 hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-300/30"
+                        >
+                          Mở bài
+                        </Link>
+                      ) : null}
+                    </div>
+                  ) : null}
+
+                  {Array.isArray(recommendedVideos) && recommendedVideos.length > 0 ? (
+                    <div className="mt-3">
+                      <div className="text-xs font-semibold text-slate-300">Video minh hoạ</div>
+                      <div className="mt-2 grid gap-2">
+                        {recommendedVideos.slice(0, 2).map((v) => (
+                          <Link
+                            key={v.id}
+                            href={v.url || `/video/${v.id}`}
+                            className="rounded-2xl border border-white/10 bg-white/5 p-3 transition hover:bg-white/10"
+                          >
+                            <div className="text-sm font-semibold text-white">{v.title}</div>
+                            {v.summary ? (
+                              <div className="mt-1 text-xs leading-5 text-slate-300">{v.summary}</div>
+                            ) : null}
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  ) : null}
+
+                  {Array.isArray(sources) && sources.length > 0 ? (
+                    <div className="mt-3">
+                      <div className="text-xs font-semibold text-slate-300">Nguồn tham chiếu</div>
+                      <ul className="mt-2 grid gap-2">
+                        {sources.slice(0, 3).map((s) => (
+                          <SourceItem key={s.id} source={s} />
+                        ))}
+                      </ul>
+                    </div>
                   ) : null}
                 </div>
-              ) : null}
 
-              <form onSubmit={onSubmit} className="mt-3 grid gap-2 sm:grid-cols-[1fr_auto]">
-                <input
-                  ref={inputRef}
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                  placeholder="Ví dụ: 'đá tống trước sai thường gặp?'"
-                  className="h-10 w-full rounded-2xl border border-white/10 bg-slate-950/60 px-3 text-sm text-white outline-none focus:ring-2 focus:ring-blue-300/30"
-                />
-
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="inline-flex h-10 items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-blue-400 to-blue-600 px-4 text-sm font-semibold text-slate-950 transition hover:brightness-110 disabled:opacity-60 focus:outline-none focus:ring-2 focus:ring-blue-300/40"
+                <form
+                  onSubmit={onSubmit}
+                  className="mt-3 grid gap-2 sm:grid-cols-[1fr_auto] shrink-0"
                 >
-                  <Sparkles className="h-4 w-4" />
-                  {loading ? "Đang trả lời…" : "Hỏi"}
-                </button>
-              </form>
+                  <input
+                    ref={inputRef}
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
+                    placeholder="Ví dụ: 'đá tống trước sai thường gặp?'"
+                    className="h-10 w-full rounded-2xl border border-white/10 bg-slate-950/60 px-3 text-sm text-white outline-none focus:ring-2 focus:ring-blue-300/30"
+                  />
 
-            {Array.isArray(recommendedVideos) && recommendedVideos.length > 0 ? (
-              <div className="mt-3">
-                <div className="text-xs font-semibold text-slate-300">Video minh hoạ</div>
-                <div className="mt-2 grid gap-2">
-                  {recommendedVideos.slice(0, 2).map((v) => (
-                    <Link
-                      key={v.id}
-                      href={v.url || `/video/${v.id}`}
-                      className="rounded-2xl border border-white/10 bg-white/5 p-3 transition hover:bg-white/10"
-                    >
-                      <div className="text-sm font-semibold text-white">{v.title}</div>
-                      {v.summary ? (
-                        <div className="mt-1 text-xs leading-5 text-slate-300">{v.summary}</div>
-                      ) : null}
-                    </Link>
-                  ))}
-                </div>
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="inline-flex h-10 items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-blue-400 to-blue-600 px-4 text-sm font-semibold text-slate-950 transition hover:brightness-110 disabled:opacity-60 focus:outline-none focus:ring-2 focus:ring-blue-300/40"
+                  >
+                    <Sparkles className="h-4 w-4" />
+                    {loading ? "Đang trả lời…" : "Hỏi"}
+                  </button>
+                </form>
               </div>
-            ) : null}
-
-            {Array.isArray(sources) && sources.length > 0 ? (
-              <div className="mt-3">
-                <div className="text-xs font-semibold text-slate-300">Nguồn tham chiếu</div>
-                <ul className="mt-2 grid gap-2">
-                  {sources.slice(0, 3).map((s) => (
-                    <SourceItem key={s.id} source={s} />
-                  ))}
-                </ul>
-              </div>
-            ) : null}
-            </div>
+            )}
           </div>
         </div>
       ) : (
@@ -722,7 +772,7 @@ export default function AiCoachBubble() {
             aria-hidden
             className="pointer-events-none absolute -inset-6 rounded-[1.75rem] bg-[radial-gradient(circle_at_center,rgba(59,130,246,0.35),transparent_60%)] blur-2xl"
           />
-          <Bot className="relative h-6 w-6" />
+          <MascotIcon className="relative h-7 w-7" />
         </button>
       )}
     </div>

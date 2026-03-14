@@ -5,9 +5,10 @@ import { usePathname } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { Bot, Sparkles, ThumbsDown, ThumbsUp } from "lucide-react";
+import { Sparkles, ThumbsDown, ThumbsUp } from "lucide-react";
 
 import { readProfile } from "@/lib/profile";
+import MascotIcon from "@/components/MascotIcon";
 
 const CHAT_STORE_KEY = "vovinam_ai_chat_v1";
 
@@ -100,7 +101,7 @@ function ChatMessage({ message }) {
     <div className={"flex gap-2 " + (isUser ? "justify-end" : "justify-start")}>
       {!isUser ? (
         <span className="mt-0.5 inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-2xl border border-white/10 bg-gradient-to-br from-blue-500/20 to-blue-600/10 text-blue-100">
-          <Bot className="h-4 w-4" />
+          <MascotIcon className="h-5 w-5" />
         </span>
       ) : null}
 
@@ -198,8 +199,11 @@ export default function AiCoachChat({ context }) {
   const [sources, setSources] = useState([]);
   const [recommendedVideos, setRecommendedVideos] = useState([]);
   const [sessionId, setSessionId] = useState("");
+  const [planId, setPlanId] = useState("free");
   const abortRef = useRef(null);
   const scrollRef = useRef(null);
+
+  const isPremium = planId === "premium";
 
   const sendFeedback = async ({ messageId, rating }) => {
     const id = String(messageId || "").trim();
@@ -230,6 +234,21 @@ export default function AiCoachChat({ context }) {
     const store = readChatStore();
     setSessionId(store.sessionId || "");
     setChatHistory(Array.isArray(store.history) ? store.history : []);
+  }, []);
+
+  useEffect(() => {
+    const sync = () => {
+      const p = readProfile();
+      setPlanId(p?.planId === "premium" ? "premium" : "free");
+    };
+
+    sync();
+    window.addEventListener("vovinam-profile", sync);
+    window.addEventListener("storage", sync);
+    return () => {
+      window.removeEventListener("vovinam-profile", sync);
+      window.removeEventListener("storage", sync);
+    };
   }, []);
 
   useEffect(() => {
@@ -460,16 +479,59 @@ export default function AiCoachChat({ context }) {
   }, []);
 
   return (
-    <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-white/5 p-6 sm:p-8 shadow-[var(--shadow-card)]">
+    !isPremium ? (
+      <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-white/5 shadow-[var(--shadow-card)] flex flex-col h-[calc(100vh-5rem)] lg:sticky lg:top-20">
+        <div
+          aria-hidden
+          className="pointer-events-none absolute -inset-8 rounded-[2.75rem] bg-[radial-gradient(circle_at_bottom_right,rgba(59,130,246,0.18),transparent_60%)] blur-2xl"
+        />
+
+        <div className="relative flex flex-col h-full p-6 sm:p-8">
+          <div className="flex items-start gap-3 shrink-0">
+            <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-400 to-blue-600 text-slate-950">
+              <MascotIcon className="h-6 w-6" />
+            </span>
+            <div className="min-w-0">
+              <h2 className="text-xl font-semibold text-white">AI Coach (Premium)</h2>
+              <p className="mt-1 text-sm leading-6 text-slate-300">
+                Tính năng này thuộc gói Premium. Nâng cấp để mở khóa AI Coach (RAG) và kỹ thuật Hoàng/Huyền đai.
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-4 rounded-3xl border border-white/10 bg-slate-950/30 p-5 text-sm leading-6 text-slate-200">
+            <div className="text-xs font-semibold text-slate-300">Premium mở khóa</div>
+            <ul className="mt-2 grid gap-1">
+              <li>• Hỏi lỗi thường gặp + cách sửa theo tài liệu</li>
+              <li>• Gợi ý bài tập an toàn theo cấp đai</li>
+              <li>• Mở khóa video/kỹ thuật nâng cao</li>
+            </ul>
+          </div>
+
+          <div className="mt-auto pt-4">
+            <Link
+              href="/ho-so"
+              className="inline-flex h-11 w-full items-center justify-center rounded-2xl bg-gradient-to-r from-blue-400 to-blue-600 px-5 text-sm font-semibold text-slate-950 transition hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-blue-400/40"
+            >
+              Nâng cấp Premium
+            </Link>
+            <p className="mt-2 text-xs leading-5 text-slate-400">
+              Demo: bạn có thể bật Premium trong Hồ sơ.
+            </p>
+          </div>
+        </div>
+      </div>
+    ) : (
+    <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-white/5 shadow-[var(--shadow-card)] flex flex-col h-[calc(100vh-5rem)] lg:sticky lg:top-20">
       <div
         aria-hidden
         className="pointer-events-none absolute -inset-8 rounded-[2.75rem] bg-[radial-gradient(circle_at_bottom_right,rgba(59,130,246,0.18),transparent_60%)] blur-2xl"
       />
 
-      <div className="relative">
-        <div className="flex items-start gap-3">
+      <div className="relative flex flex-col h-full p-6 sm:p-8">
+        <div className="flex items-start gap-3 shrink-0">
           <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-400 to-blue-600 text-slate-950">
-            <Bot className="h-5 w-5" />
+            <MascotIcon className="h-6 w-6" />
           </span>
           <div className="min-w-0">
             <h2 className="text-xl font-semibold text-white">AI Coach</h2>
@@ -479,7 +541,7 @@ export default function AiCoachChat({ context }) {
 
         <div
           ref={scrollRef}
-          className="mt-4 max-h-[24rem] overflow-y-auto rounded-3xl border border-white/10 bg-slate-950/30 p-4 sm:max-h-[28rem]"
+          className="ai-scrollbar mt-4 flex-1 min-h-0 overflow-y-auto rounded-3xl border border-white/10 bg-slate-950/30 p-4"
         >
           {hasChat ? (
             <div className="grid gap-3">
@@ -497,7 +559,44 @@ export default function AiCoachChat({ context }) {
               </div>
             </div>
           )}
+
+          {Array.isArray(recommendedVideos) && recommendedVideos.length > 0 ? (
+            <div className="mt-4">
+              <div className="text-xs font-semibold text-slate-300">Video minh hoạ</div>
+              <div className="mt-2 grid gap-2">
+                {recommendedVideos.slice(0, 2).map((v) => (
+                  <Link
+                    key={v.id}
+                    href={v.url || `/video/${v.id}`}
+                    className="rounded-2xl border border-white/10 bg-white/5 p-4 transition hover:border-blue-400/20 hover:bg-white/10"
+                  >
+                    <div className="text-sm font-semibold text-white">{v.title}</div>
+                    {v.summary ? (
+                      <div className="mt-1 text-xs leading-5 text-slate-300">{v.summary}</div>
+                    ) : null}
+                  </Link>
+                ))}
+              </div>
+            </div>
+          ) : null}
+
+          {Array.isArray(sources) && sources.length > 0 ? (
+            <div className="mt-4">
+              <div className="text-xs font-semibold text-slate-300">Nguồn tham chiếu</div>
+              <ul className="mt-2 grid gap-2">
+                {sources.slice(0, 5).map((s) => (
+                  <SourceItem key={s.id} source={s} />
+                ))}
+              </ul>
+            </div>
+          ) : null}
         </div>
+
+        {error ? (
+          <div className="mt-4 rounded-2xl border border-rose-400/20 bg-rose-500/10 p-4 text-sm text-rose-100 shrink-0">
+            {error}
+          </div>
+        ) : null}
 
         <form onSubmit={onAsk} className="mt-4 grid gap-3 sm:grid-cols-[1fr_auto]">
           <input
@@ -515,44 +614,8 @@ export default function AiCoachChat({ context }) {
             {loading ? "Đang trả lời…" : "Hỏi"}
           </button>
         </form>
-
-        {error ? (
-          <div className="mt-4 rounded-2xl border border-rose-400/20 bg-rose-500/10 p-4 text-sm text-rose-100">
-            {error}
-          </div>
-        ) : null}
-
-      {Array.isArray(recommendedVideos) && recommendedVideos.length > 0 ? (
-        <div className="mt-4">
-          <div className="text-xs font-semibold text-slate-300">Video minh hoạ</div>
-          <div className="mt-2 grid gap-2">
-            {recommendedVideos.slice(0, 2).map((v) => (
-              <Link
-                key={v.id}
-                href={v.url || `/video/${v.id}`}
-                className="rounded-2xl border border-white/10 bg-white/5 p-4 transition hover:border-blue-400/20 hover:bg-white/10"
-              >
-                <div className="text-sm font-semibold text-white">{v.title}</div>
-                {v.summary ? (
-                  <div className="mt-1 text-xs leading-5 text-slate-300">{v.summary}</div>
-                ) : null}
-              </Link>
-            ))}
-          </div>
-        </div>
-      ) : null}
-
-      {Array.isArray(sources) && sources.length > 0 ? (
-        <div className="mt-4">
-          <div className="text-xs font-semibold text-slate-300">Nguồn tham chiếu</div>
-          <ul className="mt-2 grid gap-2">
-            {sources.slice(0, 5).map((s) => (
-              <SourceItem key={s.id} source={s} />
-            ))}
-          </ul>
-        </div>
-      ) : null}
       </div>
     </div>
+    )
   );
 }

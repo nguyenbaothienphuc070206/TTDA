@@ -51,6 +51,33 @@ html {
   scroll-behavior: smooth;
 }
 
+.ai-scrollbar {
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(59, 130, 246, 0.45) rgba(255, 255, 255, 0.08);
+}
+
+.ai-scrollbar::-webkit-scrollbar {
+  width: 10px;
+}
+
+.ai-scrollbar::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 999px;
+}
+
+.ai-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(59, 130, 246, 0.35);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+.ai-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(59, 130, 246, 0.5);
+  background-clip: padding-box;
+}
+
 body {
   font-family: var(--font-sans), ui-sans-serif, system-ui, -apple-system,
     "Segoe UI", Roboto, Arial, "Noto Sans", "Liberation Sans", sans-serif;

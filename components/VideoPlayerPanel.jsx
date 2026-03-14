@@ -1,10 +1,12 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import HlsVideoPlayer from "@/components/HlsVideoPlayer";
 import OfflineVideoControls from "@/components/OfflineVideoControls";
 import YouTubeEmbed from "@/components/YouTubeEmbed";
+import { readProfile } from "@/lib/profile";
 
 const TRANSCRIPT_KEY_PREFIX = "vovinam_video_transcript_v1:";
 
@@ -61,8 +63,30 @@ function formatTime(seconds) {
 export default function VideoPlayerPanel({ video }) {
   const playerApiRef = useRef(null);
 
+  const [planId, setPlanId] = useState("free");
+  const isPremium = planId === "premium";
+
   const videoId = String(video?.id || "").trim();
   const title = String(video?.title || "Video").trim();
+  const beltId = String(video?.beltId || "").trim();
+
+  const isLocked = Boolean(beltId) && beltId !== "lam-dai";
+  const canAccess = !isLocked || isPremium;
+
+  useEffect(() => {
+    const sync = () => {
+      const p = readProfile();
+      setPlanId(p?.planId === "premium" ? "premium" : "free");
+    };
+
+    sync();
+    window.addEventListener("vovinam-profile", sync);
+    window.addEventListener("storage", sync);
+    return () => {
+      window.removeEventListener("vovinam-profile", sync);
+      window.removeEventListener("storage", sync);
+    };
+  }, []);
 
   const stored = useMemo(() => readStoredTranscript(videoId), [videoId]);
   const [segments, setSegments] = useState(() => stored?.segments || []);
@@ -72,6 +96,7 @@ export default function VideoPlayerPanel({ video }) {
 
   useEffect(() => {
     if (!videoId) return;
+    if (!canAccess) return;
     if (segments.length > 0) return;
 
     let cancelled = false;
@@ -125,7 +150,7 @@ export default function VideoPlayerPanel({ video }) {
       cancelled = true;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [videoId]);
+  }, [videoId, canAccess]);
 
   const onSeek = (startSec) => {
     try {
@@ -139,6 +164,37 @@ export default function VideoPlayerPanel({ video }) {
     if (mode === "openai") return "Transcript (AI)";
     return "Transcript";
   }, [mode]);
+
+  if (!canAccess) {
+    return (
+      <section className="rounded-3xl border border-white/10 bg-white/5 p-6 sm:p-8 shadow-[var(--shadow-card)]">
+        <h2 className="text-lg font-semibold text-white">Video Premium</h2>
+        <p className="mt-2 text-sm leading-6 text-slate-300">
+          Video này thuộc Hoàng/Huyền đai. Mở Premium để xem video, transcript và
+          hỏi AI Coach (RAG).
+        </p>
+
+        <div className="mt-4 flex flex-col gap-2 sm:flex-row">
+          <Link
+            href="/ho-so"
+            className="inline-flex h-11 items-center justify-center rounded-2xl bg-gradient-to-r from-blue-400 to-blue-600 px-4 text-sm font-semibold text-slate-950 transition hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-blue-400/50"
+          >
+            Mở khóa Premium
+          </Link>
+          <Link
+            href="/video"
+            className="inline-flex h-11 items-center justify-center rounded-2xl border border-white/10 bg-white/5 px-4 text-sm font-semibold text-white transition hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-blue-400/30"
+          >
+            Xem video Lam đai
+          </Link>
+        </div>
+
+        <p className="mt-3 text-xs leading-5 text-slate-400">
+          Lưu ý: Premium hiện là demo theo hồ sơ (localStorage).
+        </p>
+      </section>
+    );
+  }
 
   return (
     <section className="rounded-3xl border border-white/10 bg-white/5 p-4 sm:p-6 shadow-[var(--shadow-card)]">

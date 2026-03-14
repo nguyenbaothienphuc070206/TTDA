@@ -13,6 +13,7 @@ export default function TechniqueLibraryPage() {
         </h1>
         <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-300">
           Tra cứu đòn chân/đòn tay/tấn pháp/khóa gỡ/phản đòn bằng bộ lọc thông minh.
+          Lam đai mở miễn phí; Hoàng/Huyền đai cần Premium.
         </p>
       </header>
 

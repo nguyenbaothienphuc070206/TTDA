@@ -12,8 +12,8 @@ export default function StorePage() {
           Cửa hàng
         </h1>
         <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-300">
-          Mua đồ tập & phụ kiện (demo). Giỏ hàng và đơn hàng được lưu trên máy của
-          bạn.
+          Cửa hàng theo mô hình Affiliate: bấm “Mua tại đối tác” để mở trang mua
+          hàng bên ngoài. Ứng dụng có thể nhận hoa hồng khi bạn mua qua liên kết.
         </p>
       </header>
 
