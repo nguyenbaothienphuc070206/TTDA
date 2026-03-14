@@ -270,28 +270,10 @@ export default function ProfileDashboard() {
 
   return (
     <div className="grid gap-4 lg:grid-cols-2">
-      <section className="rounded-3xl border border-white/10 bg-white/5 p-6 sm:p-8 lg:col-span-2">
-        <h2 className="text-xl font-semibold text-white">Trạng thái hôm nay</h2>
-        <p className="mt-2 text-sm leading-6 text-slate-300">
-          Hôm nay là ngày thứ <span className="font-semibold text-white">{personalizedStatus.days}</span> bạn gắn bó với Vovinam. {personalizedStatus.encouragement}
-        </p>
-        <div className="mt-4 grid gap-3 sm:grid-cols-3">
-          <div className="rounded-2xl border border-white/10 bg-slate-950/30 p-4">
-            <div className="text-xs font-semibold text-slate-300">Cấp đai hiện tại</div>
-            <div className="mt-2 text-sm font-semibold text-white">{currentBelt?.title}</div>
-          </div>
-          <div className="rounded-2xl border border-white/10 bg-slate-950/30 p-4">
-            <div className="text-xs font-semibold text-slate-300">Mục tiêu</div>
-            <div className="mt-2 text-sm font-semibold text-white">Đúng kỹ thuật & đều đặn</div>
-          </div>
-          <div className="rounded-2xl border border-white/10 bg-slate-950/30 p-4">
-            <div className="text-xs font-semibold text-slate-300">Gợi ý</div>
-            <div className="mt-2 text-sm leading-6 text-slate-300">Nếu có 5 phút: ôn lại 1 kỹ thuật bạn hay sai.</div>
-          </div>
-        </div>
-      </section>
-
-      <section className="rounded-3xl border border-white/10 bg-white/5 p-6 sm:p-8 lg:col-span-2">
+      <section
+        id="goi-premium"
+        className="scroll-mt-24 rounded-3xl border border-white/10 bg-white/5 p-6 sm:p-8 lg:col-span-2"
+      >
         <h2 className="text-xl font-semibold text-white">Gói Freemium / Premium</h2>
         <p className="mt-2 text-sm leading-6 text-slate-300">
           Freemium cho phép xem kỹ thuật/video nền tảng (Lam đai). Premium mở khóa kỹ thuật nâng cao và AI Coach.
@@ -302,6 +284,24 @@ export default function ProfileDashboard() {
             <div className="text-xs font-semibold text-slate-300">Gói hiện tại</div>
             <div className="mt-2 text-sm font-semibold text-white">{isPremium ? "Premium" : "Freemium"}</div>
             <div className="mt-1 text-xs text-slate-400">(Demo: lưu trên máy)</div>
+
+            <button
+              type="button"
+              onClick={() => {
+                setProfile((p) => ({
+                  ...p,
+                  planId: isPremium ? "free" : "premium",
+                }));
+              }}
+              className={
+                "mt-3 inline-flex h-11 w-full items-center justify-center rounded-2xl px-4 text-sm font-semibold transition focus:outline-none focus:ring-2 " +
+                (isPremium
+                  ? "border border-white/10 bg-white/5 text-white hover:bg-white/10 focus:ring-blue-400/30"
+                  : "bg-gradient-to-r from-cyan-300 to-blue-500 text-slate-950 hover:brightness-110 focus:ring-cyan-300/50")
+              }
+            >
+              {isPremium ? "Tắt Premium (demo)" : "Nâng cấp Premium (demo)"}
+            </button>
           </div>
 
           <div className="rounded-2xl border border-white/10 bg-slate-950/30 p-4 sm:col-span-2">
@@ -324,27 +324,28 @@ export default function ProfileDashboard() {
           </div>
         </div>
 
-        <div className="mt-4 grid gap-3 sm:grid-cols-2">
-          <button
-            type="button"
-            onClick={() => {
-              setProfile((p) => ({
-                ...p,
-                planId: isPremium ? "free" : "premium",
-              }));
-            }}
-            className={
-              "inline-flex h-12 items-center justify-center rounded-2xl px-5 text-sm font-semibold transition focus:outline-none focus:ring-2 " +
-              (isPremium
-                ? "border border-white/10 bg-white/5 text-white hover:bg-white/10 focus:ring-blue-400/30"
-                : "bg-gradient-to-r from-cyan-300 to-blue-500 text-slate-950 hover:brightness-110 focus:ring-cyan-300/50")
-            }
-          >
-            {isPremium ? "Tắt Premium (demo)" : "Nâng cấp Premium (demo)"}
-          </button>
+        <div className="mt-4 rounded-2xl border border-white/10 bg-white/5 p-4 text-sm leading-6 text-slate-200">
+          Gợi ý triển khai thật: dùng Stripe Subscription + lưu entitlement theo user trong Supabase để đồng bộ đa thiết bị.
+        </div>
+      </section>
 
-          <div className="rounded-2xl border border-white/10 bg-white/5 p-4 text-sm leading-6 text-slate-200">
-            Gợi ý triển khai thật: dùng Stripe Subscription + lưu entitlement theo user trong Supabase để đồng bộ đa thiết bị.
+      <section className="rounded-3xl border border-white/10 bg-white/5 p-6 sm:p-8 lg:col-span-2">
+        <h2 className="text-xl font-semibold text-white">Trạng thái hôm nay</h2>
+        <p className="mt-2 text-sm leading-6 text-slate-300">
+          Hôm nay là ngày thứ <span className="font-semibold text-white">{personalizedStatus.days}</span> bạn gắn bó với Vovinam. {personalizedStatus.encouragement}
+        </p>
+        <div className="mt-4 grid gap-3 sm:grid-cols-3">
+          <div className="rounded-2xl border border-white/10 bg-slate-950/30 p-4">
+            <div className="text-xs font-semibold text-slate-300">Cấp đai hiện tại</div>
+            <div className="mt-2 text-sm font-semibold text-white">{currentBelt?.title}</div>
+          </div>
+          <div className="rounded-2xl border border-white/10 bg-slate-950/30 p-4">
+            <div className="text-xs font-semibold text-slate-300">Mục tiêu</div>
+            <div className="mt-2 text-sm font-semibold text-white">Đúng kỹ thuật & đều đặn</div>
+          </div>
+          <div className="rounded-2xl border border-white/10 bg-slate-950/30 p-4">
+            <div className="text-xs font-semibold text-slate-300">Gợi ý</div>
+            <div className="mt-2 text-sm leading-6 text-slate-300">Nếu có 5 phút: ôn lại 1 kỹ thuật bạn hay sai.</div>
           </div>
         </div>
       </section>

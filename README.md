@@ -29,6 +29,10 @@ npm run build
 npm start
 ```
 
+## Tài liệu pitching
+
+- Business case (Profit/Team/Maintenance/Break-even): `docs/business-case.md`
+
 ## Các trang chính
 
 - Trang chủ: `app/page.js`

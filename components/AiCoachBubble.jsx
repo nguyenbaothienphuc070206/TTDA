@@ -667,7 +667,7 @@ export default function AiCoachBubble() {
                 </div>
 
                 <Link
-                  href="/ho-so"
+                  href="/ho-so#goi-premium"
                   className="inline-flex h-11 items-center justify-center rounded-2xl bg-gradient-to-r from-blue-400 to-blue-600 px-4 text-sm font-semibold text-slate-950 transition hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-blue-300/40"
                 >
                   Nâng cấp Premium
