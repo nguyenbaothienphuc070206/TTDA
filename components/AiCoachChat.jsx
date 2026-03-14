@@ -202,6 +202,7 @@ export default function AiCoachChat({ context }) {
   const [planId, setPlanId] = useState("free");
   const abortRef = useRef(null);
   const scrollRef = useRef(null);
+  const stickToBottomRef = useRef(true);
 
   const isPremium = planId === "premium";
 
@@ -255,12 +256,22 @@ export default function AiCoachChat({ context }) {
     const el = scrollRef.current;
     if (!el) return;
 
+    if (!stickToBottomRef.current) return;
+
     try {
       el.scrollTo({ top: el.scrollHeight, behavior: "smooth" });
     } catch {
       // ignore
     }
   }, [chatHistory.length, answer]);
+
+  const onScroll = () => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const threshold = 64;
+    const distance = el.scrollHeight - el.scrollTop - el.clientHeight;
+    stickToBottomRef.current = distance <= threshold;
+  };
 
   const helperText = useMemo(() => {
     if (context?.videoId) {
@@ -284,6 +295,7 @@ export default function AiCoachChat({ context }) {
     setAnswer("");
     setSources([]);
     setRecommendedVideos([]);
+    stickToBottomRef.current = true;
 
     if (abortRef.current) {
       try {
@@ -541,6 +553,7 @@ export default function AiCoachChat({ context }) {
 
         <div
           ref={scrollRef}
+          onScroll={onScroll}
           className="ai-scrollbar mt-4 flex-1 min-h-0 overflow-y-auto rounded-3xl border border-white/10 bg-slate-950/30 p-4"
         >
           {hasChat ? (
