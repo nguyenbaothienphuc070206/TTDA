@@ -226,6 +226,7 @@ export default function AiCoachBubble() {
   const abortRef = useRef(null);
   const inputRef = useRef(null);
   const scrollRef = useRef(null);
+  const stickToBottomRef = useRef(true);
 
   const isPremium = planId === "premium";
 
@@ -569,16 +570,29 @@ export default function AiCoachBubble() {
     }, 0);
   }, [open]);
 
-  useEffect(() => {
-    if (!open) return;
+  const scrollToBottom = (behavior = "auto") => {
     const el = scrollRef.current;
     if (!el) return;
 
     try {
-      el.scrollTo({ top: el.scrollHeight, behavior: "smooth" });
+      el.scrollTo({ top: el.scrollHeight, behavior });
     } catch {
       // ignore
     }
+  };
+
+  useEffect(() => {
+    if (!open) return;
+    stickToBottomRef.current = true;
+    setTimeout(() => {
+      scrollToBottom("auto");
+    }, 0);
+  }, [open]);
+
+  useEffect(() => {
+    if (!open) return;
+    if (!stickToBottomRef.current) return;
+    scrollToBottom("smooth");
   }, [open, chatHistory.length, answer]);
 
   const nextStepHint = useMemo(() => {
@@ -616,7 +630,7 @@ export default function AiCoachBubble() {
             className="pointer-events-none absolute -inset-8 rounded-[2.75rem] bg-[radial-gradient(circle_at_bottom_right,rgba(59,130,246,0.25),transparent_60%)] blur-2xl"
           />
 
-          <div className="relative w-[22rem] max-w-[calc(100vw-2rem)] max-h-[calc(100vh-6rem)] overflow-hidden rounded-[2rem] border border-white/10 bg-[color:var(--header-bg)] shadow-[var(--shadow-card-strong)] backdrop-blur flex flex-col">
+          <div className="relative w-[20rem] sm:w-[22rem] max-w-[calc(100vw-2rem)] h-[30rem] max-h-[calc(100vh-6rem)] overflow-hidden rounded-[2rem] border border-white/10 bg-[color:var(--header-bg)] shadow-[var(--shadow-card-strong)] backdrop-blur flex flex-col">
             <div className="flex items-center justify-between gap-3 border-b border-white/10 px-4 py-3">
               <div className="flex items-center gap-2">
                 <span className="inline-flex h-9 w-9 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-400 to-blue-600 text-slate-950">
@@ -662,7 +676,17 @@ export default function AiCoachBubble() {
               </div>
             ) : (
               <div className="p-4 flex flex-col flex-1 min-h-0">
-                <div ref={scrollRef} className="ai-scrollbar flex-1 min-h-0 overflow-auto pr-1">
+                <div
+                  ref={scrollRef}
+                  onScroll={() => {
+                    const el = scrollRef.current;
+                    if (!el) return;
+                    const threshold = 48;
+                    const distance = el.scrollHeight - el.scrollTop - el.clientHeight;
+                    stickToBottomRef.current = distance <= threshold;
+                  }}
+                  className="ai-scrollbar flex-1 min-h-0 overflow-auto pr-1"
+                >
                   {hasChat ? (
                     <div className="grid gap-2">
                       {chatHistory.map((m, idx) => (
