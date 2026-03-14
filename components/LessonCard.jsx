@@ -1,13 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Check, MessageCircle, Play } from "lucide-react";
 
+import { popConfettiFromElement } from "@/lib/confetti";
 import { isLessonDone, toggleLessonDone } from "@/lib/progress";
 
 export default function LessonCard({ lesson, isActive = false }) {
   const [done, setDone] = useState(false);
+  const doneButtonRef = useRef(null);
 
   useEffect(() => {
     const sync = () => {
@@ -24,8 +26,14 @@ export default function LessonCard({ lesson, isActive = false }) {
   }, [lesson.slug]);
 
   const onToggle = () => {
+    const wasDone = done;
     const next = toggleLessonDone(lesson.slug);
-    setDone(next.includes(lesson.slug));
+    const nextDone = next.includes(lesson.slug);
+    setDone(nextDone);
+
+    if (!wasDone && nextDone) {
+      popConfettiFromElement(doneButtonRef.current);
+    }
   };
 
   const onAskAi = () => {
@@ -108,6 +116,7 @@ export default function LessonCard({ lesson, isActive = false }) {
         <button
           type="button"
           onClick={onToggle}
+          ref={doneButtonRef}
           className={
             "col-span-1 inline-flex h-10 w-full items-center justify-center gap-2 rounded-2xl border px-3 text-sm font-semibold transition focus:outline-none focus:ring-2 sm:w-auto " +
             (done

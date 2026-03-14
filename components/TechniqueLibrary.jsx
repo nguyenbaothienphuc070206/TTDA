@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Mic } from "lucide-react";
 
 import { TECHNIQUE_CATEGORIES, TECHNIQUES } from "@/data/wiki";
 import { trackView } from "@/lib/analytics";
@@ -23,9 +24,14 @@ function difficultyLabel(d) {
 
 export default function TechniqueLibrary() {
   const [query, setQuery] = useState("");
+  const [debouncedQuery, setDebouncedQuery] = useState("");
   const [categoryId, setCategoryId] = useState("all");
   const [difficulty, setDifficulty] = useState("all");
   const [planId, setPlanId] = useState("free");
+
+  const [voiceNotice, setVoiceNotice] = useState("");
+  const [listening, setListening] = useState(false);
+  const voiceRef = useRef(null);
 
   const isPremium = planId === "premium";
 
@@ -41,6 +47,34 @@ export default function TechniqueLibrary() {
     return () => {
       window.removeEventListener("vovinam-profile", sync);
       window.removeEventListener("storage", sync);
+    };
+  }, []);
+
+  useEffect(() => {
+    const t = window.setTimeout(() => {
+      setDebouncedQuery(query);
+    }, 300);
+
+    return () => {
+      window.clearTimeout(t);
+    };
+  }, [query]);
+
+  useEffect(() => {
+    return () => {
+      const rec = voiceRef.current;
+      if (!rec) return;
+      try {
+        rec.abort?.();
+      } catch {
+        // ignore
+      }
+      try {
+        rec.stop?.();
+      } catch {
+        // ignore
+      }
+      voiceRef.current = null;
     };
   }, []);
 
@@ -71,14 +105,66 @@ export default function TechniqueLibrary() {
       if (difficulty !== "all" && t.difficulty !== difficulty) return false;
 
       const hay = [t.title, t.summary, ...(t.tags || [])].join(" ");
-      return matches(hay, query);
+      return matches(hay, debouncedQuery);
     });
-  }, [query, categoryId, difficulty]);
+  }, [debouncedQuery, categoryId, difficulty]);
 
   const onReset = () => {
     setQuery("");
+    setDebouncedQuery("");
     setCategoryId("all");
     setDifficulty("all");
+  };
+
+  const onVoiceSearch = () => {
+    setVoiceNotice("");
+
+    if (typeof window === "undefined") return;
+
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      setVoiceNotice("Trình duyệt chưa hỗ trợ tìm kiếm bằng giọng nói.");
+      return;
+    }
+
+    if (listening) {
+      try {
+        voiceRef.current?.stop?.();
+      } catch {
+        // ignore
+      }
+      return;
+    }
+
+    const rec = new SpeechRecognition();
+    voiceRef.current = rec;
+    rec.lang = "vi-VN";
+    rec.interimResults = false;
+    rec.maxAlternatives = 1;
+
+    rec.onresult = (event) => {
+      const transcript = String(event?.results?.[0]?.[0]?.transcript || "").trim();
+      if (!transcript) return;
+      setQuery(transcript);
+      setDebouncedQuery(transcript);
+    };
+
+    rec.onerror = () => {
+      setVoiceNotice("Không nhận được giọng nói. Thử lại nhé.");
+    };
+
+    rec.onend = () => {
+      setListening(false);
+      voiceRef.current = null;
+    };
+
+    try {
+      setListening(true);
+      rec.start();
+    } catch {
+      setListening(false);
+      voiceRef.current = null;
+    }
   };
 
   return (
@@ -104,12 +190,32 @@ export default function TechniqueLibrary() {
         <div className="grid gap-3 lg:grid-cols-4">
           <label className="block lg:col-span-2">
             <div className="text-xs font-semibold text-slate-200">Tìm kiếm</div>
-            <input
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Ví dụ: đá, tấn, khóa gỡ, phản đòn…"
-              className="mt-2 h-11 w-full rounded-2xl border border-white/10 bg-slate-950/60 px-4 text-sm text-white outline-none focus:ring-2 focus:ring-blue-400/30"
-            />
+            <div className="mt-2 flex gap-2">
+              <input
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Ví dụ: đá, tấn, khóa gỡ, phản đòn…"
+                className="h-11 w-full flex-1 rounded-2xl border border-white/10 bg-slate-950/60 px-4 text-sm text-white outline-none focus:ring-2 focus:ring-blue-400/30"
+              />
+
+              <button
+                type="button"
+                onClick={onVoiceSearch}
+                className={
+                  "inline-flex h-11 w-11 items-center justify-center rounded-2xl border text-slate-200 transition focus:outline-none focus:ring-2 " +
+                  (listening
+                    ? "border-blue-400/30 bg-blue-500/15 text-blue-100 hover:bg-blue-500/20 focus:ring-blue-400/40"
+                    : "border-white/10 bg-white/5 hover:bg-white/10 hover:text-white focus:ring-blue-400/30")
+                }
+                aria-label={listening ? "Dừng tìm bằng giọng nói" : "Tìm bằng giọng nói"}
+              >
+                <Mic className="h-4 w-4" />
+              </button>
+            </div>
+
+            {voiceNotice ? (
+              <div className="mt-2 text-xs text-slate-300">{voiceNotice}</div>
+            ) : null}
           </label>
 
           <label className="block">

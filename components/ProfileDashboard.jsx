@@ -411,7 +411,7 @@ export default function ProfileDashboard() {
             <div className="text-sm font-semibold text-slate-200">ngày chưa ôn</div>
           </div>
           <p className="mt-2 text-xs leading-5 text-slate-400">
-            Lời nhắc dựa trên lần gần nhất bạn mở chi tiết kỹ thuật trong trang Wiki.
+            Lời nhắc dựa trên lần gần nhất bạn xem bài học/kỹ thuật/video trong app.
           </p>
         </div>
       </section>

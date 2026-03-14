@@ -1,11 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
+import { popConfettiFromElement } from "@/lib/confetti";
 import { isLessonDone, toggleLessonDone } from "@/lib/progress";
 
 export default function LessonDoneButton({ slug }) {
   const [done, setDone] = useState(false);
+  const buttonRef = useRef(null);
 
   useEffect(() => {
     const sync = () => {
@@ -22,14 +24,21 @@ export default function LessonDoneButton({ slug }) {
   }, [slug]);
 
   const onClick = () => {
+    const wasDone = done;
     const next = toggleLessonDone(slug);
-    setDone(next.includes(slug));
+    const nextDone = next.includes(slug);
+    setDone(nextDone);
+
+    if (!wasDone && nextDone) {
+      popConfettiFromElement(buttonRef.current);
+    }
   };
 
   return (
     <button
       type="button"
       onClick={onClick}
+      ref={buttonRef}
       className={
         done
           ? "inline-flex h-11 items-center justify-center rounded-2xl border border-emerald-400/20 bg-emerald-500/15 px-4 text-sm font-semibold text-emerald-200 transition hover:bg-emerald-500/20 focus:outline-none focus:ring-2 focus:ring-emerald-300/30"

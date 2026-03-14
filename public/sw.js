@@ -1,7 +1,7 @@
 /* global self, caches, fetch, Response */
 
-const STATIC_CACHE = "vovinam-static-v3";
-const PAGE_CACHE = "vovinam-pages-v3";
+const STATIC_CACHE = "vovinam-static-v4";
+const PAGE_CACHE = "vovinam-pages-v4";
 
 // Keep the page cache small to avoid storage bloat.
 const MAX_PAGE_ENTRIES = 25;
@@ -11,7 +11,18 @@ const STATIC_ASSET_PATHS = [
   "/manifest.webmanifest",
 ];
 
-const PAGE_PATHS = ["/"];
+const PAGE_PATHS = [
+  "/",
+  "/hoc-tap",
+  "/lo-trinh",
+  "/ky-thuat",
+  "/video",
+
+  // Basic Lam-đai lessons (offline-friendly theory).
+  "/bai-hoc/tu-the-chuan-bi",
+  "/bai-hoc/di-chuyen-co-ban",
+  "/bai-hoc/dam-thang-co-ban",
+];
 
 async function addAllBestEffort(cacheName, urls) {
   if (!Array.isArray(urls) || urls.length === 0) return;

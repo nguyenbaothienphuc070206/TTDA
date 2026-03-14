@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 
 import TechniqueDetailPanel from "@/components/TechniqueDetailPanel";
+import TrackView from "@/components/TrackView";
 import { TECHNIQUE_CATEGORIES, TECHNIQUES, getTechniqueBySlug } from "@/data/wiki";
 
 export async function generateStaticParams() {
@@ -38,5 +39,10 @@ export default async function TechniqueDetailPage({ params }) {
 
   const category = TECHNIQUE_CATEGORIES.find((c) => c.id === technique.categoryId);
 
-  return <TechniqueDetailPanel technique={technique} category={category} />;
+  return (
+    <>
+      <TrackView type="technique" id={technique.slug} />
+      <TechniqueDetailPanel technique={technique} category={category} />
+    </>
+  );
 }

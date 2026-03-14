@@ -2,7 +2,6 @@
 
 import { useEffect } from "react";
 
-import { TECHNIQUES } from "@/data/wiki";
 import { readAnalytics } from "@/lib/analytics";
 import { readProfile, writeProfile } from "@/lib/profile";
 
@@ -13,32 +12,25 @@ function daysBetween(nowMs, thenMs) {
   return Math.floor((nowMs - thenMs) / msPerDay);
 }
 
-function pickTechniqueReminder(analytics, thresholdDays) {
-  const map = analytics?.techniqueLastViewedAt && typeof analytics.techniqueLastViewedAt === "object"
-    ? analytics.techniqueLastViewedAt
-    : {};
+function maxTimestamp(map) {
+  if (!map || typeof map !== "object") return 0;
 
-  const nowMs = Date.now();
-  let best = null;
-
-  for (const [slug, ts] of Object.entries(map)) {
-    const last = Number(ts);
-    if (!Number.isFinite(last) || last <= 0) continue;
-
-    const d = daysBetween(nowMs, last);
-    if (d < thresholdDays) continue;
-
-    if (!best || d > best.days) {
-      const technique = TECHNIQUES.find((t) => t.slug === slug);
-      best = {
-        slug,
-        title: technique ? technique.title : slug,
-        days: d,
-      };
-    }
+  let best = 0;
+  for (const ts of Object.values(map)) {
+    const n = Number(ts);
+    if (Number.isFinite(n) && n > best) best = n;
   }
-
   return best;
+}
+
+function lastActivityAt(analytics) {
+  const a = analytics && typeof analytics === "object" ? analytics : {};
+
+  return Math.max(
+    maxTimestamp(a.lessonLastViewedAt),
+    maxTimestamp(a.techniqueLastViewedAt),
+    maxTimestamp(a.videoLastViewedAt)
+  );
 }
 
 async function showSifuNotification({ title, body, url }) {
@@ -95,13 +87,16 @@ export default function SifuReminderAgent() {
 
       const analytics = readAnalytics();
       const threshold = Number(reminders.daysWithoutPractice) || 3;
-      const reminder = pickTechniqueReminder(analytics, Math.max(1, Math.round(threshold)));
-      if (!reminder) return;
+      const lastAt = lastActivityAt(analytics);
+      if (!lastAt) return;
+
+      const inactiveDays = daysBetween(nowMs, lastAt);
+      if (inactiveDays < Math.max(1, Math.round(threshold))) return;
 
       const sent = await showSifuNotification({
         title: "Lời nhắc sư phụ",
-        body: `Đã ${reminder.days} ngày bạn chưa luyện tập ${reminder.title}, dành 5 phút ôn lại nhé?`,
-        url: `/ky-thuat#${encodeURIComponent(reminder.slug)}`,
+        body: "Sư phụ thấy bạn nghỉ hơi lâu rồi đó, vào ôn bài 5 phút nhé!",
+        url: "/hoc-tap",
       });
 
       if (!sent) return;

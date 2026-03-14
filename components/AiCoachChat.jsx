@@ -480,7 +480,7 @@ export default function AiCoachChat({ context }) {
 
   return (
     !isPremium ? (
-      <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-white/5 shadow-[var(--shadow-card)] flex flex-col h-[calc(100vh-5rem)] lg:sticky lg:top-20">
+      <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-white/5 shadow-[var(--shadow-card)] flex flex-col h-[calc(100vh-theme(spacing.16))] lg:sticky lg:top-16">
         <div
           aria-hidden
           className="pointer-events-none absolute -inset-8 rounded-[2.75rem] bg-[radial-gradient(circle_at_bottom_right,rgba(59,130,246,0.18),transparent_60%)] blur-2xl"
@@ -522,7 +522,7 @@ export default function AiCoachChat({ context }) {
         </div>
       </div>
     ) : (
-    <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-white/5 shadow-[var(--shadow-card)] flex flex-col h-[calc(100vh-5rem)] lg:sticky lg:top-20">
+    <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-white/5 shadow-[var(--shadow-card)] flex flex-col h-[calc(100vh-theme(spacing.16))] lg:sticky lg:top-16">
       <div
         aria-hidden
         className="pointer-events-none absolute -inset-8 rounded-[2.75rem] bg-[radial-gradient(circle_at_bottom_right,rgba(59,130,246,0.18),transparent_60%)] blur-2xl"

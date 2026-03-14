@@ -56,7 +56,7 @@ export default async function VideoDetailPage({ params }) {
         </p>
       </header>
 
-      <div className="grid gap-4 lg:grid-cols-2 stagger-fade">
+      <div className="grid gap-4 lg:grid-cols-[minmax(0,7fr)_minmax(0,3fr)] lg:items-start stagger-fade">
         <VideoPlayerPanel video={video} />
 
         <AiCoachChat context={{ videoId: video.id }} />
