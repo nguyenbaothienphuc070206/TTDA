@@ -60,6 +60,21 @@ export default function YouTubeEmbed({ src, title, className, apiRef }) {
           // ignore
         }
       },
+
+      setPlaybackRate: (rate) => {
+        const frame = iframeRef.current;
+        const r = Number(rate);
+        if (!frame?.contentWindow || !Number.isFinite(r) || r <= 0) return;
+
+        try {
+          frame.contentWindow.postMessage(
+            JSON.stringify({ event: "command", func: "setPlaybackRate", args: [r] }),
+            postMessageOrigin
+          );
+        } catch {
+          // ignore
+        }
+      },
     };
 
     return () => {

@@ -37,7 +37,7 @@ function Field({ label, children }) {
 export default function MembersManager() {
   const [members, setMembers] = useState(() => readMembers());
   const [name, setName] = useState("");
-  const [beltId, setBeltId] = useState("lam-dai");
+  const [beltId, setBeltId] = useState(BELTS[0]?.id || "");
 
   useEffect(() => {
     const sync = () => setMembers(readMembers());
@@ -68,7 +68,7 @@ export default function MembersManager() {
           id,
           code,
           name: memberName,
-          beltId: memberBeltId || "lam-dai",
+          beltId: memberBeltId || BELTS[0]?.id || "",
           joinedAt,
         };
       })

@@ -30,7 +30,8 @@ export async function GET(request) {
     }
   }
 
-  const failUrl = new URL("/admin/login", url.origin);
+  const failPath = next.startsWith("/admin") ? "/admin/login" : "/ho-so";
+  const failUrl = new URL(failPath, url.origin);
   failUrl.searchParams.set("reason", "auth_failed");
   return NextResponse.redirect(failUrl);
 }

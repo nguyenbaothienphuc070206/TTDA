@@ -1,5 +1,8 @@
 {
   "nav": {
+    "learning": "Learning",
+    "community": "Community",
+    "shop": "Shop",
     "roadmap": "Roadmap",
     "course": "Course",
     "videos": "Videos",
@@ -11,13 +14,14 @@
     "progress": "Progress",
     "progressAria": "View learning progress",
     "brandTitle": "Vovinam",
-    "brandSubtitle": "Blue → Yellow → Black belt"
+    "brandSubtitle": "14 belt levels"
   },
   "theme": {
     "label": "Theme",
+    "light": "Light",
     "dark": "Dark",
-    "midnight": "Midnight",
-    "toggleAria": "Toggle theme"
+    "vodo": "Vovinam Blue",
+    "toggleAria": "Choose theme"
   },
   "language": {
     "label": "Language",
@@ -31,20 +35,28 @@
     "startLearning": "Start learning",
     "createSchedule": "Create a schedule",
     "brandName": "Vovinam Learning",
-    "brandSubtitle": "Blue → Yellow → Black belt",
+    "brandSubtitle": "14 belt levels",
     "brandDescription": "A roadmap-based app with step-by-step lessons and simple progress tracking.",
     "navTitle": "Navigation",
-    "levelTitle": "Levels",
+    "levelTitle": "Belt groups",
+    "levelGroups": {
+      "lam": "Blue belt system",
+      "hoang": "Yellow belt system",
+      "hong": "Red belt system"
+    },
     "safetyTitle": "Safety notes",
-    "safety1": "Warm up for 5–10 minutes (ankles, knees, hips, shoulders).",
-    "safety2": "Go slow—clean technique first, speed later.",
-    "safety3": "Sharp pain/dizziness: stop and rest—don't push through.",
+    "safety1": "Warm up for 5-10 minutes (ankles, knees, hips, shoulders).",
+    "safety2": "Go slow: clean technique first, speed later.",
+    "safety3": "Sharp pain or dizziness: stop and rest, do not push through.",
     "safety4": "Advanced techniques: train with a coach when possible.",
     "emergencySupport": "Emergency support",
     "backToTop": "Back to top ↑",
     "copyright": "Built with Next.js",
     "links": {
       "home": "Home",
+      "learning": "Learning",
+      "community": "Community",
+      "shop": "Shop",
       "roadmap": "Roadmap",
       "course": "Course",
       "videos": "Videos",
@@ -61,3 +73,4 @@
     }
   }
 }
+

@@ -1,7 +1,7 @@
 /* global self, caches, fetch, Response */
 
-const STATIC_CACHE = "vovinam-static-v4";
-const PAGE_CACHE = "vovinam-pages-v4";
+const STATIC_CACHE = "vovinam-static-v5";
+const PAGE_CACHE = "vovinam-pages-v5";
 
 // Keep the page cache small to avoid storage bloat.
 const MAX_PAGE_ENTRIES = 25;
@@ -202,9 +202,6 @@ async function handleNavigate(request) {
   } catch {
     const cached = await cache.match(request, { ignoreVary: true });
     if (cached) return cached;
-
-    const fallback = await cache.match("/", { ignoreVary: true });
-    if (fallback) return fallback;
 
     return new Response("Offline", {
       status: 503,

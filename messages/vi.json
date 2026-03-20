@@ -1,5 +1,8 @@
 {
   "nav": {
+    "learning": "Học tập",
+    "community": "Cộng đồng",
+    "shop": "Cửa hàng",
     "roadmap": "Lộ trình",
     "course": "Khóa học",
     "videos": "Video",
@@ -11,13 +14,14 @@
     "progress": "Tiến độ",
     "progressAria": "Xem tiến độ học tập",
     "brandTitle": "Vovinam",
-    "brandSubtitle": "Lam đai → Hoàng đai → Huyền đai"
+    "brandSubtitle": "Lam đai tự vệ → ... → Hồng đai tứ"
   },
   "theme": {
     "label": "Giao diện",
+    "light": "Sáng",
     "dark": "Tối",
-    "midnight": "Đen sâu",
-    "toggleAria": "Chuyển chế độ giao diện"
+    "vodo": "Võ đạo xanh",
+    "toggleAria": "Chọn chế độ giao diện"
   },
   "language": {
     "label": "Ngôn ngữ",
@@ -31,20 +35,28 @@
     "startLearning": "Bắt đầu học",
     "createSchedule": "Tạo lịch tập",
     "brandName": "Vovinam Learning",
-    "brandSubtitle": "Lam đai → Hoàng đai → Huyền đai",
+    "brandSubtitle": "Lam đai tự vệ → ... → Hồng đai tứ",
     "brandDescription": "App học theo lộ trình, hướng dẫn từng bước, dễ theo dõi tiến độ.",
     "navTitle": "Điều hướng",
-    "levelTitle": "Cấp đai",
+    "levelTitle": "Nhóm cấp đai",
+    "levelGroups": {
+      "lam": "Hệ Lam đai",
+      "hoang": "Hệ Hoàng đai",
+      "hong": "Hệ Hồng/Huyền đai"
+    },
     "safetyTitle": "Lưu ý an toàn",
-    "safety1": "Khởi động 5–10 phút (cổ chân, gối, hông, vai).",
-    "safety2": "Tập chậm – đúng kỹ thuật trước khi tăng tốc.",
+    "safety1": "Khởi động 5-10 phút (cổ chân, gối, hông, vai).",
+    "safety2": "Tập chậm - đúng kỹ thuật trước khi tăng tốc.",
     "safety3": "Đau nhói/choáng: dừng lại và nghỉ, không cố.",
     "safety4": "Kỹ thuật khó: nên có huấn luyện viên hướng dẫn.",
     "emergencySupport": "Liên hệ hỗ trợ khẩn cấp",
     "backToTop": "Lên đầu trang ↑",
-    "copyright": "Built with Next.js",
+    "copyright": "Xây dựng với Next.js",
     "links": {
       "home": "Trang chủ",
+      "learning": "Học tập",
+      "community": "Cộng đồng",
+      "shop": "Cửa hàng",
       "roadmap": "Lộ trình",
       "course": "Khóa học",
       "videos": "Video",
@@ -55,9 +67,10 @@
       "store": "Cửa hàng",
       "profile": "Hồ sơ",
       "aiCoach": "AI Coach",
-      "admin": "Admin/Coach",
+      "admin": "Quản trị/HLV",
       "privacy": "Chính sách bảo mật",
       "terms": "Điều khoản"
     }
   }
 }
+

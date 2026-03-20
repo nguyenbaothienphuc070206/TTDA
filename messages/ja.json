@@ -1,5 +1,8 @@
 {
   "nav": {
+    "learning": "学習",
+    "community": "コミュニティ",
+    "shop": "ショップ",
     "roadmap": "ロードマップ",
     "course": "コース",
     "videos": "動画",
@@ -11,13 +14,14 @@
     "progress": "進捗",
     "progressAria": "学習の進捗を見る",
     "brandTitle": "Vovinam",
-    "brandSubtitle": "青帯 → 黄帯 → 黒帯"
+    "brandSubtitle": "14段階の帯レベル"
   },
   "theme": {
     "label": "テーマ",
+    "light": "ライト",
     "dark": "ダーク",
-    "midnight": "ミッドナイト",
-    "toggleAria": "テーマを切り替える"
+    "vodo": "武道ブルー",
+    "toggleAria": "テーマを選ぶ"
   },
   "language": {
     "label": "言語",
@@ -31,10 +35,15 @@
     "startLearning": "学習を始める",
     "createSchedule": "スケジュール作成",
     "brandName": "Vovinam Learning",
-    "brandSubtitle": "青帯 → 黄帯 → 黒帯",
+    "brandSubtitle": "14段階の帯レベル",
     "brandDescription": "ロードマップ型の学習アプリ。ステップ別レッスンと進捗管理ができます。",
     "navTitle": "ナビゲーション",
-    "levelTitle": "レベル",
+    "levelTitle": "帯グループ",
+    "levelGroups": {
+      "lam": "青帯システム",
+      "hoang": "黄帯システム",
+      "hong": "紅帯システム"
+    },
     "safetyTitle": "安全の注意",
     "safety1": "5〜10分の準備運動（足首・膝・股関節・肩）。",
     "safety2": "まずはゆっくり正確に。スピードは後から。",
@@ -42,9 +51,12 @@
     "safety4": "難しい技は、可能ならコーチと練習。",
     "emergencySupport": "緊急サポート",
     "backToTop": "トップへ ↑",
-    "copyright": "Built with Next.js",
+    "copyright": "Next.js で構築",
     "links": {
       "home": "ホーム",
+      "learning": "学習",
+      "community": "コミュニティ",
+      "shop": "ショップ",
       "roadmap": "ロードマップ",
       "course": "コース",
       "videos": "動画",

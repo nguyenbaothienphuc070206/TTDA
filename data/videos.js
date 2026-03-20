@@ -1,67 +1,81 @@
-export const VIDEOS = [
+import { BELTS } from "./belts";
+
+const HLS_DEMO_URL = "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8";
+const YOUTUBE_DEMO_ID = "M7lc1UVf-VE";
+
+const VIDEO_TRACKS = [
   {
-    id: "hls-demo",
-    title: "Demo HLS streaming (mẫu)",
-    minutes: 5,
-    beltId: "lam-dai",
-    hlsUrl: "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8",
+    id: "quyen",
+    title: "Video quyền",
+    query: "bai quyen",
+    youtubeId: YOUTUBE_DEMO_ID,
+    baseMinutes: 8,
     summary:
-      "Demo phát video HLS (m3u8) trực tiếp trong app. Dùng để minh hoạ hạ tầng player/SEO; bạn có thể thay bằng nguồn HLS thật sau.",
-    transcript: [
-      "Gợi ý: nếu video không chạy, kiểm tra CORS của nguồn HLS hoặc thử nguồn khác.",
-      "Trường hợp iPhone/Safari: HLS thường chạy native, không cần Hls.js.",
-      "Trường hợp Chrome/Edge: dùng Hls.js để phát m3u8.",
-    ],
-    tags: ["HLS", "streaming"],
+      "Video thực hành quyền theo đúng nhịp và chuyển tấn của cấp đai này.",
   },
   {
-    id: "quyen-1",
-    title: "Bài quyền số 1 (mẫu)",
-    minutes: 8,
-    beltId: "lam-dai",
-    embedUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+    id: "chien-luoc",
+    title: "Video chiến lược",
+    query: "chien luoc doi luyen",
+    youtubeId: YOUTUBE_DEMO_ID,
+    baseMinutes: 10,
     summary:
-      "Video mẫu để demo chức năng hỏi nhanh kỹ thuật bằng RAG. Bạn có thể thay link YouTube thật sau.",
-    transcript: [
-      "Mở đầu: đứng tư thế chuẩn bị, giữ trục cơ thể thẳng và thở đều.",
-      "Phần 1: di chuyển tiến/lùi ngắn, tay thủ luôn giữ cao, khuỷu gần thân.",
-      "Phần 2: đòn tay thẳng – ra đòn gọn, thu tay về nhanh để bảo vệ cằm.",
-      "Kết thúc: giãn cơ nhẹ vùng hông, gối, cổ chân; uống nước từ từ.",
-    ],
-    tags: ["tư thế", "di chuyển", "đòn tay"],
+      "Video chiến lược vào - ra cự ly, quản trị nhịp và đọc ý đồ đối thủ.",
   },
   {
-    id: "da-co-ban",
-    title: "Đá tống trước (mẫu)",
-    minutes: 6,
-    beltId: "lam-dai",
-    embedUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+    id: "phan-don",
+    title: "Video phản đòn",
+    query: "phan don",
+    youtubeId: YOUTUBE_DEMO_ID,
+    baseMinutes: 11,
     summary:
-      "Trọng tâm: nâng gối đúng hướng, duỗi chân, thu về nhanh, không cố đá cao khi chưa kiểm soát.",
-    transcript: [
-      "Bước 1: tư thế thủ, trọng tâm ổn định.",
-      "Bước 2: nâng gối (chân đá) lên trước, gối hướng thẳng.",
-      "Bước 3: duỗi cẳng chân ra trước, thở ra ngắn.",
-      "Bước 4: thu gối về trước khi đặt chân xuống để bảo vệ khớp.",
-    ],
-    tags: ["đòn chân", "thăng bằng", "gối"],
+      "Video mô tả chuỗi né - gạt - phản đòn theo đúng nguyên tắc an toàn.",
   },
   {
-    id: "phan-don-1",
-    title: "Phản đòn căn bản 1 (mẫu)",
-    minutes: 10,
-    beltId: "hoang-dai",
-    embedUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+    id: "khoa-go",
+    title: "Video khóa gỡ",
+    query: "khoa go tu ve",
+    youtubeId: YOUTUBE_DEMO_ID,
+    baseMinutes: 12,
     summary:
-      "Demo bài phản đòn: ưu tiên khoảng cách, thủ chắc, thao tác gọn và dừng đúng nhịp.",
-    transcript: [
-      "Mục tiêu: thủ an toàn trước, phản đòn sau.",
-      "Dùng bước góc để tránh đứng trực diện.",
-      "Khi phản đòn: ra đòn ngắn, thu về nhanh.",
-    ],
-    tags: ["phản đòn", "tự vệ", "khoảng cách"],
+      "Video khóa gỡ và thoát hiểm theo bài bản dành riêng cho cấp đai tương ứng.",
   },
 ];
+
+function makeYoutubeEmbedUrl(videoId) {
+  const id = String(videoId || "").trim();
+  if (!id) return "";
+  return `https://www.youtube.com/embed/${encodeURIComponent(id)}`;
+}
+
+function makeTranscript(trackTitle, beltTitle) {
+  return [
+    `Mục tiêu buổi này: chuẩn hóa ${trackTitle.toLowerCase()} cho ${beltTitle}.`,
+    "Giữ nhịp thở đều và ưu tiên trục cơ thể ổn định.",
+    "Tập chậm trước, tăng tốc sau khi động tác sạch.",
+    "Nếu đau nhói hoặc mất kiểm soát, dừng ngay để đảm bảo an toàn.",
+  ];
+}
+
+export const VIDEOS = BELTS.flatMap((belt, beltIndex) => {
+  return VIDEO_TRACKS.map((track, trackIndex) => {
+    const title = `${track.title} ${belt.title}`;
+    const query = `Vovinam ${belt.title} ${track.query}`;
+
+    return {
+      id: `${belt.id}-${track.id}`,
+      title,
+      minutes: track.baseMinutes + Math.floor(beltIndex / 2) + trackIndex,
+      beltId: belt.id,
+      hlsUrl: HLS_DEMO_URL,
+      embedUrl: makeYoutubeEmbedUrl(track.youtubeId),
+      watchUrl: `https://www.youtube.com/results?search_query=${encodeURIComponent(query)}`,
+      summary: `${track.summary} Từ khóa tìm kiếm video: ${query}.`,
+      transcript: makeTranscript(track.title, belt.title),
+      tags: [belt.title, track.title, "Vovinam"],
+    };
+  });
+});
 
 export function getVideoById(id) {
   return VIDEOS.find((v) => v.id === id) || null;

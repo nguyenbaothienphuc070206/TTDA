@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 
-import { LEVELS } from "@/data/lessons";
+import { BELT_FAMILIES, getBeltsByFamilyId } from "@/data/belts";
 
 function FooterLink({ href, children }) {
   return (
@@ -26,6 +26,11 @@ export default async function SiteFooter() {
   const t = await getTranslations("footer");
   const year = new Date().getFullYear();
   const emergencySupportUrl = String(process.env.NEXT_PUBLIC_EMERGENCY_SUPPORT_URL || "").trim();
+  const levelFamilies = BELT_FAMILIES.map((family) => ({
+    id: family.id,
+    title: t(`levelGroups.${family.id}`),
+    belts: getBeltsByFamilyId(family.id),
+  })).filter((family) => family.belts.length > 0);
 
   return (
     <footer className="border-t border-white/10">
@@ -44,7 +49,7 @@ export default async function SiteFooter() {
 
             <div className="flex flex-col gap-2 sm:flex-row">
               <Link
-                href="/lo-trinh"
+                href="/learning"
                 className="inline-flex h-11 items-center justify-center rounded-2xl bg-gradient-to-r from-blue-400 to-blue-600 px-4 text-sm font-semibold text-slate-950 transition hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-blue-400/50"
               >
                 {t("startLearning")}
@@ -80,16 +85,28 @@ export default async function SiteFooter() {
             <FooterTitle>{t("navTitle")}</FooterTitle>
             <div className="mt-3 grid gap-2">
               <FooterLink href="/">{t("links.home")}</FooterLink>
+
+              <details>
+                <summary className="flex cursor-pointer list-none items-center justify-between rounded-lg py-1 text-sm text-slate-300 transition hover:text-white">
+                  <span>{t("links.learning")}</span>
+                  <span className="text-xs text-slate-400">▾</span>
+                </summary>
+                <div className="mt-2 grid gap-2 pl-3">
+                  <FooterLink href="/learning">{t("links.learning")}</FooterLink>
+                  <FooterLink href="/hoc-tap">{t("links.course")}</FooterLink>
+                  <FooterLink href="/video">{t("links.videos")}</FooterLink>
+                  <FooterLink href="/ky-thuat">{t("links.techniques")}</FooterLink>
+                </div>
+              </details>
+
+              <FooterLink href="/cong-dong">{t("links.community")}</FooterLink>
               <FooterLink href="/lo-trinh">{t("links.roadmap")}</FooterLink>
-              <FooterLink href="/hoc-tap">{t("links.course")}</FooterLink>
-              <FooterLink href="/video">{t("links.videos")}</FooterLink>
-              <FooterLink href="/ky-thuat">{t("links.techniques")}</FooterLink>
               <FooterLink href="/lich-tap">{t("links.schedule")}</FooterLink>
               <FooterLink href="/dinh-duong">{t("links.nutrition")}</FooterLink>
               <FooterLink href="/tien-do">{t("links.progress")}</FooterLink>
-              <FooterLink href="/cua-hang">{t("links.store")}</FooterLink>
-              <FooterLink href="/ho-so">{t("links.profile")}</FooterLink>
+              <FooterLink href="/cua-hang">{t("links.shop")}</FooterLink>
               <FooterLink href="/ai-coach">{t("links.aiCoach")}</FooterLink>
+              <FooterLink href="/ho-so">{t("links.profile")}</FooterLink>
               <FooterLink href="/admin">{t("links.admin")}</FooterLink>
               <FooterLink href="/chinh-sach-bao-mat">{t("links.privacy")}</FooterLink>
               <FooterLink href="/dieu-khoan">{t("links.terms")}</FooterLink>
@@ -99,10 +116,27 @@ export default async function SiteFooter() {
           <div>
             <FooterTitle>{t("levelTitle")}</FooterTitle>
             <div className="mt-3 grid gap-2">
-              {LEVELS.map((level) => (
-                <FooterLink key={level.id} href={`/lo-trinh#${level.id}`}>
-                  {level.title}
-                </FooterLink>
+              {levelFamilies.map((family) => (
+                <details
+                  key={family.id}
+                  className="py-1"
+                  open={family.id === "lam"}
+                >
+                  <summary className="flex cursor-pointer list-none items-center justify-between gap-3">
+                    <span className="text-sm font-semibold text-white">{family.title}</span>
+                    <span className="rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-xs text-slate-300">
+                      {family.belts.length}
+                    </span>
+                  </summary>
+
+                  <div className="mt-3 grid gap-2">
+                    {family.belts.map((belt) => (
+                      <FooterLink key={belt.id} href={`/lo-trinh#${belt.lessonLevel}`}>
+                        {belt.title}
+                      </FooterLink>
+                    ))}
+                  </div>
+                </details>
               ))}
             </div>
           </div>

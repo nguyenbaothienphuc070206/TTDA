@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useLocale } from "next-intl";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Sparkles, ThumbsDown, ThumbsUp } from "lucide-react";
@@ -11,6 +12,100 @@ import { readProfile } from "@/lib/profile";
 import MascotIcon from "@/components/MascotIcon";
 
 const CHAT_STORE_KEY = "vovinam_ai_chat_v1";
+
+function getCopy(locale) {
+  const id = String(locale || "vi").toLowerCase();
+
+  if (id === "en") {
+    return {
+      feedbackHelpful: "Helpful feedback",
+      feedbackNotHelpful: "Not helpful feedback",
+      thinkingAria: "AI is thinking",
+      thinkingSr: "AI is thinking...",
+      open: "Open",
+      helperVideo: "Quick questions about techniques in this video (RAG).",
+      helperDefault: "Ask about techniques, common mistakes, and safe training tips.",
+      needLongerQuestion: "Please enter a slightly longer question.",
+      requestError: "Could not process the request.",
+      apiError: "Cannot connect to API. Please try again.",
+      premiumTitle: "AI Coach (Premium)",
+      premiumDesc:
+        "This feature is part of Premium. Upgrade to unlock AI Coach (RAG) and Yellow/Red belt techniques.",
+      premiumUnlock: "Premium unlocks",
+      premiumFeat1: "Ask common mistakes + fixes grounded in learning materials",
+      premiumFeat2: "Safe practice suggestions by belt level",
+      premiumFeat3: "Unlock advanced videos/techniques",
+      upgrade: "Upgrade Premium",
+      demoNote: "Demo: you can enable Premium in Profile.",
+      emptyState:
+        "Ask about techniques, common mistakes, and safe practice tips. AI answers based on available learning sources.",
+      recommendedVideos: "Suggested videos",
+      sources: "References",
+      inputPlaceholder: "Example: 'common mistakes in front push kick?'",
+      answering: "Answering...",
+      ask: "Ask",
+    };
+  }
+
+  if (id === "ja") {
+    return {
+      feedbackHelpful: "役に立ったフィードバック",
+      feedbackNotHelpful: "役に立たなかったフィードバック",
+      thinkingAria: "AIが考えています",
+      thinkingSr: "AIが考えています...",
+      open: "開く",
+      helperVideo: "この動画の技術についてすぐ質問できます（RAG）。",
+      helperDefault: "技術、よくあるミス、安全な練習のコツを質問できます。",
+      needLongerQuestion: "もう少し長く質問を入力してください。",
+      requestError: "リクエストを処理できませんでした。",
+      apiError: "APIに接続できません。しばらくして再試行してください。",
+      premiumTitle: "AIコーチ（プレミアム）",
+      premiumDesc:
+        "この機能はプレミアム対象です。アップグレードすると AIコーチ（RAG）と黄帯・紅帯技術を利用できます。",
+      premiumUnlock: "プレミアムで開放",
+      premiumFeat1: "教材に基づく、よくあるミスと修正方法の質問",
+      premiumFeat2: "帯レベルに応じた安全な練習提案",
+      premiumFeat3: "上級動画・技術を開放",
+      upgrade: "プレミアムへアップグレード",
+      demoNote: "デモ: プロフィールでプレミアムを有効化できます。",
+      emptyState:
+        "技術、よくあるミス、安全な練習のコツを質問してください。AIが利用可能な資料に基づいて回答します。",
+      recommendedVideos: "おすすめ動画",
+      sources: "参照ソース",
+      inputPlaceholder: "例: 「前蹴りのよくあるミスは？」",
+      answering: "回答中...",
+      ask: "質問",
+    };
+  }
+
+  return {
+    feedbackHelpful: "Phản hồi hữu ích",
+    feedbackNotHelpful: "Phản hồi không hữu ích",
+    thinkingAria: "AI đang suy nghĩ",
+    thinkingSr: "AI đang suy nghĩ...",
+    open: "Mở",
+    helperVideo: "Hỏi nhanh về kỹ thuật trong video này (RAG).",
+    helperDefault: "Hỏi về kỹ thuật, lỗi thường gặp, mẹo tập an toàn…",
+    needLongerQuestion: "Bạn nhập câu hỏi dài hơn một chút nhé.",
+    requestError: "Không xử lý được yêu cầu.",
+    apiError: "Không kết nối được API. Vui lòng thử lại.",
+    premiumTitle: "AI Coach (Premium)",
+    premiumDesc:
+      "Tính năng này thuộc gói Premium. Nâng cấp để mở khóa AI Coach (RAG) và kỹ thuật Hoàng/Hồng đai.",
+    premiumUnlock: "Premium mở khóa",
+    premiumFeat1: "Hỏi lỗi thường gặp + cách sửa theo tài liệu",
+    premiumFeat2: "Gợi ý bài tập an toàn theo cấp đai",
+    premiumFeat3: "Mở khóa video/kỹ thuật nâng cao",
+    upgrade: "Nâng cấp Premium",
+    demoNote: "Demo: bạn có thể bật Premium trong Hồ sơ.",
+    emptyState: "Hỏi về kỹ thuật, lỗi thường gặp, mẹo tập an toàn… AI sẽ trả lời theo tài liệu có sẵn.",
+    recommendedVideos: "Video minh hoạ",
+    sources: "Nguồn tham chiếu",
+    inputPlaceholder: "Ví dụ: 'đá tống trước sai thường gặp?'",
+    answering: "Đang trả lời…",
+    ask: "Hỏi",
+  };
+}
 
 function readChatStore() {
   if (typeof window === "undefined") return { history: [], sessionId: "" };
@@ -70,7 +165,7 @@ function MarkdownAnswer({ children }) {
           a: ({ href, children: c }) => (
             <a
               href={href}
-              className="text-blue-200 underline underline-offset-4 hover:text-blue-100"
+              className="text-amber-200 underline underline-offset-4 hover:text-amber-100"
               target={href?.startsWith("http") ? "_blank" : undefined}
               rel={href?.startsWith("http") ? "noreferrer" : undefined}
             >
@@ -88,7 +183,7 @@ function MarkdownAnswer({ children }) {
   );
 }
 
-function ChatMessage({ message }) {
+function ChatMessage({ message, copy }) {
   const role = message?.role;
   const content = String(message?.content || "");
   if (!content.trim()) return null;
@@ -100,7 +195,7 @@ function ChatMessage({ message }) {
   return (
     <div className={"flex gap-2 " + (isUser ? "justify-end" : "justify-start")}>
       {!isUser ? (
-        <span className="mt-0.5 inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-2xl border border-white/10 bg-gradient-to-br from-blue-500/20 to-blue-600/10 text-blue-100">
+        <span className="mt-0.5 inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-2xl border border-white/10 bg-gradient-to-br from-amber-400/20 to-amber-500/10 text-amber-100">
           <MascotIcon className="h-5 w-5" />
         </span>
       ) : null}
@@ -109,8 +204,8 @@ function ChatMessage({ message }) {
         className={
           "max-w-[82%] rounded-3xl border p-3 " +
           (isUser
-            ? "border-blue-400/25 bg-blue-500/15 text-slate-100"
-            : "border-white/10 bg-white/5 text-slate-200")
+            ? "border-amber-300/25 bg-amber-400/10 text-white"
+            : "border-white/10 bg-slate-950/30 backdrop-blur-xl text-slate-200")
         }
       >
         {isUser ? (
@@ -125,12 +220,12 @@ function ChatMessage({ message }) {
               type="button"
               onClick={() => message?.onFeedback?.({ messageId, rating: 1 })}
               className={
-                "inline-flex h-8 w-8 items-center justify-center rounded-xl border text-slate-200 transition focus:outline-none focus:ring-2 focus:ring-blue-400/30 " +
+                "inline-flex h-8 w-8 items-center justify-center rounded-xl border text-slate-200 transition focus:outline-none focus:ring-2 focus:ring-amber-300/30 " +
                 (feedback === 1
-                  ? "border-blue-400/30 bg-blue-500/15 text-blue-100"
+                  ? "border-amber-300/30 bg-amber-400/10 text-amber-100"
                   : "border-white/10 bg-white/5 hover:bg-white/10 hover:text-white")
               }
-              aria-label="Phản hồi hữu ích"
+              aria-label={copy.feedbackHelpful}
             >
               <ThumbsUp className="h-4 w-4" />
             </button>
@@ -138,12 +233,12 @@ function ChatMessage({ message }) {
               type="button"
               onClick={() => message?.onFeedback?.({ messageId, rating: -1 })}
               className={
-                "inline-flex h-8 w-8 items-center justify-center rounded-xl border text-slate-200 transition focus:outline-none focus:ring-2 focus:ring-blue-400/30 " +
+                "inline-flex h-8 w-8 items-center justify-center rounded-xl border text-slate-200 transition focus:outline-none focus:ring-2 focus:ring-amber-300/30 " +
                 (feedback === -1
-                  ? "border-blue-400/30 bg-blue-500/15 text-blue-100"
+                  ? "border-amber-300/30 bg-amber-400/10 text-amber-100"
                   : "border-white/10 bg-white/5 hover:bg-white/10 hover:text-white")
               }
-              aria-label="Phản hồi không hữu ích"
+              aria-label={copy.feedbackNotHelpful}
             >
               <ThumbsDown className="h-4 w-4" />
             </button>
@@ -154,11 +249,35 @@ function ChatMessage({ message }) {
   );
 }
 
-function SourceItem({ source }) {
+function AssistantThinkingSkeleton({ copy }) {
+  return (
+    <div
+      className="flex gap-2 justify-start"
+      role="status"
+      aria-live="polite"
+      aria-label={copy.thinkingAria}
+    >
+      <span className="mt-0.5 inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-2xl border border-white/10 bg-gradient-to-br from-amber-400/20 to-amber-500/10 text-amber-100">
+        <MascotIcon className="h-5 w-5" />
+      </span>
+
+      <div className="max-w-[82%] rounded-3xl border border-blue-400/20 bg-blue-500/10 p-3">
+        <span className="sr-only">{copy.thinkingSr}</span>
+        <div className="grid gap-2 animate-pulse">
+          <div className="h-3 w-44 rounded-full bg-blue-300/20" />
+          <div className="h-3 w-64 max-w-full rounded-full bg-blue-300/20" />
+          <div className="h-3 w-36 rounded-full bg-blue-300/20" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function SourceItem({ source, copy }) {
   const href = String(source?.url || "").trim();
 
   return (
-    <li className="rounded-2xl border border-white/10 bg-white/5 p-3">
+    <li className="rounded-2xl border border-white/10 bg-slate-950/30 backdrop-blur-xl p-3">
       <div className="flex items-center justify-between gap-3">
         <div className="min-w-0">
           <div className="text-sm font-semibold text-white truncate">
@@ -171,9 +290,9 @@ function SourceItem({ source }) {
         {href ? (
           <Link
             href={href}
-            className="shrink-0 rounded-xl border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-semibold text-slate-200 transition hover:bg-white/10 hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-400/30"
+            className="shrink-0 rounded-xl border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-semibold text-slate-200 transition hover:bg-white/10 hover:text-white hover:border-amber-300/20 focus:outline-none focus:ring-2 focus:ring-amber-300/30"
           >
-            Mở
+            {copy.open}
           </Link>
         ) : null}
       </div>
@@ -190,6 +309,9 @@ function SourceItem({ source }) {
 }
 
 export default function AiCoachChat({ context }) {
+  const locale = useLocale();
+  const copy = getCopy(locale);
+
   const pathname = usePathname() || "";
   const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(false);
@@ -275,18 +397,18 @@ export default function AiCoachChat({ context }) {
 
   const helperText = useMemo(() => {
     if (context?.videoId) {
-      return "Hỏi nhanh về kỹ thuật trong video này (RAG).";
+      return copy.helperVideo;
     }
 
-    return "Hỏi về kỹ thuật, lỗi thường gặp, mẹo tập an toàn…";
-  }, [context?.videoId]);
+    return copy.helperDefault;
+  }, [context?.videoId, copy.helperDefault, copy.helperVideo]);
 
   const onAsk = async (e) => {
     e.preventDefault();
 
     const q = String(query || "").trim();
     if (q.length < 2) {
-      setError("Bạn nhập câu hỏi dài hơn một chút nhé.");
+      setError(copy.needLongerQuestion);
       return;
     }
 
@@ -428,7 +550,7 @@ export default function AiCoachChat({ context }) {
             }
 
             if (evt === "error") {
-              setError(payload?.error || "Không xử lý được yêu cầu.");
+              setError(payload?.error || copy.requestError);
             }
           }
         }
@@ -449,7 +571,7 @@ export default function AiCoachChat({ context }) {
 
       const data = await res.json().catch(() => null);
       if (!res.ok) {
-        setError(data?.error || "Không xử lý được yêu cầu.");
+        setError(data?.error || copy.requestError);
         return;
       }
 
@@ -474,7 +596,7 @@ export default function AiCoachChat({ context }) {
       writeChatStore({ history: nextHistory, sessionId: String(data?.sessionId || sessionId || "") });
       setChatHistory(nextUiHistory);
     } catch {
-      setError("Không kết nối được API. Vui lòng thử lại.");
+      setError(copy.apiError);
     } finally {
       setLoading(false);
     }
@@ -492,57 +614,57 @@ export default function AiCoachChat({ context }) {
 
   return (
     !isPremium ? (
-      <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-white/5 shadow-[var(--shadow-card)] flex flex-col h-[calc(100vh-theme(spacing.16))] lg:sticky lg:top-16">
+      <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-slate-950/30 backdrop-blur-xl shadow-[var(--shadow-card)] flex flex-col h-[calc(100vh-theme(spacing.16))] lg:sticky lg:top-16">
         <div
           aria-hidden
-          className="pointer-events-none absolute -inset-8 rounded-[2.75rem] bg-[radial-gradient(circle_at_bottom_right,rgba(59,130,246,0.18),transparent_60%)] blur-2xl"
+          className="pointer-events-none absolute -inset-8 rounded-[2.75rem] bg-[radial-gradient(circle_at_bottom_right,rgba(250,204,21,0.16),transparent_60%)] blur-2xl"
         />
 
         <div className="relative flex flex-col h-full p-6 sm:p-8">
           <div className="flex items-start gap-3 shrink-0">
-            <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-400 to-blue-600 text-slate-950">
+            <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-300 to-amber-500 text-slate-950">
               <MascotIcon className="h-6 w-6" />
             </span>
             <div className="min-w-0">
-              <h2 className="text-xl font-semibold text-white">AI Coach (Premium)</h2>
+              <h2 className="text-xl font-semibold text-white">{copy.premiumTitle}</h2>
               <p className="mt-1 text-sm leading-6 text-slate-300">
-                Tính năng này thuộc gói Premium. Nâng cấp để mở khóa AI Coach (RAG) và kỹ thuật Hoàng/Huyền đai.
+                {copy.premiumDesc}
               </p>
             </div>
           </div>
 
           <div className="mt-4 rounded-3xl border border-white/10 bg-slate-950/30 p-5 text-sm leading-6 text-slate-200">
-            <div className="text-xs font-semibold text-slate-300">Premium mở khóa</div>
+            <div className="text-xs font-semibold text-slate-300">{copy.premiumUnlock}</div>
             <ul className="mt-2 grid gap-1">
-              <li>• Hỏi lỗi thường gặp + cách sửa theo tài liệu</li>
-              <li>• Gợi ý bài tập an toàn theo cấp đai</li>
-              <li>• Mở khóa video/kỹ thuật nâng cao</li>
+              <li>• {copy.premiumFeat1}</li>
+              <li>• {copy.premiumFeat2}</li>
+              <li>• {copy.premiumFeat3}</li>
             </ul>
           </div>
 
           <div className="mt-auto pt-4">
             <Link
               href="/ho-so#goi-premium"
-              className="inline-flex h-11 w-full items-center justify-center rounded-2xl bg-gradient-to-r from-blue-400 to-blue-600 px-5 text-sm font-semibold text-slate-950 transition hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-blue-400/40"
+              className="inline-flex h-11 w-full items-center justify-center rounded-2xl bg-gradient-to-r from-amber-300 to-amber-500 px-5 text-sm font-semibold text-slate-950 transition hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-amber-300/40"
             >
-              Nâng cấp Premium
+              {copy.upgrade}
             </Link>
             <p className="mt-2 text-xs leading-5 text-slate-400">
-              Demo: bạn có thể bật Premium trong Hồ sơ.
+              {copy.demoNote}
             </p>
           </div>
         </div>
       </div>
     ) : (
-    <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-white/5 shadow-[var(--shadow-card)] flex flex-col h-[calc(100vh-theme(spacing.16))] lg:sticky lg:top-16">
+    <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-slate-950/30 backdrop-blur-xl shadow-[var(--shadow-card)] flex flex-col h-[calc(100vh-theme(spacing.16))] lg:sticky lg:top-16">
       <div
         aria-hidden
-        className="pointer-events-none absolute -inset-8 rounded-[2.75rem] bg-[radial-gradient(circle_at_bottom_right,rgba(59,130,246,0.18),transparent_60%)] blur-2xl"
+        className="pointer-events-none absolute -inset-8 rounded-[2.75rem] bg-[radial-gradient(circle_at_bottom_right,rgba(250,204,21,0.16),transparent_60%)] blur-2xl"
       />
 
       <div className="relative flex flex-col h-full p-6 sm:p-8">
         <div className="flex items-start gap-3 shrink-0">
-          <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-400 to-blue-600 text-slate-950">
+          <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-300 to-amber-500 text-slate-950">
             <MascotIcon className="h-6 w-6" />
           </span>
           <div className="min-w-0">
@@ -559,29 +681,31 @@ export default function AiCoachChat({ context }) {
           {hasChat ? (
             <div className="grid gap-3">
               {chatHistory.map((m, idx) => (
-                <ChatMessage key={`${m.role}-${idx}`} message={m} />
+                <ChatMessage key={`${m.role}-${idx}`} message={m} copy={copy} />
               ))}
+
+              {loading && !String(answer || "").trim() ? <AssistantThinkingSkeleton copy={copy} /> : null}
             </div>
           ) : (
             <div className="flex items-start gap-3 text-slate-300">
-              <span className="mt-0.5 inline-flex h-9 w-9 items-center justify-center rounded-2xl border border-white/10 bg-white/5 text-blue-100">
+              <span className="mt-0.5 inline-flex h-9 w-9 items-center justify-center rounded-2xl border border-white/10 bg-white/5 text-amber-100">
                 <Sparkles className="h-5 w-5" />
               </span>
               <div className="text-sm leading-6">
-                Hỏi về kỹ thuật, lỗi thường gặp, mẹo tập an toàn… AI sẽ trả lời theo tài liệu có sẵn.
+                {copy.emptyState}
               </div>
             </div>
           )}
 
           {Array.isArray(recommendedVideos) && recommendedVideos.length > 0 ? (
             <div className="mt-4">
-              <div className="text-xs font-semibold text-slate-300">Video minh hoạ</div>
+              <div className="text-xs font-semibold text-slate-300">{copy.recommendedVideos}</div>
               <div className="mt-2 grid gap-2">
                 {recommendedVideos.slice(0, 2).map((v) => (
                   <Link
                     key={v.id}
                     href={v.url || `/video/${v.id}`}
-                    className="rounded-2xl border border-white/10 bg-white/5 p-4 transition hover:border-blue-400/20 hover:bg-white/10"
+                    className="rounded-2xl border border-white/10 bg-slate-950/30 backdrop-blur-xl p-4 transition hover:border-amber-300/25 hover:bg-slate-950/20"
                   >
                     <div className="text-sm font-semibold text-white">{v.title}</div>
                     {v.summary ? (
@@ -595,10 +719,10 @@ export default function AiCoachChat({ context }) {
 
           {Array.isArray(sources) && sources.length > 0 ? (
             <div className="mt-4">
-              <div className="text-xs font-semibold text-slate-300">Nguồn tham chiếu</div>
+              <div className="text-xs font-semibold text-slate-300">{copy.sources}</div>
               <ul className="mt-2 grid gap-2">
                 {sources.slice(0, 5).map((s) => (
-                  <SourceItem key={s.id} source={s} />
+                  <SourceItem key={s.id} source={s} copy={copy} />
                 ))}
               </ul>
             </div>
@@ -615,16 +739,16 @@ export default function AiCoachChat({ context }) {
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Ví dụ: 'đá tống trước sai thường gặp?'"
-            className="h-11 w-full rounded-2xl border border-white/10 bg-slate-950/60 px-4 text-sm text-white outline-none focus:ring-2 focus:ring-blue-400/30"
+            placeholder={copy.inputPlaceholder}
+            className="h-11 w-full rounded-2xl border border-white/10 bg-slate-950/60 px-4 text-sm text-white outline-none focus:ring-2 focus:ring-amber-300/30"
           />
 
           <button
             type="submit"
             disabled={loading}
-            className="inline-flex h-11 items-center justify-center rounded-2xl bg-gradient-to-r from-blue-400 to-blue-600 px-5 text-sm font-semibold text-slate-950 transition hover:brightness-110 disabled:opacity-60 focus:outline-none focus:ring-2 focus:ring-blue-400/40"
+            className="inline-flex h-11 items-center justify-center rounded-2xl bg-gradient-to-r from-amber-300 to-amber-500 px-5 text-sm font-semibold text-slate-950 transition hover:brightness-110 disabled:opacity-60 focus:outline-none focus:ring-2 focus:ring-amber-300/40"
           >
-            {loading ? "Đang trả lời…" : "Hỏi"}
+            {loading ? copy.answering : copy.ask}
           </button>
         </form>
       </div>

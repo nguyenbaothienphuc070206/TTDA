@@ -1,11 +1,38 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useLocale } from "next-intl";
 
 import { popConfettiFromElement } from "@/lib/confetti";
 import { isLessonDone, toggleLessonDone } from "@/lib/progress";
 
+function getCopy(locale) {
+  const id = String(locale || "vi").toLowerCase();
+
+  if (id === "en") {
+    return {
+      done: "Completed • Tap to undo",
+      mark: "Mark as completed",
+    };
+  }
+
+  if (id === "ja") {
+    return {
+      done: "完了済み • クリックで解除",
+      mark: "完了として記録",
+    };
+  }
+
+  return {
+    done: "Đã hoàn thành • Bấm để bỏ",
+    mark: "Đánh dấu hoàn thành",
+  };
+}
+
 export default function LessonDoneButton({ slug }) {
+  const locale = useLocale();
+  const copy = getCopy(locale);
+
   const [done, setDone] = useState(false);
   const buttonRef = useRef(null);
 
@@ -45,7 +72,7 @@ export default function LessonDoneButton({ slug }) {
           : "inline-flex h-11 items-center justify-center rounded-2xl bg-gradient-to-r from-cyan-300 to-blue-500 px-4 text-sm font-semibold text-slate-950 transition hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-cyan-300/50"
       }
     >
-      {done ? "Đã hoàn thành • Bấm để bỏ" : "Đánh dấu hoàn thành"}
+      {done ? copy.done : copy.mark}
     </button>
   );
 }

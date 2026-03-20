@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+﻿import { NextResponse } from "next/server";
 
 import { TECHNIQUES, TECHNIQUE_CATEGORIES } from "@/data/wiki";
 import { VIDEOS } from "@/data/videos";
@@ -8,7 +8,7 @@ import {
   extractHighlights,
   searchDocuments,
 } from "@/lib/rag";
-import { BELT_ORDER, normalizeBeltId, isBeltAllowed } from "@/lib/ai/belts";
+import { normalizeBeltId, tryNormalizeBeltId, isBeltAllowed } from "@/lib/ai/belts";
 import {
   AI_COACH_NOT_FOUND_MESSAGE,
   buildAiCoachFewShotMessages,
@@ -92,10 +92,16 @@ function toKbSource(row) {
 }
 
 function beltFromLessonLevel(levelId) {
-  if (levelId === "co-ban") return "lam-dai";
-  if (levelId === "trung-cap") return "hoang-dai";
-  if (levelId === "nang-cao") return "huyen-dai";
-  return null;
+  const raw = asText(levelId);
+  if (!raw) return null;
+
+  // Backward compatibility for old 3-level data.
+  if (raw === "co-ban") return "lam-dai";
+  if (raw === "trung-cap") return "hoang-dai";
+  if (raw === "nang-cao") return "hong-dai";
+
+  const normalized = tryNormalizeBeltId(raw);
+  return normalized || null;
 }
 
 function lessonToSource(lesson) {
@@ -164,7 +170,7 @@ async function resolveUserContext({ request, body }) {
       .maybeSingle();
 
     const rawDbBelt = asText(progress?.belt_rank);
-    const dbBelt = BELT_ORDER.includes(rawDbBelt) ? rawDbBelt : "";
+    const dbBelt = tryNormalizeBeltId(rawDbBelt);
 
     return {
       user,
@@ -255,7 +261,7 @@ async function retrieveSources({ query, videoId }) {
 
 function buildContextBlock(sources, beltId) {
   const lines = [];
-  lines.push("TÀI LIỆU (trích đoạn) — chỉ dùng các đoạn sau để trả lời:");
+  lines.push("TÀI LIỆU (trích đoạn) - chỉ dùng các đoạn sau để trả lời:");
 
   sources.slice(0, 5).forEach((s, idx) => {
     const tag = `S${idx + 1}`;
@@ -632,3 +638,4 @@ export async function POST(request) {
     return res;
   }
 }
+

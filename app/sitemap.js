@@ -1,6 +1,7 @@
 import { LESSONS } from "@/data/lessons";
 import { VIDEOS } from "@/data/videos";
 import { TECHNIQUES } from "@/data/wiki";
+import { WEAPONS } from "@/data/weapons";
 
 export default function sitemap() {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
@@ -12,6 +13,12 @@ export default function sitemap() {
       lastModified,
       changeFrequency: "weekly",
       priority: 1,
+    },
+    {
+      url: `${baseUrl}/learning`,
+      lastModified,
+      changeFrequency: "weekly",
+      priority: 0.9,
     },
     {
       url: `${baseUrl}/hoc-tap`,
@@ -50,6 +57,30 @@ export default function sitemap() {
       priority: 0.6,
     },
     {
+      url: `${baseUrl}/dau-truong-ai`,
+      lastModified,
+      changeFrequency: "weekly",
+      priority: 0.65,
+    },
+    {
+      url: `${baseUrl}/thien-vo`,
+      lastModified,
+      changeFrequency: "weekly",
+      priority: 0.65,
+    },
+    {
+      url: `${baseUrl}/ban-do-the-gioi`,
+      lastModified,
+      changeFrequency: "monthly",
+      priority: 0.55,
+    },
+    {
+      url: `${baseUrl}/bang-so`,
+      lastModified,
+      changeFrequency: "monthly",
+      priority: 0.55,
+    },
+    {
       url: `${baseUrl}/lich-tap`,
       lastModified,
       changeFrequency: "monthly",
@@ -66,6 +97,18 @@ export default function sitemap() {
       lastModified,
       changeFrequency: "monthly",
       priority: 0.6,
+    },
+    {
+      url: `${baseUrl}/cong-dong`,
+      lastModified,
+      changeFrequency: "weekly",
+      priority: 0.65,
+    },
+    {
+      url: `${baseUrl}/impact-dashboard`,
+      lastModified,
+      changeFrequency: "monthly",
+      priority: 0.55,
     },
     {
       url: `${baseUrl}/ho-so`,
@@ -114,5 +157,14 @@ export default function sitemap() {
     };
   });
 
-  return [...staticPages, ...lessonPages, ...videoPages, ...techniquePages];
+  const weaponPages = WEAPONS.map((weapon) => {
+    return {
+      url: `${baseUrl}/binh-khi/${weapon.slug}`,
+      lastModified,
+      changeFrequency: "monthly",
+      priority: 0.45,
+    };
+  });
+
+  return [...staticPages, ...lessonPages, ...videoPages, ...techniquePages, ...weaponPages];
 }

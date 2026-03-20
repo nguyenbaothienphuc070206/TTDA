@@ -27,12 +27,12 @@ export const metadata = {
     template: "%s | Vovinam Learning",
   },
   description:
-    "App học Vovinam theo Lam/Hoàng/Huyền đai: lộ trình rõ ràng, bài tập từng bước, lưu tiến độ và lịch tập 7 ngày.",
+    "App học Vovinam theo hệ 14 cấp đai: lộ trình rõ ràng, bài tập từng bước, lưu tiến độ và lịch tập 7 ngày.",
   manifest: "/manifest.webmanifest",
 };
 
 export const viewport = {
-  themeColor: "#020617",
+  themeColor: "#f1f5f9",
 };
 
 export default async function RootLayout({ children }) {
@@ -40,7 +40,16 @@ export default async function RootLayout({ children }) {
   const messages = await getMessages();
 
   return (
-    <html lang={locale}>
+    <html lang={locale} data-theme="light">
+      <head>
+        <script
+          // Set theme early to avoid visual flicker while client JS hydrates.
+          dangerouslySetInnerHTML={{
+            __html:
+              "(function(){try{var k='vovinam_theme_v1';var t=localStorage.getItem(k);if(t==='light'||t==='dark'||t==='vodo'){document.documentElement.dataset.theme=t;}}catch(_){}})();",
+          }}
+        />
+      </head>
       <body
         id="top"
         className={`${beVietnam.variable} ${geistMono.variable} antialiased flex min-h-screen flex-col bg-[color:var(--app-bg)] text-[color:var(--app-fg)]`}

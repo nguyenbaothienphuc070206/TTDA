@@ -1,4 +1,21 @@
-import Link from "next/link";
+﻿import Link from "next/link";
+import { getLocale } from "next-intl/server";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faBookOpen,
+  faCalendarCheck,
+  faCalendarDays,
+  faChartLine,
+  faDumbbell,
+  faGaugeHigh,
+  faHeartPulse,
+  faLock,
+  faPersonRunning,
+  faRoute,
+  faShieldHalved,
+  faUsers,
+  faBolt,
+} from "@fortawesome/free-solid-svg-icons";
 
 import { BELTS } from "@/data/belts";
 import { LEVELS, LESSONS, getLessonsByLevel } from "@/data/lessons";
@@ -32,12 +49,14 @@ function SectionHeading({ id, title, description, right }) {
   );
 }
 
-function FeatureCard({ title, description }) {
+function FeatureCard({ title, description, icon }) {
   return (
     <div className="group relative overflow-hidden rounded-3xl border border-white/10 bg-white/5 p-5 transition hover:bg-white/10">
       <div className="absolute inset-0 opacity-0 transition-opacity group-hover:opacity-100 bg-[radial-gradient(circle_at_top,rgba(34,211,238,0.10),transparent_55%)]" />
       <div className="relative flex items-start gap-4">
-        <div className="mt-0.5 h-10 w-10 shrink-0 rounded-2xl border border-white/10 bg-gradient-to-br from-cyan-300/15 to-blue-500/10" />
+        <div className="mt-0.5 inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border border-white/10 bg-gradient-to-br from-cyan-300/15 to-blue-500/10 text-cyan-200">
+          {icon ? <span className="text-lg">{icon}</span> : null}
+        </div>
         <div className="min-w-0">
           <h3 className="text-base font-semibold text-white">{title}</h3>
           <p className="mt-1 text-sm leading-6 text-slate-300">{description}</p>
@@ -166,21 +185,47 @@ function LevelPreview({ level }) {
 }
 
 function BeltPreview({ belt }) {
+  const isHighest = belt?.id === BELTS[BELTS.length - 1]?.id;
+
   return (
     <Link
       href="/hoc-tap"
-      className="group relative overflow-hidden rounded-3xl border border-white/10 bg-white/5 p-6 transition hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-cyan-300/30"
+      className={
+        "group relative overflow-hidden rounded-3xl border p-6 transition focus:outline-none focus:ring-2 " +
+        (isHighest
+          ? "border-amber-300/25 bg-slate-950/30 backdrop-blur-xl shadow-[var(--shadow-card)] hover:bg-slate-950/20 focus:ring-amber-300/30"
+          : "border-white/10 bg-white/5 hover:bg-white/10 focus:ring-cyan-300/30")
+      }
     >
-      <div className="absolute inset-0 opacity-0 transition-opacity group-hover:opacity-100 bg-[radial-gradient(circle_at_top,rgba(34,211,238,0.10),transparent_55%)]" />
+      <div
+        className={
+          "absolute inset-0 opacity-0 transition-opacity group-hover:opacity-100 " +
+          (isHighest
+            ? "bg-[radial-gradient(circle_at_top,rgba(250,204,21,0.10),transparent_55%)]"
+            : "bg-[radial-gradient(circle_at_top,rgba(34,211,238,0.10),transparent_55%)]")
+        }
+      />
       <div className="relative">
         <div className="flex items-center justify-between gap-3">
           <h3 className="text-lg font-semibold text-white">{belt.title}</h3>
-          <span className="rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-xs font-semibold text-slate-200">
+          <span
+            className={
+              "rounded-full border px-2.5 py-1 text-xs font-semibold " +
+              (isHighest
+                ? "border-amber-300/25 bg-amber-400/10 text-amber-100"
+                : "border-white/10 bg-white/5 text-slate-200")
+            }
+          >
             {belt.short}
           </span>
         </div>
         <p className="mt-2 text-sm leading-6 text-slate-300">{belt.description}</p>
-        <div className="mt-4 text-sm font-semibold text-cyan-200 transition group-hover:text-white">
+        <div
+          className={
+            "mt-4 text-sm font-semibold transition group-hover:text-white " +
+            (isHighest ? "text-amber-200" : "text-cyan-200")
+          }
+        >
           Xem khóa học →
         </div>
       </div>
@@ -194,9 +239,9 @@ function NewsCard({ item }) {
   return (
     <Link
       href={item.href}
-      className="group relative overflow-hidden rounded-3xl border border-white/10 bg-white/5 p-5 transition hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-cyan-300/30"
+      className="group relative overflow-hidden rounded-3xl border border-white/10 bg-slate-950/30 backdrop-blur-xl p-5 shadow-[var(--shadow-card)] transition hover:bg-slate-950/20 hover:border-amber-300/20 focus:outline-none focus:ring-2 focus:ring-amber-300/30"
     >
-      <div className="absolute inset-0 opacity-0 transition-opacity group-hover:opacity-100 bg-[radial-gradient(circle_at_top,rgba(59,130,246,0.10),transparent_55%)]" />
+      <div className="absolute inset-0 opacity-0 transition-opacity group-hover:opacity-100 bg-[radial-gradient(circle_at_top,rgba(250,204,21,0.10),transparent_55%)]" />
       <div className="relative">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <Pill>{kind || "Sự kiện"}</Pill>
@@ -204,7 +249,7 @@ function NewsCard({ item }) {
         </div>
         <h3 className="mt-3 text-base font-semibold text-white">{item.title}</h3>
         <p className="mt-1 text-sm leading-6 text-slate-300">{item.summary}</p>
-        <div className="mt-4 text-sm font-semibold text-cyan-200 transition group-hover:text-white">
+        <div className="mt-4 text-sm font-semibold text-amber-200 transition group-hover:text-white">
           Xem thêm →
         </div>
       </div>
@@ -212,12 +257,10 @@ function NewsCard({ item }) {
   );
 }
 
-export default function Home() {
-  const featured = [
-    ...getLessonsByLevel("co-ban").slice(0, 2),
-    ...getLessonsByLevel("trung-cap").slice(0, 2),
-    ...getLessonsByLevel("nang-cao").slice(0, 2),
-  ];
+function HomeVi() {
+  const featured = BELTS.slice(0, 6)
+    .map((belt) => getLessonsByLevel(belt.lessonLevel)[0])
+    .filter(Boolean);
 
   const levelTitleById = Object.fromEntries(
     LEVELS.map((l) => [l.id, l.title])
@@ -233,7 +276,7 @@ export default function Home() {
           </p>
 
           <h1 className="mt-5 text-3xl font-semibold tracking-tight text-white sm:text-5xl">
-            Học Vovinam theo cấp Lam → Hoàng → Huyền đai
+            Học Vovinam theo lộ trình đầy đủ từ Lam đai tự vệ đến Hồng đai tứ
           </h1>
           <p className="mt-4 max-w-2xl text-base leading-7 text-slate-300 sm:text-lg">
             Mỗi bài có mục tiêu, hướng dẫn từng bước, lỗi thường gặp và gợi ý tự
@@ -257,7 +300,7 @@ export default function Home() {
 
           <div className="mt-8 grid gap-3 sm:grid-cols-3">
             <Stat label="Tổng bài học" value={LESSONS.length} />
-            <Stat label="Cấp đai" value={LEVELS.length} />
+            <Stat label="Cấp đai" value={BELTS.length} />
             <Stat label="Mục tiêu" value="Đúng kỹ thuật" />
           </div>
 
@@ -278,21 +321,24 @@ export default function Home() {
         <SectionHeading
           id="vo-dao"
           title="Tinh thần võ đạo"
-          description="Tập để khỏe – tự tin – kỷ luật. Tập đúng kỹ thuật và giữ tâm thế bình tĩnh." 
+          description="Tập để khỏe - tự tin - kỷ luật. Tập đúng kỹ thuật và giữ tâm thế bình tĩnh." 
         />
 
         <div className="mt-5 grid gap-3 lg:grid-cols-3">
           <FeatureCard
             title="Kỷ luật & đều đặn"
             description="Tập đều quan trọng hơn tập nặng. Tăng dần nhẹ mỗi tuần để bền." 
+            icon={<FontAwesomeIcon icon={faCalendarCheck} className="h-5 w-5" />}
           />
           <FeatureCard
             title="Tôn trọng & tự vệ"
             description="Mục tiêu là tự bảo vệ và kiểm soát bản thân, không phô trương hay gây hấn." 
+            icon={<FontAwesomeIcon icon={faShieldHalved} className="h-5 w-5" />}
           />
           <FeatureCard
             title="An toàn là ưu tiên"
             description="Khởi động kỹ, tập chậm, dừng khi đau nhói. Kỹ thuật khó nên có HLV." 
+            icon={<FontAwesomeIcon icon={faHeartPulse} className="h-5 w-5" />}
           />
         </div>
       </section>
@@ -301,7 +347,7 @@ export default function Home() {
         <SectionHeading
           id="khoa-hoc"
           title="Khóa học theo cấp đai"
-          description="Chia theo Lam/Hoàng/Huyền để bạn biết đang ở giai đoạn nào và học gì tiếp theo." 
+          description="Chia theo đầy đủ hệ đai để bạn biết đang ở giai đoạn nào và học gì tiếp theo." 
           right={
             <Link
               href="/hoc-tap"
@@ -360,26 +406,32 @@ export default function Home() {
           <FeatureCard
             title="Bài học từng bước"
             description="Mỗi bài có mục tiêu, bước tập, lỗi thường gặp và gợi ý để bạn tập đúng." 
+            icon={<FontAwesomeIcon icon={faBookOpen} className="h-5 w-5" />}
           />
           <FeatureCard
             title="Lưu tiến độ tự động"
             description="Bấm “Đánh dấu hoàn thành” để theo dõi bạn đã học tới đâu (lưu ngay trên máy)."
+            icon={<FontAwesomeIcon icon={faChartLine} className="h-5 w-5" />}
           />
           <FeatureCard
             title="Lịch tập 7 ngày"
             description="Tạo lịch theo cấp đai + số buổi/tuần + thời lượng. Dễ duy trì thói quen." 
+            icon={<FontAwesomeIcon icon={faCalendarDays} className="h-5 w-5" />}
           />
           <FeatureCard
-            title="Thiết kế tập trung"
-            description="UI tối, chữ rõ, nút lớn dễ bấm. Nhìn lâu không mỏi và không rối mắt."
+            title="Thiết kế sáng rõ"
+            description="UI sáng, chữ rõ, nút lớn dễ bấm. Nhìn lâu không mỏi và không rối mắt."
+            icon={<FontAwesomeIcon icon={faGaugeHigh} className="h-5 w-5" />}
           />
           <FeatureCard
             title="Tối ưu bảo mật"
             description="Bật security headers, tắt X-Powered-By, có robots/sitemap và trang chính sách." 
+            icon={<FontAwesomeIcon icon={faLock} className="h-5 w-5" />}
           />
           <FeatureCard
             title="Nhẹ và nhanh"
             description="Trang chủ chủ yếu render tĩnh; nội dung bài học nằm trong data nên tải nhanh." 
+            icon={<FontAwesomeIcon icon={faBolt} className="h-5 w-5" />}
           />
         </div>
       </section>
@@ -395,11 +447,11 @@ export default function Home() {
           <StepCard
             step="1"
             title="Bắt đầu từ nền tảng"
-            description="Đừng vội đá cao/nhanh. Nền tảng tốt giúp bạn lên Huyền đai an toàn."
+            description="Đừng vội đá cao/nhanh. Nền tảng tốt giúp bạn lên cấp cao an toàn."
             bullets={[
               "Tập tấn + di chuyển trước",
               "Tập tay thủ và thở đều",
-              "Quay video 10–20 giây để tự sửa",
+              "Quay video 10-20 giây để tự sửa",
             ]}
           />
           <StepCard
@@ -407,8 +459,8 @@ export default function Home() {
             title="Tập theo nhịp nhỏ"
             description="Chia nhỏ thời gian giúp bạn giữ kỹ thuật tốt và dễ duy trì." 
             bullets={[
-              "3–4 hiệp ngắn mỗi buổi",
-              "Nghỉ 30–60 giây giữa hiệp",
+              "3-4 hiệp ngắn mỗi buổi",
+              "Nghỉ 30-60 giây giữa hiệp",
               "Ưu tiên đúng động tác hơn số lần",
             ]}
           />
@@ -456,7 +508,7 @@ export default function Home() {
           <div>
             <h2 className="text-xl font-semibold text-white">Lộ trình theo cấp đai</h2>
             <p className="mt-1 text-sm text-slate-300">
-              Bắt đầu từ “Lam đai”, khi ổn thì lên “Hoàng đai”, rồi “Huyền đai”.
+              Bắt đầu từ Lam đai tự vệ, tiến dần theo từng cấp đến Hồng đai tứ.
             </p>
           </div>
           <Link
@@ -495,21 +547,25 @@ export default function Home() {
               w: "Tuần 1",
               title: "Nền tảng",
               desc: "Tấn + di chuyển + đấm thẳng. Tập chậm, chuẩn trục cơ thể.",
+              icon: faRoute,
             },
             {
               w: "Tuần 2",
               title: "Đòn chân",
               desc: "Đá tống trước + đỡ cơ bản. Thêm thăng bằng và nhịp thở.",
+              icon: faPersonRunning,
             },
             {
               w: "Tuần 3",
               title: "Kết hợp",
-              desc: "Phối hợp tay–chân, tăng độ bền. Nếu ổn có thể thử Hoàng đai.",
+              desc: "Phối hợp tay-chân, tăng độ bền. Nếu ổn có thể thử Hoàng đai.",
+              icon: faDumbbell,
             },
             {
               w: "Tuần 4",
               title: "Ứng dụng",
               desc: "Tập chuỗi kỹ thuật, phản đòn nguyên tắc. Ưu tiên an toàn khi tập đôi.",
+              icon: faUsers,
             },
           ].map((item) => (
             <div
@@ -518,7 +574,9 @@ export default function Home() {
             >
               <div className="flex items-center justify-between gap-2">
                 <Pill>{item.w}</Pill>
-                <span className="h-10 w-10 rounded-2xl border border-white/10 bg-gradient-to-br from-cyan-300/15 to-blue-500/10" />
+                <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-white/10 bg-gradient-to-br from-cyan-300/15 to-blue-500/10 text-cyan-200">
+                  <FontAwesomeIcon icon={item.icon} className="h-5 w-5" />
+                </span>
               </div>
               <h3 className="mt-4 text-base font-semibold text-white">
                 {item.title}
@@ -556,14 +614,17 @@ export default function Home() {
           <FeatureCard
             title="Khởi động đúng"
             description="Ưu tiên cổ chân, gối, hông và vai. Khởi động nhẹ rồi tăng dần."
+            icon={<FontAwesomeIcon icon={faHeartPulse} className="h-5 w-5" />}
           />
           <FeatureCard
             title="Không gian & dụng cụ"
             description="Sàn không trơn, đủ rộng; có nước; có thảm/nệm mỏng nếu tập ngã."
+            icon={<FontAwesomeIcon icon={faDumbbell} className="h-5 w-5" />}
           />
           <FeatureCard
             title="Tập đôi an toàn"
             description="Thống nhất tốc độ & tín hiệu dừng. Không dùng lực mạnh khi không có bảo hộ."
+            icon={<FontAwesomeIcon icon={faShieldHalved} className="h-5 w-5" />}
           />
         </div>
 
@@ -573,11 +634,11 @@ export default function Home() {
             <ul className="mt-3 grid gap-2 text-sm leading-6 text-slate-300">
               <li className="flex gap-2">
                 <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-cyan-300/80" />
-                <span>Khởi động 5–10 phút (cổ chân, gối, hông, vai).</span>
+                <span>Khởi động 5-10 phút (cổ chân, gối, hông, vai).</span>
               </li>
               <li className="flex gap-2">
                 <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-cyan-300/80" />
-                <span>Tập chậm – đúng kỹ thuật trước khi tăng tốc.</span>
+                <span>Tập chậm - đúng kỹ thuật trước khi tăng tốc.</span>
               </li>
               <li className="flex gap-2">
                 <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-cyan-300/80" />
@@ -585,7 +646,7 @@ export default function Home() {
               </li>
               <li className="flex gap-2">
                 <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-cyan-300/80" />
-                <span>Giãn cơ 3–5 phút sau buổi tập để đỡ đau nhức.</span>
+                <span>Giãn cơ 3-5 phút sau buổi tập để đỡ đau nhức.</span>
               </li>
             </ul>
           </div>
@@ -632,11 +693,11 @@ export default function Home() {
         <div className="mt-5 grid gap-3 lg:grid-cols-2">
           <FaqItem
             q="Mình mới hoàn toàn thì bắt đầu từ đâu?"
-            a="Vào trang Lộ trình, bắt đầu Lam đai. Tập 2–3 bài đầu thật chắc trước khi học bài mới."
+            a="Vào trang Lộ trình, bắt đầu từ Lam đai tự vệ. Tập 2-3 bài đầu thật chắc trước khi học bài mới."
           />
           <FaqItem
             q="Mỗi buổi nên tập bao lâu?"
-            a="Nếu mới: 20–30 phút là ổn (khởi động + tập + giãn cơ). Quan trọng là đều đặn và đúng kỹ thuật."
+            a="Nếu mới: 20-30 phút là ổn (khởi động + tập + giãn cơ). Quan trọng là đều đặn và đúng kỹ thuật."
           />
           <FaqItem
             q="Có cần dụng cụ gì không?"
@@ -647,7 +708,7 @@ export default function Home() {
             a="Dừng lại, giảm độ hạ tấn/biên độ đá, kiểm tra hướng gối theo mũi chân. Nếu đau kéo dài, nên hỏi huấn luyện viên hoặc chuyên môn y tế."
           />
           <FaqItem
-            q="Khi nào nên lên Hoàng/Huyền đai?"
+            q="Khi nào nên lên cấp đai tiếp theo?"
             a="Khi bạn kiểm soát được tư thế, thăng bằng và nhịp thở; tập chậm vẫn đúng động tác và không đau. Không cần vội."
           />
           <FaqItem
@@ -689,3 +750,212 @@ export default function Home() {
     </div>
   );
 }
+
+function getGlobalHomeCopy(locale) {
+  const id = String(locale || "vi").toLowerCase();
+
+  if (id === "en") {
+    return {
+      heroPill: "Clear roadmap • Practical drills • Progress tracking",
+      heroTitle: "Train Vovinam with a clear step-by-step path",
+      heroDescription:
+        "Follow a structured flow from fundamentals to advanced levels. Learn safely, track progress, and build consistency each week.",
+      startLearning: "Start roadmap",
+      createSchedule: "Create 7-day schedule",
+      statLessons: "Total lessons",
+      statBelts: "Belt levels",
+      statGoal: "Goal",
+      statGoalValue: "Clean technique",
+      highlightsTitle: "Core highlights",
+      highlightsDescription:
+        "Everything you need for practical self-training: clear instructions, safety-first guidance, and measurable progress.",
+      features: [
+        {
+          title: "Step-by-step lessons",
+          description: "Each lesson includes goals, sequence, common mistakes, and practical tips.",
+          icon: faBookOpen,
+        },
+        {
+          title: "Automatic progress",
+          description: "Mark lessons complete and keep your roadmap state saved on your device.",
+          icon: faChartLine,
+        },
+        {
+          title: "Weekly scheduling",
+          description: "Plan training sessions by level, frequency, and duration to stay consistent.",
+          icon: faCalendarDays,
+        },
+        {
+          title: "Technique library",
+          description: "Review movement details, common errors, and safety notes anytime.",
+          icon: faShieldHalved,
+        },
+      ],
+      quickLinksTitle: "Quick links",
+      ctaTitle: "Ready for your first focused session?",
+      ctaDescription:
+        "Open the roadmap, pick one suitable lesson, and train with clean form. Keep the pace controlled and safety-first.",
+    };
+  }
+
+  if (id === "ja") {
+    return {
+      heroPill: "明確なロードマップ • 実践練習 • 進捗管理",
+      heroTitle: "段階的な流れで Vovinam を練習する",
+      heroDescription:
+        "基礎から上位レベルまで、構造化された順序で学べます。安全を重視し、進捗を記録しながら毎週の習慣を作ります。",
+      startLearning: "ロードマップ開始",
+      createSchedule: "7日間スケジュール作成",
+      statLessons: "総レッスン数",
+      statBelts: "帯レベル",
+      statGoal: "目標",
+      statGoalValue: "正確な技術",
+      highlightsTitle: "主な特長",
+      highlightsDescription:
+        "自主練に必要な要素をまとめています。分かりやすい手順、安全重視のガイド、測定可能な進捗。",
+      features: [
+        {
+          title: "ステップ式レッスン",
+          description: "各レッスンに目標、手順、よくあるミス、実践ヒントを用意。",
+          icon: faBookOpen,
+        },
+        {
+          title: "進捗の自動保存",
+          description: "完了を記録すると端末にロードマップ状態が保存されます。",
+          icon: faChartLine,
+        },
+        {
+          title: "週間スケジュール",
+          description: "レベルや頻度、時間に応じて練習計画を作成できます。",
+          icon: faCalendarDays,
+        },
+        {
+          title: "技術ライブラリ",
+          description: "動作の細部、よくあるミス、安全ポイントをいつでも確認。",
+          icon: faShieldHalved,
+        },
+      ],
+      quickLinksTitle: "クイックリンク",
+      ctaTitle: "最初の集中トレーニングを始めましょう",
+      ctaDescription:
+        "ロードマップから自分に合うレッスンを1つ選び、正確なフォームで練習しましょう。ペース管理と安全を最優先に。",
+    };
+  }
+
+  return null;
+}
+
+function HomeGlobal({ copy }) {
+  return (
+    <div className="mx-auto w-full max-w-6xl px-4 py-10 sm:py-16">
+      <section className="relative overflow-hidden rounded-[2.25rem] border border-white/10 bg-white/5 p-7 sm:p-12">
+        <div className="absolute inset-0 opacity-80 bg-[radial-gradient(circle_at_top,rgba(34,211,238,0.12),transparent_55%)]" />
+        <div className="relative">
+          <p className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-semibold text-slate-200">
+            {copy.heroPill}
+          </p>
+
+          <h1 className="mt-5 text-3xl font-semibold tracking-tight text-white sm:text-5xl">
+            {copy.heroTitle}
+          </h1>
+          <p className="mt-4 max-w-2xl text-base leading-7 text-slate-300 sm:text-lg">
+            {copy.heroDescription}
+          </p>
+
+          <div className="mt-7 flex flex-col gap-3 sm:flex-row">
+            <Link
+              href="/lo-trinh"
+              className="inline-flex h-12 items-center justify-center rounded-2xl bg-gradient-to-r from-cyan-300 to-blue-500 px-5 text-sm font-semibold text-slate-950 transition hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-cyan-300/50"
+            >
+              {copy.startLearning}
+            </Link>
+            <Link
+              href="/lich-tap"
+              className="inline-flex h-12 items-center justify-center rounded-2xl border border-white/10 bg-white/5 px-5 text-sm font-semibold text-white transition hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-cyan-300/30"
+            >
+              {copy.createSchedule}
+            </Link>
+          </div>
+
+          <div className="mt-8 grid gap-3 sm:grid-cols-3">
+            <Stat label={copy.statLessons} value={LESSONS.length} />
+            <Stat label={copy.statBelts} value={BELTS.length} />
+            <Stat label={copy.statGoal} value={copy.statGoalValue} />
+          </div>
+        </div>
+      </section>
+
+      <section className="mt-10">
+        <SectionHeading
+          id="highlights"
+          title={copy.highlightsTitle}
+          description={copy.highlightsDescription}
+        />
+
+        <div className="mt-5 grid gap-3 lg:grid-cols-2">
+          {copy.features.map((feature) => (
+            <FeatureCard
+              key={feature.title}
+              title={feature.title}
+              description={feature.description}
+              icon={<FontAwesomeIcon icon={feature.icon} className="h-5 w-5" />}
+            />
+          ))}
+        </div>
+      </section>
+
+      <section className="mt-10">
+        <SectionHeading id="quick-links" title={copy.quickLinksTitle} />
+        <div className="mt-4 flex flex-wrap gap-2">
+          <ChipLink href="/lo-trinh">Roadmap</ChipLink>
+          <ChipLink href="/hoc-tap">Learning</ChipLink>
+          <ChipLink href="/ky-thuat">Techniques</ChipLink>
+          <ChipLink href="/video">Videos</ChipLink>
+          <ChipLink href="/lich-tap">Schedule</ChipLink>
+          <ChipLink href="/cong-dong">Community</ChipLink>
+        </div>
+      </section>
+
+      <section className="mt-12">
+        <div className="relative overflow-hidden rounded-[2.25rem] border border-white/10 bg-white/5 p-7 sm:p-12">
+          <div className="absolute inset-0 opacity-80 bg-[radial-gradient(circle_at_top,rgba(34,211,238,0.12),transparent_55%)]" />
+          <div className="relative">
+            <h2 className="text-2xl font-semibold tracking-tight text-white sm:text-3xl">
+              {copy.ctaTitle}
+            </h2>
+            <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-300 sm:text-base">
+              {copy.ctaDescription}
+            </p>
+
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+              <Link
+                href="/lo-trinh"
+                className="inline-flex h-12 items-center justify-center rounded-2xl bg-gradient-to-r from-cyan-300 to-blue-500 px-5 text-sm font-semibold text-slate-950 transition hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-cyan-300/50"
+              >
+                {copy.startLearning}
+              </Link>
+              <Link
+                href="/lich-tap"
+                className="inline-flex h-12 items-center justify-center rounded-2xl border border-white/10 bg-white/5 px-5 text-sm font-semibold text-white transition hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-cyan-300/30"
+              >
+                {copy.createSchedule}
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}
+
+export default async function Home() {
+  const locale = await getLocale();
+  const globalCopy = getGlobalHomeCopy(locale);
+
+  if (!globalCopy) {
+    return <HomeVi />;
+  }
+
+  return <HomeGlobal copy={globalCopy} />;
+}
+

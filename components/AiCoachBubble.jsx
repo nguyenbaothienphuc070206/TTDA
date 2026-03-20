@@ -1,8 +1,9 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useLocale } from "next-intl";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Sparkles, ThumbsDown, ThumbsUp, X } from "lucide-react";
@@ -13,6 +14,116 @@ import { readProfile } from "@/lib/profile";
 import MascotIcon from "@/components/MascotIcon";
 
 const CHAT_STORE_KEY = "vovinam_ai_chat_v1";
+
+function getCopy(locale) {
+  const id = String(locale || "vi").toLowerCase();
+
+  if (id === "en") {
+    return {
+      feedbackHelpful: "Helpful feedback",
+      feedbackNotHelpful: "Not helpful feedback",
+      open: "Open",
+      score: "score",
+      helperRoadmap: (title, minutes) => `Today's suggestion: ${title} • ${minutes} min.`,
+      helperVideo: "You are watching a video. Ask quick questions about techniques in this video (RAG).",
+      helperLesson: (title) => `You are in lesson "${title}". Ask about common mistakes, fixes, and safety.`,
+      helperLessonFallback: "You are in a lesson page. Ask about common mistakes, fixes, and safety.",
+      helperDefault: "Ask about techniques, common mistakes, and safe training tips.",
+      shortQuestion: "Please enter a slightly longer question.",
+      cannotProcess: "Could not process this request.",
+      cannotConnect: "Could not connect to API. Please try again.",
+      nextTitle: "Next",
+      nextLessonHint: "Open the lesson, practice slowly step by step for 10-15 minutes, then come back and mark complete.",
+      nextRoadmapHint: (title) => `Do one more short lesson: ${title}.`,
+      closeAria: "Close AI Coach",
+      premiumTitle: "AI Coach is Premium",
+      premiumDesc: "Upgrade to unlock AI Coach (RAG) and Yellow/Red belt content.",
+      premiumFeature1: "Grounded answers from the knowledge base",
+      premiumFeature2: "Mistake fixes and safety tips by belt level",
+      premiumFeature3: "Advanced videos/techniques",
+      upgrade: "Upgrade Premium",
+      premiumDemo: "Demo: enable Premium in Profile.",
+      emptyState: "Ask about techniques, common mistakes, and safe training tips.",
+      openLesson: "Open lesson",
+      demoVideos: "Demo videos",
+      references: "References",
+      inputPlaceholder: "Example: 'common errors in front push kick?'",
+      ask: "Ask",
+      answering: "Answering...",
+      openCoachAria: "Open AI Coach",
+    };
+  }
+
+  if (id === "ja") {
+    return {
+      feedbackHelpful: "役に立った",
+      feedbackNotHelpful: "役に立たなかった",
+      open: "開く",
+      score: "スコア",
+      helperRoadmap: (title, minutes) => `今日のおすすめ: ${title} • ${minutes}分。`,
+      helperVideo: "動画を視聴中です。この動画の技術について素早く質問できます（RAG）。",
+      helperLesson: (title) => `レッスン「${title}」を表示中です。よくあるミス、修正、安全面を質問できます。`,
+      helperLessonFallback: "レッスンページです。よくあるミス、修正、安全面を質問できます。",
+      helperDefault: "技術、よくあるミス、安全な練習のコツを質問してください。",
+      shortQuestion: "もう少し長く質問を入力してください。",
+      cannotProcess: "リクエストを処理できませんでした。",
+      cannotConnect: "APIに接続できませんでした。もう一度お試しください。",
+      nextTitle: "次へ",
+      nextLessonHint: "レッスンを開き、10-15分ほど手順をゆっくり練習してから完了を記録しましょう。",
+      nextRoadmapHint: (title) => `次に短いレッスンを1つ: ${title}。`,
+      closeAria: "AIコーチを閉じる",
+      premiumTitle: "AIコーチはプレミアム機能です",
+      premiumDesc: "プレミアムでAIコーチ（RAG）と黄帯/紅帯コンテンツを開放できます。",
+      premiumFeature1: "資料に基づく回答",
+      premiumFeature2: "帯レベル別のミス修正と安全ガイド",
+      premiumFeature3: "上級動画・技術",
+      upgrade: "プレミアムにアップグレード",
+      premiumDemo: "デモ: プロフィールでプレミアムを有効化できます。",
+      emptyState: "技術、よくあるミス、安全な練習のコツを質問してください。",
+      openLesson: "レッスンを開く",
+      demoVideos: "参考動画",
+      references: "参照元",
+      inputPlaceholder: "例: 「前蹴りでよくあるミスは?」",
+      ask: "質問",
+      answering: "回答中...",
+      openCoachAria: "AIコーチを開く",
+    };
+  }
+
+  return {
+    feedbackHelpful: "Phản hồi hữu ích",
+    feedbackNotHelpful: "Phản hồi không hữu ích",
+    open: "Mở",
+    score: "score",
+    helperRoadmap: (title, minutes) => `Gợi ý hôm nay: ${title} • ${minutes} phút.`,
+    helperVideo: "Bạn đang xem video - hỏi nhanh về kỹ thuật trong video này (RAG).",
+    helperLesson: (title) => `Bạn đang ở bài "${title}" - hỏi về lỗi thường gặp, cách sửa, an toàn...`,
+    helperLessonFallback: "Bạn đang ở trang bài học - hỏi về lỗi thường gặp, cách sửa, an toàn...",
+    helperDefault: "Hỏi về kỹ thuật, lỗi thường gặp, mẹo tập an toàn...",
+    shortQuestion: "Bạn nhập câu hỏi dài hơn một chút nhé.",
+    cannotProcess: "Không xử lý được yêu cầu.",
+    cannotConnect: "Không kết nối được API. Vui lòng thử lại.",
+    nextTitle: "Tiếp theo",
+    nextLessonHint: "Mở bài, tập chậm theo từng bước 10-15 phút, rồi quay lại đánh dấu hoàn thành.",
+    nextRoadmapHint: (title) => `Làm thêm 1 bài nhỏ: ${title}.`,
+    closeAria: "Đóng AI Coach",
+    premiumTitle: "AI Coach là Premium",
+    premiumDesc: "Nâng cấp để mở khóa AI Coach (RAG) và nội dung Hoàng/Hồng đai.",
+    premiumFeature1: "Trả lời grounded theo tài liệu",
+    premiumFeature2: "Gợi ý sửa lỗi + an toàn theo cấp",
+    premiumFeature3: "Video/kỹ thuật nâng cao",
+    upgrade: "Nâng cấp Premium",
+    premiumDemo: "Demo: bật Premium trong Hồ sơ.",
+    emptyState: "Hỏi về kỹ thuật, lỗi thường gặp, mẹo tập an toàn...",
+    openLesson: "Mở bài",
+    demoVideos: "Video minh họa",
+    references: "Nguồn tham chiếu",
+    inputPlaceholder: "Ví dụ: 'đá tống trước sai thường gặp?'",
+    ask: "Hỏi",
+    answering: "Đang trả lời...",
+    openCoachAria: "Mở AI Coach",
+  };
+}
 
 function readChatStore() {
   if (typeof window === "undefined") return { history: [], sessionId: "" };
@@ -97,7 +208,7 @@ function MarkdownAnswer({ children, className = "" }) {
   );
 }
 
-function ChatMessage({ message }) {
+function ChatMessage({ message, copy }) {
   const role = message?.role;
   const content = String(message?.content || "");
   if (!content.trim()) return null;
@@ -139,7 +250,7 @@ function ChatMessage({ message }) {
                   ? "border-blue-400/30 bg-blue-500/15 text-blue-100"
                   : "border-white/10 bg-white/5 hover:bg-white/10 hover:text-white")
               }
-              aria-label="Phản hồi hữu ích"
+              aria-label={copy.feedbackHelpful}
             >
               <ThumbsUp className="h-4 w-4" />
             </button>
@@ -152,7 +263,7 @@ function ChatMessage({ message }) {
                   ? "border-blue-400/30 bg-blue-500/15 text-blue-100"
                   : "border-white/10 bg-white/5 hover:bg-white/10 hover:text-white")
               }
-              aria-label="Phản hồi không hữu ích"
+              aria-label={copy.feedbackNotHelpful}
             >
               <ThumbsDown className="h-4 w-4" />
             </button>
@@ -163,7 +274,7 @@ function ChatMessage({ message }) {
   );
 }
 
-function SourceItem({ source }) {
+function SourceItem({ source, copy }) {
   const href = String(source?.url || "").trim();
 
   return (
@@ -174,7 +285,7 @@ function SourceItem({ source }) {
             {source.title}
           </div>
           <div className="mt-0.5 text-xs text-slate-300">
-            {source.type} • score {source.score}
+            {source.type} • {copy.score} {source.score}
           </div>
         </div>
         {href ? (
@@ -182,7 +293,7 @@ function SourceItem({ source }) {
             href={href}
             className="shrink-0 rounded-xl border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-semibold text-slate-200 transition hover:bg-white/10 hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-400/30"
           >
-            Mở
+            {copy.open}
           </Link>
         ) : null}
       </div>
@@ -209,6 +320,8 @@ function parseRouteContext(pathname) {
 }
 
 export default function AiCoachBubble() {
+  const locale = useLocale();
+  const copy = getCopy(locale);
   const pathname = usePathname() || "/";
   const routeCtx = useMemo(() => parseRouteContext(pathname), [pathname]);
 
@@ -306,22 +419,22 @@ export default function AiCoachBubble() {
 
   const helperText = useMemo(() => {
     if (routeCtx.kind === "roadmap" && nextLesson) {
-      return `Gợi ý hôm nay: ${nextLesson.title} • ${nextLesson.minutes} phút.`;
+      return copy.helperRoadmap(nextLesson.title, nextLesson.minutes);
     }
 
     if (routeCtx.kind === "video" && routeCtx.videoId) {
-      return "Bạn đang xem video — hỏi nhanh về kỹ thuật trong video này (RAG).";
+      return copy.helperVideo;
     }
 
     if (routeCtx.kind === "lesson" && routeCtx.lessonSlug) {
       const l = getLessonBySlug(routeCtx.lessonSlug);
       return l
-        ? `Bạn đang ở bài “${l.title}” — hỏi về lỗi thường gặp, cách sửa, an toàn…`
-        : "Bạn đang ở trang bài học — hỏi về lỗi thường gặp, cách sửa, an toàn…";
+        ? copy.helperLesson(l.title)
+        : copy.helperLessonFallback;
     }
 
-    return "Hỏi về kỹ thuật, lỗi thường gặp, mẹo tập an toàn…";
-  }, [nextLesson, routeCtx.kind, routeCtx.lessonSlug, routeCtx.videoId]);
+    return copy.helperDefault;
+  }, [copy, nextLesson, routeCtx.kind, routeCtx.lessonSlug, routeCtx.videoId]);
 
   const ask = async ({ q, contextOverride }) => {
     if (!isPremium) {
@@ -331,7 +444,7 @@ export default function AiCoachBubble() {
 
     const question = String(q || "").trim();
     if (question.length < 2) {
-      setError("Bạn nhập câu hỏi dài hơn một chút nhé.");
+      setError(copy.shortQuestion);
       return;
     }
 
@@ -479,7 +592,7 @@ export default function AiCoachBubble() {
               }
             }
             if (evt === "error") {
-              setError(payload?.error || "Không xử lý được yêu cầu.");
+              setError(payload?.error || copy.cannotProcess);
             }
           }
         }
@@ -496,7 +609,7 @@ export default function AiCoachBubble() {
 
       const data = await res.json().catch(() => null);
       if (!res.ok) {
-        setError(data?.error || "Không xử lý được yêu cầu.");
+        setError(data?.error || copy.cannotProcess);
         return;
       }
 
@@ -525,7 +638,7 @@ export default function AiCoachBubble() {
       });
       setChatHistory(attachFeedbackHandler(nextHistory));
     } catch {
-      setError("Không kết nối được API. Vui lòng thử lại.");
+      setError(copy.cannotConnect);
     } finally {
       setLoading(false);
     }
@@ -600,22 +713,22 @@ export default function AiCoachBubble() {
 
     if (lessonSlug) {
       return {
-        title: "Tiếp theo",
-        text: "Mở bài, tập chậm theo từng bước 10–15 phút, rồi quay lại đánh dấu hoàn thành.",
+        title: copy.nextTitle,
+        text: copy.nextLessonHint,
         href: `/bai-hoc/${lessonSlug}`,
       };
     }
 
     if (String(activeContext?.kind) === "roadmap" && nextLesson) {
       return {
-        title: "Tiếp theo",
-        text: `Làm thêm 1 bài nhỏ: ${nextLesson.title}.`,
+        title: copy.nextTitle,
+        text: copy.nextRoadmapHint(nextLesson.title),
         href: `/bai-hoc/${nextLesson.slug}`,
       };
     }
 
     return null;
-  }, [activeContext?.kind, activeContext?.lessonSlug, nextLesson]);
+  }, [copy, activeContext?.kind, activeContext?.lessonSlug, nextLesson]);
 
   const hasChat = useMemo(() => {
     return Array.isArray(chatHistory) && chatHistory.some((m) => String(m?.content || "").trim());
@@ -646,7 +759,7 @@ export default function AiCoachBubble() {
                 type="button"
                 onClick={() => setOpen(false)}
                 className="inline-flex h-9 w-9 items-center justify-center rounded-2xl border border-white/10 bg-white/5 text-slate-200 transition hover:bg-white/10 hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-300/30"
-                aria-label="Đóng AI Coach"
+                aria-label={copy.closeAria}
               >
                 <X className="h-4 w-4" />
               </button>
@@ -655,14 +768,14 @@ export default function AiCoachBubble() {
             {!isPremium ? (
               <div className="p-4 flex flex-col gap-3">
                 <div className="rounded-3xl border border-white/10 bg-slate-950/30 p-4 text-sm leading-6 text-slate-200">
-                  <div className="text-xs font-semibold text-slate-300">AI Coach là Premium</div>
+                  <div className="text-xs font-semibold text-slate-300">{copy.premiumTitle}</div>
                   <p className="mt-2 text-slate-300">
-                    Nâng cấp để mở khóa AI Coach (RAG) và nội dung Hoàng/Huyền đai.
+                    {copy.premiumDesc}
                   </p>
                   <ul className="mt-3 grid gap-1 text-slate-300">
-                    <li>• Trả lời grounded theo tài liệu</li>
-                    <li>• Gợi ý sửa lỗi + an toàn theo cấp</li>
-                    <li>• Video/kỹ thuật nâng cao</li>
+                    <li>• {copy.premiumFeature1}</li>
+                    <li>• {copy.premiumFeature2}</li>
+                    <li>• {copy.premiumFeature3}</li>
                   </ul>
                 </div>
 
@@ -670,9 +783,9 @@ export default function AiCoachBubble() {
                   href="/ho-so#goi-premium"
                   className="inline-flex h-11 items-center justify-center rounded-2xl bg-gradient-to-r from-blue-400 to-blue-600 px-4 text-sm font-semibold text-slate-950 transition hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-blue-300/40"
                 >
-                  Nâng cấp Premium
+                  {copy.upgrade}
                 </Link>
-                <p className="text-xs leading-5 text-slate-400">Demo: bật Premium trong Hồ sơ.</p>
+                <p className="text-xs leading-5 text-slate-400">{copy.premiumDemo}</p>
               </div>
             ) : (
               <div className="p-4 flex flex-col flex-1 min-h-0">
@@ -693,13 +806,14 @@ export default function AiCoachBubble() {
                         <ChatMessage
                           // idx is OK here: history is append-only within the last 8 turns.
                           key={`${m.role}-${idx}`}
+                          copy={copy}
                           message={m}
                         />
                       ))}
                     </div>
                   ) : (
                     <div className="rounded-3xl border border-white/10 bg-white/5 p-3 text-sm leading-6 text-slate-300">
-                      Hỏi về kỹ thuật, lỗi thường gặp, mẹo tập an toàn…
+                      {copy.emptyState}
                     </div>
                   )}
 
@@ -718,7 +832,7 @@ export default function AiCoachBubble() {
                           href={nextStepHint.href}
                           className="mt-2 inline-flex items-center justify-center rounded-xl border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-semibold text-slate-200 transition hover:bg-white/10 hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-300/30"
                         >
-                          Mở bài
+                          {copy.openLesson}
                         </Link>
                       ) : null}
                     </div>
@@ -726,7 +840,7 @@ export default function AiCoachBubble() {
 
                   {Array.isArray(recommendedVideos) && recommendedVideos.length > 0 ? (
                     <div className="mt-3">
-                      <div className="text-xs font-semibold text-slate-300">Video minh hoạ</div>
+                      <div className="text-xs font-semibold text-slate-300">{copy.demoVideos}</div>
                       <div className="mt-2 grid gap-2">
                         {recommendedVideos.slice(0, 2).map((v) => (
                           <Link
@@ -746,10 +860,10 @@ export default function AiCoachBubble() {
 
                   {Array.isArray(sources) && sources.length > 0 ? (
                     <div className="mt-3">
-                      <div className="text-xs font-semibold text-slate-300">Nguồn tham chiếu</div>
+                      <div className="text-xs font-semibold text-slate-300">{copy.references}</div>
                       <ul className="mt-2 grid gap-2">
                         {sources.slice(0, 3).map((s) => (
-                          <SourceItem key={s.id} source={s} />
+                          <SourceItem key={s.id} source={s} copy={copy} />
                         ))}
                       </ul>
                     </div>
@@ -764,7 +878,7 @@ export default function AiCoachBubble() {
                     ref={inputRef}
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
-                    placeholder="Ví dụ: 'đá tống trước sai thường gặp?'"
+                    placeholder={copy.inputPlaceholder}
                     className="h-10 w-full rounded-2xl border border-white/10 bg-slate-950/60 px-3 text-sm text-white outline-none focus:ring-2 focus:ring-blue-300/30"
                   />
 
@@ -774,7 +888,7 @@ export default function AiCoachBubble() {
                     className="inline-flex h-10 items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-blue-400 to-blue-600 px-4 text-sm font-semibold text-slate-950 transition hover:brightness-110 disabled:opacity-60 focus:outline-none focus:ring-2 focus:ring-blue-300/40"
                   >
                     <Sparkles className="h-4 w-4" />
-                    {loading ? "Đang trả lời…" : "Hỏi"}
+                    {loading ? copy.answering : copy.ask}
                   </button>
                 </form>
               </div>
@@ -790,7 +904,7 @@ export default function AiCoachBubble() {
             setOpen(true);
           }}
           className="relative inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-400 to-blue-600 text-slate-950 shadow-[var(--shadow-card)] transition hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-blue-300/40"
-          aria-label="Mở AI Coach"
+          aria-label={copy.openCoachAria}
         >
           <span
             aria-hidden
@@ -802,3 +916,4 @@ export default function AiCoachBubble() {
     </div>
   );
 }
+

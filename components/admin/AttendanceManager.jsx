@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
 
@@ -323,7 +323,7 @@ export default function AttendanceManager() {
               onChange={(e) => setMemberId(e.target.value)}
               className="mt-2 w-full rounded-xl border border-white/10 bg-slate-950/60 px-3 py-2 text-sm text-white outline-none focus:ring-2 focus:ring-cyan-300/30"
             >
-              <option value="">— Chọn hội viên —</option>
+              <option value="">- Chọn hội viên -</option>
               {memberList.map((m) => (
                 <option key={m.id} value={m.id}>
                   {m.name} ({m.code})
@@ -402,3 +402,4 @@ export default function AttendanceManager() {
     </div>
   );
 }
+

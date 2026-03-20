@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { useLocale } from "next-intl";
 
 import { readProfile, writeProfile } from "@/lib/profile";
 
@@ -19,8 +20,66 @@ async function postToServiceWorker(message) {
     return false;
   }
 }
+  function getCopy(locale) {
+    const id = String(locale || "vi").toLowerCase();
+
+    if (id === "en") {
+      return {
+        savedOk: "Saved for offline (page + transcript). YouTube videos may not be playable offline.",
+        savedLocalOnly: "Saved to offline list. (Could not send cache request to Service Worker)",
+        removedOk: "Removed from offline cache.",
+        removedLocalOnly: "Removed from offline list.",
+        section: "Offline",
+        desc: "Save this page for weak/no network. (Demo: cache HTML + assets + transcript)",
+        processing: "Processing...",
+        removeOffline: "Remove offline",
+        saving: "Saving...",
+        saveOffline: "Save offline",
+        status: "Status",
+        saved: "Saved",
+        notSaved: "Not saved",
+      };
+    }
+
+    if (id === "ja") {
+      return {
+        savedOk: "オフライン保存しました（ページ + 文字起こし）。YouTube動画はオフライン再生できない場合があります。",
+        savedLocalOnly: "オフライン一覧に保存しました。（Service Worker へキャッシュ要求を送信できませんでした）",
+        removedOk: "オフラインキャッシュから削除しました。",
+        removedLocalOnly: "オフライン一覧から削除しました。",
+        section: "オフライン",
+        desc: "回線が弱い/ない時でも開けるよう保存します。（デモ: HTML + assets + 文字起こしをキャッシュ）",
+        processing: "処理中...",
+        removeOffline: "オフライン削除",
+        saving: "保存中...",
+        saveOffline: "オフライン保存",
+        status: "状態",
+        saved: "保存済み",
+        notSaved: "未保存",
+      };
+    }
+
+    return {
+      savedOk: "Đã lưu offline (trang + transcript). Video YouTube có thể không xem offline.",
+      savedLocalOnly: "Đã lưu danh sách offline. (Không gửi được yêu cầu cache cho Service Worker)",
+      removedOk: "Đã xoá offline.",
+      removedLocalOnly: "Đã xoá khỏi danh sách offline.",
+      section: "Offline",
+      desc: "Lưu để mở lại trang khi mạng yếu/không có mạng. (Demo: cache HTML + assets + transcript)",
+      processing: "Đang xử lý…",
+      removeOffline: "Xoá offline",
+      saving: "Đang lưu…",
+      saveOffline: "Lưu offline",
+      status: "Trạng thái",
+      saved: "Đã lưu",
+      notSaved: "Chưa lưu",
+    };
+  }
 
 export default function OfflineVideoControls({ videoId, title }) {
+    const locale = useLocale();
+    const copy = getCopy(locale);
+
   const [profile, setProfile] = useState(() => readProfile());
   const [notice, setNotice] = useState("");
   const [busy, setBusy] = useState(false);
@@ -63,8 +122,8 @@ export default function OfflineVideoControls({ videoId, title }) {
 
       setNotice(
         ok
-          ? "Đã lưu offline (trang + transcript). Video YouTube có thể không xem offline."
-          : "Đã lưu danh sách offline. (Không gửi được yêu cầu cache cho Service Worker)"
+            ? copy.savedOk
+            : copy.savedLocalOnly
       );
     } finally {
       setBusy(false);
@@ -88,7 +147,7 @@ export default function OfflineVideoControls({ videoId, title }) {
         payload: { urls: [`/video/${videoId}`] },
       });
 
-      setNotice(ok ? "Đã xoá offline." : "Đã xoá khỏi danh sách offline." );
+        setNotice(ok ? copy.removedOk : copy.removedLocalOnly);
     } finally {
       setBusy(false);
     }
@@ -98,10 +157,10 @@ export default function OfflineVideoControls({ videoId, title }) {
     <div className="rounded-2xl border border-white/10 bg-slate-950/30 p-4">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
-          <div className="text-xs font-semibold text-slate-300">Offline</div>
+            <div className="text-xs font-semibold text-slate-300">{copy.section}</div>
           <div className="mt-1 text-sm font-semibold text-white truncate">{title}</div>
           <p className="mt-1 text-xs leading-5 text-slate-400">
-            Lưu để mở lại trang khi mạng yếu/không có mạng. (Demo: cache HTML + assets + transcript)
+              {copy.desc}
           </p>
         </div>
 
@@ -113,7 +172,7 @@ export default function OfflineVideoControls({ videoId, title }) {
               onClick={onRemove}
               className="inline-flex h-10 items-center justify-center rounded-xl border border-white/10 bg-white/5 px-3 text-xs font-semibold text-white transition hover:bg-white/10 disabled:opacity-60 focus:outline-none focus:ring-2 focus:ring-blue-400/30"
             >
-              {busy ? "Đang xử lý…" : "Xoá offline"}
+                {busy ? copy.processing : copy.removeOffline}
             </button>
           ) : (
             <button
@@ -122,7 +181,7 @@ export default function OfflineVideoControls({ videoId, title }) {
               onClick={onSave}
               className="inline-flex h-10 items-center justify-center rounded-xl bg-gradient-to-r from-blue-400 to-blue-600 px-3 text-xs font-semibold text-slate-950 transition hover:brightness-110 disabled:opacity-60 focus:outline-none focus:ring-2 focus:ring-blue-400/50"
             >
-              {busy ? "Đang lưu…" : "Lưu offline"}
+                {busy ? copy.saving : copy.saveOffline}
             </button>
           )}
         </div>
@@ -135,7 +194,7 @@ export default function OfflineVideoControls({ videoId, title }) {
       ) : null}
 
       <div className="mt-2 text-xs text-slate-400">
-        Trạng thái: <span className="font-semibold text-slate-200">{saved ? "Đã lưu" : "Chưa lưu"}</span>
+          {copy.status}: <span className="font-semibold text-slate-200">{saved ? copy.saved : copy.notSaved}</span>
       </div>
     </div>
   );

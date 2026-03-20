@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { getLocale } from "next-intl/server";
 
 import JsonLd from "@/components/JsonLd";
 import LessonDoneButton from "@/components/LessonDoneButton";
@@ -43,6 +44,68 @@ function Steps({ items }) {
   );
 }
 
+function getCopy(locale) {
+  const id = String(locale || "vi").toLowerCase();
+
+  if (id === "en") {
+    return {
+      fallbackTitle: "Lesson",
+      backRoadmap: "Roadmap",
+      fallbackLevel: "Lesson",
+      minutes: "min",
+      viewSchedule: "View schedule",
+      goals: "Goals",
+      steps: "Step-by-step",
+      mistakes: "Common mistakes",
+      tips: "Self-practice tips",
+      prev: "Previous",
+      next: "Next",
+      done: "Finished",
+      none: "None",
+      backToRoadmap: "Back to roadmap",
+      viewLesson: "View lesson",
+    };
+  }
+
+  if (id === "ja") {
+    return {
+      fallbackTitle: "レッスン",
+      backRoadmap: "ロードマップ",
+      fallbackLevel: "レッスン",
+      minutes: "分",
+      viewSchedule: "スケジュールを見る",
+      goals: "目標",
+      steps: "ステップガイド",
+      mistakes: "よくあるミス",
+      tips: "自主練のコツ",
+      prev: "前のレッスン",
+      next: "次のレッスン",
+      done: "完了",
+      none: "なし",
+      backToRoadmap: "ロードマップへ戻る",
+      viewLesson: "レッスンを見る",
+    };
+  }
+
+  return {
+    fallbackTitle: "Bài học",
+    backRoadmap: "Lộ trình",
+    fallbackLevel: "Bài học",
+    minutes: "phút",
+    viewSchedule: "Xem lịch tập",
+    goals: "Mục tiêu",
+    steps: "Hướng dẫn từng bước",
+    mistakes: "Lỗi thường gặp",
+    tips: "Gợi ý tự tập",
+    prev: "Bài trước",
+    next: "Bài tiếp theo",
+    done: "Hoàn tất",
+    none: "Không có",
+    backToRoadmap: "Quay lại lộ trình",
+    viewLesson: "Xem bài",
+  };
+}
+
 export async function generateMetadata({ params }) {
   const { slug } = await params;
   const lesson = getLessonBySlug(slug);
@@ -68,6 +131,9 @@ export async function generateMetadata({ params }) {
 }
 
 export default async function LessonPage({ params }) {
+  const locale = await getLocale();
+  const copy = getCopy(locale);
+
   const { slug } = await params;
   const lesson = getLessonBySlug(slug);
   if (!lesson) notFound();
@@ -97,14 +163,14 @@ export default async function LessonPage({ params }) {
       <JsonLd data={jsonLd} />
       <div className="mb-6 flex flex-wrap items-center gap-2 text-sm text-slate-300">
         <Link href="/lo-trinh" className="hover:text-white transition">
-          ← Lộ trình
+          ← {copy.backRoadmap}
         </Link>
         <span className="text-white/20">/</span>
         <span className="rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-xs font-semibold text-slate-200">
-          {level?.title || "Bài học"}
+          {level?.title || copy.fallbackLevel}
         </span>
         <span className="rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-xs font-semibold text-slate-200">
-          {lesson.minutes} phút
+          {lesson.minutes} {copy.minutes}
         </span>
       </div>
 
@@ -121,24 +187,24 @@ export default async function LessonPage({ params }) {
           href="/lich-tap"
           className="inline-flex h-11 items-center justify-center rounded-2xl border border-white/10 bg-white/5 px-4 text-sm font-semibold text-white transition hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-cyan-300/30"
         >
-          Xem lịch tập
+          {copy.viewSchedule}
         </Link>
       </div>
 
       <div className="mt-8 grid gap-4">
-        <Card title="Mục tiêu">
+        <Card title={copy.goals}>
           <List items={lesson.goals} />
         </Card>
 
-        <Card title="Hướng dẫn từng bước">
+        <Card title={copy.steps}>
           <Steps items={lesson.steps} />
         </Card>
 
-        <Card title="Lỗi thường gặp">
+        <Card title={copy.mistakes}>
           <List items={lesson.mistakes} />
         </Card>
 
-        <Card title="Gợi ý tự tập">
+        <Card title={copy.tips}>
           <List items={lesson.tips} />
         </Card>
       </div>
@@ -149,13 +215,13 @@ export default async function LessonPage({ params }) {
             href={`/bai-hoc/${prev.slug}`}
             className="rounded-3xl border border-white/10 bg-white/5 p-5 text-left transition hover:bg-white/10"
           >
-            <div className="text-xs font-semibold text-slate-300">Bài trước</div>
+            <div className="text-xs font-semibold text-slate-300">{copy.prev}</div>
             <div className="mt-1 font-semibold text-white">{prev.title}</div>
           </Link>
         ) : (
           <div className="rounded-3xl border border-white/10 bg-white/5 p-5">
-            <div className="text-xs font-semibold text-slate-300">Bài trước</div>
-            <div className="mt-1 font-semibold text-slate-400">Không có</div>
+            <div className="text-xs font-semibold text-slate-300">{copy.prev}</div>
+            <div className="mt-1 font-semibold text-slate-400">{copy.none}</div>
           </div>
         )}
 
@@ -164,7 +230,7 @@ export default async function LessonPage({ params }) {
             href={`/bai-hoc/${next.slug}`}
             className="rounded-3xl border border-white/10 bg-white/5 p-5 text-left transition hover:bg-white/10"
           >
-            <div className="text-xs font-semibold text-slate-300">Bài tiếp theo</div>
+            <div className="text-xs font-semibold text-slate-300">{copy.next}</div>
             <div className="mt-1 font-semibold text-white">{next.title}</div>
           </Link>
         ) : (
@@ -172,8 +238,8 @@ export default async function LessonPage({ params }) {
             href="/lo-trinh"
             className="rounded-3xl border border-white/10 bg-white/5 p-5 text-left transition hover:bg-white/10"
           >
-            <div className="text-xs font-semibold text-slate-300">Hoàn tất</div>
-            <div className="mt-1 font-semibold text-white">Quay lại lộ trình</div>
+            <div className="text-xs font-semibold text-slate-300">{copy.done}</div>
+            <div className="mt-1 font-semibold text-white">{copy.backToRoadmap}</div>
           </Link>
         )}
       </div>

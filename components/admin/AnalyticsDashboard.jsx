@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useMemo, useState } from "react";
 import { Bar, Line } from "react-chartjs-2";
@@ -402,7 +402,7 @@ export default function AnalyticsDashboard() {
                 </div>
                 <div className="flex items-center justify-between gap-3">
                   <span className="truncate">Tỷ lệ đạt</span>
-                  <span className="shrink-0 font-semibold text-white">{examStats.total ? `${examStats.passRate}%` : "—"}</span>
+                  <span className="shrink-0 font-semibold text-white">{examStats.total ? `${examStats.passRate}%` : "-"}</span>
                 </div>
               </div>
 

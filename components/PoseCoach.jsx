@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
@@ -71,7 +71,7 @@ function pickFeedback(landmarks) {
     } else if (avg < 75) {
       tips.push("Không gập quá sâu, giữ gối an toàn. (Demo)");
     } else {
-      tips.push("Tấn nhìn ổn — giữ nhịp thở đều và vai thả lỏng.");
+      tips.push("Tấn nhìn ổn - giữ nhịp thở đều và vai thả lỏng.");
     }
   }
 
@@ -273,7 +273,7 @@ export default function PoseCoach() {
         setFeedback(pickFeedback(pose));
         setStatus("Đã phân tích ảnh.");
       } else {
-        setFeedback("Không thấy pose — thử ảnh rõ nét, đủ sáng, toàn thân.");
+        setFeedback("Không thấy pose - thử ảnh rõ nét, đủ sáng, toàn thân.");
         setStatus("Không nhận diện được pose.");
       }
 
@@ -406,7 +406,7 @@ export default function PoseCoach() {
             }
           } else if (t - lastUiUpdateRef.current > 450) {
             lastUiUpdateRef.current = t;
-            setFeedback("Không thấy pose — thử đứng xa hơn và đủ sáng.");
+            setFeedback("Không thấy pose - thử đứng xa hơn và đủ sáng.");
           }
         }
 
@@ -646,7 +646,7 @@ export default function PoseCoach() {
             }
           } else if (t - lastUiUpdateRef.current > 450) {
             lastUiUpdateRef.current = t;
-            setFeedback("Không thấy pose — thử đứng xa hơn và đủ sáng.");
+            setFeedback("Không thấy pose - thử đứng xa hơn và đủ sáng.");
           }
         }
 
@@ -786,3 +786,4 @@ export default function PoseCoach() {
     </section>
   );
 }
+

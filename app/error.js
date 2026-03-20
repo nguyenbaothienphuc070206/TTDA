@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect } from "react";
 
-export default function GlobalError({ error, reset }) {
+export default function GlobalError({ error }) {
   useEffect(() => {
     if (process.env.NODE_ENV !== "production") {
       // Log for debugging in dev only.
@@ -14,31 +14,18 @@ export default function GlobalError({ error, reset }) {
 
   return (
     <div className="mx-auto w-full max-w-3xl px-4 py-16">
-      <div className="rounded-[2.25rem] border border-white/10 bg-white/5 p-8 sm:p-12">
-        <p className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-semibold text-slate-200">
-          Môn sinh đang chào
-        </p>
-
-        <h1 className="mt-5 text-2xl font-semibold tracking-tight text-white sm:text-3xl">
-          Hệ thống xin phép dừng 1 nhịp
+      <div className="rounded-[2.25rem] border border-white/10 bg-white/5 p-8 text-center sm:p-12">
+        <h1 className="text-2xl font-semibold tracking-tight text-white sm:text-3xl">
+          Môn sinh lạc đường rồi?
         </h1>
-        <p className="mt-3 text-sm leading-6 text-slate-300">
-          Trong lúc bạn luyện tập, ứng dụng vừa gặp lỗi. Hãy thử lại, hoặc quay
-          về trang chủ để tiếp tục.
+        <p className="mt-3 text-base leading-7 text-slate-200">
+          Hãy để Sư phụ dẫn bạn quay lại trang chủ nhé!
         </p>
 
-        <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-          <button
-            type="button"
-            onClick={() => reset()}
-            className="inline-flex h-12 items-center justify-center rounded-2xl bg-gradient-to-r from-cyan-300 to-blue-500 px-5 text-sm font-semibold text-slate-950 transition hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-cyan-300/50"
-          >
-            Thử lại
-          </button>
-
+        <div className="mt-6">
           <Link
             href="/"
-            className="inline-flex h-12 items-center justify-center rounded-2xl border border-white/10 bg-white/5 px-5 text-sm font-semibold text-white transition hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-cyan-300/30"
+            className="inline-flex h-12 w-full items-center justify-center rounded-2xl bg-gradient-to-r from-cyan-300 to-blue-500 px-5 text-sm font-semibold text-slate-950 transition hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-cyan-300/50"
           >
             Về trang chủ
           </Link>

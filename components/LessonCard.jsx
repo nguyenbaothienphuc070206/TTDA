@@ -2,12 +2,63 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { Check, MessageCircle, Play } from "lucide-react";
+import { useLocale } from "next-intl";
+import { Check, MessageCircle, Play, Shield } from "lucide-react";
 
 import { popConfettiFromElement } from "@/lib/confetti";
 import { isLessonDone, toggleLessonDone } from "@/lib/progress";
 
+function getCopy(locale) {
+  const id = String(locale || "vi").toLowerCase();
+
+  if (id === "en") {
+    return {
+      minutes: "min",
+      next: "Next suggestion",
+      done: "Completed",
+      todo: "Not completed",
+      view: "View",
+      marked: "Marked",
+      mark: "Mark",
+      askAi: "Ask AI about this lesson",
+      aiQuestion: (title) =>
+        `I'm learning the lesson \"${title}\". Please point out common mistakes, corrections, and safety notes.`,
+    };
+  }
+
+  if (id === "ja") {
+    return {
+      minutes: "分",
+      next: "次のおすすめ",
+      done: "完了済み",
+      todo: "未完了",
+      view: "見る",
+      marked: "記録済み",
+      mark: "記録",
+      askAi: "このレッスンをAIに質問",
+      aiQuestion: (title) =>
+        `「${title}」を練習中です。よくあるミス、修正方法、安全上の注意を教えてください。`,
+    };
+  }
+
+  return {
+    minutes: "phút",
+    next: "Gợi ý tiếp theo",
+    done: "Đã hoàn thành",
+    todo: "Chưa hoàn thành",
+    view: "Xem",
+    marked: "Đã đánh dấu",
+    mark: "Đánh dấu",
+    askAi: "Hỏi AI về bài này",
+    aiQuestion: (title) =>
+      `Mình đang học bài “${title}”. Bạn chỉ ra lỗi thường gặp, cách sửa và lưu ý an toàn giúp mình nhé.`,
+  };
+}
+
 export default function LessonCard({ lesson, isActive = false }) {
+  const locale = useLocale();
+  const copy = getCopy(locale);
+
   const [done, setDone] = useState(false);
   const doneButtonRef = useRef(null);
 
@@ -39,7 +90,7 @@ export default function LessonCard({ lesson, isActive = false }) {
   const onAskAi = () => {
     if (typeof window === "undefined") return;
 
-    const question = `Mình đang học bài “${lesson.title}”. Bạn chỉ ra lỗi thường gặp, cách sửa và lưu ý an toàn giúp mình nhé.`;
+    const question = copy.aiQuestion(lesson.title);
     window.dispatchEvent(
       new CustomEvent("vovinam-ai-ask", {
         detail: {
@@ -82,26 +133,28 @@ export default function LessonCard({ lesson, isActive = false }) {
 
           <div className="mt-3 flex flex-wrap items-center gap-2 text-xs">
             <span className="rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-slate-200">
-              {lesson.minutes} phút
+              {lesson.minutes} {copy.minutes}
             </span>
             {isActive && !done ? (
               <span className="rounded-full border border-blue-400/25 bg-blue-500/10 px-2.5 py-1 text-blue-100">
-                Gợi ý tiếp theo
+                {copy.next}
               </span>
             ) : null}
             {done ? (
               <span className="rounded-full border border-emerald-400/20 bg-emerald-500/15 px-2.5 py-1 text-emerald-200">
-                Đã hoàn thành
+                {copy.done}
               </span>
             ) : (
               <span className="rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-slate-300">
-                Chưa hoàn thành
+                {copy.todo}
               </span>
             )}
           </div>
         </div>
 
-        <div className="h-10 w-10 shrink-0 rounded-2xl border border-white/10 bg-gradient-to-br from-blue-400/15 to-blue-600/10" />
+        <div className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border border-white/10 bg-gradient-to-br from-blue-400/15 to-blue-600/10 text-blue-100">
+          <Shield className="h-5 w-5" />
+        </div>
       </div>
 
       <div className="relative mt-4 grid grid-cols-2 gap-2 sm:flex sm:flex-row sm:items-center">
@@ -110,7 +163,7 @@ export default function LessonCard({ lesson, isActive = false }) {
           className="col-span-1 inline-flex h-10 w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-blue-400 to-blue-600 px-3 text-sm font-semibold text-slate-950 transition hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-blue-400/50 sm:w-auto"
         >
           <Play className="h-4 w-4" />
-          <span>Xem</span>
+          <span>{copy.view}</span>
         </Link>
 
         <button
@@ -125,7 +178,7 @@ export default function LessonCard({ lesson, isActive = false }) {
           }
         >
           <Check className="h-4 w-4" />
-          <span className="whitespace-nowrap">{done ? "Đã đánh dấu" : "Đánh dấu"}</span>
+          <span className="whitespace-nowrap">{done ? copy.marked : copy.mark}</span>
         </button>
 
         <button
@@ -134,7 +187,7 @@ export default function LessonCard({ lesson, isActive = false }) {
           className="col-span-2 inline-flex h-10 w-full items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-3 text-sm font-semibold text-white transition hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-blue-400/30 sm:w-auto"
         >
           <MessageCircle className="h-4 w-4" />
-          <span>Hỏi AI về bài này</span>
+          <span>{copy.askAi}</span>
         </button>
       </div>
     </div>

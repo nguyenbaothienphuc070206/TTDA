@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 
-export default function HlsVideoPlayer({ src, title, poster, className, apiRef }) {
+export default function HlsVideoPlayer({ src, title, poster, className, apiRef, onFatalError }) {
   const videoRef = useRef(null);
   const hlsRef = useRef(null);
   const [error, setError] = useState("");
@@ -20,6 +20,18 @@ export default function HlsVideoPlayer({ src, title, poster, className, apiRef }
           video.currentTime = Math.max(0, t);
           // Best-effort: resume playback after seeking.
           video.play?.().catch?.(() => {});
+        } catch {
+          // ignore
+        }
+      },
+
+      setPlaybackRate: (rate) => {
+        const video = videoRef.current;
+        const r = Number(rate);
+        if (!video || !Number.isFinite(r) || r <= 0) return;
+
+        try {
+          video.playbackRate = r;
         } catch {
           // ignore
         }
@@ -42,6 +54,16 @@ export default function HlsVideoPlayer({ src, title, poster, className, apiRef }
 
     setError("");
 
+    const reportFatal = (message) => {
+      const safeMessage = String(message || "Không phát được video.").trim();
+      setError(safeMessage);
+      try {
+        onFatalError?.(safeMessage);
+      } catch {
+        // ignore
+      }
+    };
+
     const cleanup = () => {
       const hls = hlsRef.current;
       hlsRef.current = null;
@@ -63,7 +85,7 @@ export default function HlsVideoPlayer({ src, title, poster, className, apiRef }
 
     const init = async () => {
       if (!src) {
-        setError("Thiếu nguồn video.");
+        reportFatal("Thiếu nguồn video.");
         return;
       }
 
@@ -78,12 +100,12 @@ export default function HlsVideoPlayer({ src, title, poster, className, apiRef }
 
       const Hls = mod.default;
       if (!Hls || typeof Hls.isSupported !== "function") {
-        setError("Không tải được player HLS.");
+        reportFatal("Không tải được player HLS.");
         return;
       }
 
       if (!Hls.isSupported()) {
-        setError("Trình duyệt không hỗ trợ HLS.");
+        reportFatal("Trình duyệt không hỗ trợ HLS.");
         return;
       }
 
@@ -97,7 +119,7 @@ export default function HlsVideoPlayer({ src, title, poster, className, apiRef }
       hls.on(Hls.Events.ERROR, (_evt, data) => {
         if (data?.fatal) {
           cleanup();
-          setError("Không phát được HLS trên thiết bị này.");
+          reportFatal("Không phát được HLS trên thiết bị này.");
         }
       });
 
@@ -107,20 +129,20 @@ export default function HlsVideoPlayer({ src, title, poster, className, apiRef }
           hls.loadSource(src);
         } catch {
           cleanup();
-          setError("Không phát được HLS (loadSource lỗi).");
+          reportFatal("Không phát được HLS (loadSource lỗi).");
         }
       });
     };
 
     init().catch(() => {
-      if (!cancelled) setError("Không tải được player HLS.");
+      if (!cancelled) reportFatal("Không tải được player HLS.");
     });
 
     return () => {
       cancelled = true;
       cleanup();
     };
-  }, [src]);
+  }, [onFatalError, src]);
 
   return (
     <div className={className}>

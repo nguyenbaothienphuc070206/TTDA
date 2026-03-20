@@ -1,4 +1,4 @@
-export const TECHNIQUE_CATEGORIES = [
+﻿export const TECHNIQUE_CATEGORIES = [
   {
     id: "tan-phap",
     title: "Tấn pháp",
@@ -22,7 +22,7 @@ export const TECHNIQUE_CATEGORIES = [
   {
     id: "phan-don",
     title: "Phản đòn",
-    description: "Phản xạ – góc bước – thủ chắc – phản nhanh gọn.",
+    description: "Phản xạ - góc bước - thủ chắc - phản nhanh gọn.",
   },
 ];
 
@@ -39,7 +39,7 @@ export const TECHNIQUES = [
       "Hai chân rộng bằng vai, mũi chân hơi mở tự nhiên.",
       "Hạ trọng tâm nhẹ, gối không đổ vào trong.",
       "Siết bụng nhẹ, vai thả lỏng, mắt nhìn thẳng.",
-      "Giữ 20–30 giây × 3 hiệp; thở đều.",
+      "Giữ 20-30 giây x 3 hiệp; thở đều.",
     ],
     mistakes: [
       "Gối chụm vào trong hoặc vượt mũi chân quá mức",
@@ -58,7 +58,7 @@ export const TECHNIQUES = [
     difficulty: "easy",
     tags: ["đấm", "thủ", "hông"],
     summary:
-      "Đòn tay cơ bản: lực đi từ chân–hông–vai; ra đòn gọn và thu về nhanh.",
+      "Đòn tay cơ bản: lực đi từ chân-hông-vai; ra đòn gọn và thu về nhanh.",
     steps: [
       "Tư thế thủ: cằm thấp, tay che mặt, khuỷu gần thân.",
       "Đấm theo trục thẳng, vai thả lỏng.",
@@ -112,7 +112,7 @@ export const TECHNIQUES = [
       "Đứng trực diện không bước góc",
       "Tập quá nhanh khi chưa thống nhất tín hiệu dừng",
     ],
-    safety: ["Tập đôi phải có tín hiệu 'dừng'", "Lực nhẹ – đúng kỹ thuật"],
+    safety: ["Tập đôi phải có tín hiệu 'dừng'", "Lực nhẹ - đúng kỹ thuật"],
   },
   {
     slug: "phan-don-can-ban-1",
@@ -136,3 +136,4 @@ export const TECHNIQUES = [
 export function getTechniqueBySlug(slug) {
   return TECHNIQUES.find((t) => t.slug === slug) || null;
 }
+

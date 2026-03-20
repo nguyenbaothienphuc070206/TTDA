@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
 
@@ -63,7 +63,7 @@ export default function RbacPanel() {
               <span className="font-semibold text-white">{me.user.id}</span>
             </Box>
             <Box title="Email">
-              <span className="font-semibold text-white">{me.user.email || "—"}</span>
+              <span className="font-semibold text-white">{me.user.email || "-"}</span>
             </Box>
             <Box title="Ghi chú">Role đọc từ bảng user_roles (RLS).</Box>
           </div>
@@ -76,3 +76,4 @@ export default function RbacPanel() {
     </div>
   );
 }
+

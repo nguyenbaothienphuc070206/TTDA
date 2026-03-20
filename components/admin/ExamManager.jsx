@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useMemo, useState } from "react";
 
@@ -6,23 +6,21 @@ import { BELTS, getBeltById } from "@/data/belts";
 import { readAttendance, readExams, readMembers, writeExams, writeMembers } from "@/lib/adminData";
 
 const ELIGIBILITY_LOOKBACK_DAYS = 30;
-const ELIGIBILITY_MIN_ATTENDANCE_BY_TARGET_BELT = {
-  "lam-dai": 0,
-  "hoang-dai": 8,
-  "huyen-dai": 12,
-};
 
-const ELIGIBILITY_MIN_JOINED_DAYS_BY_TARGET_BELT = {
-  "lam-dai": 0,
-  "hoang-dai": 30,
-  "huyen-dai": 60,
-};
+function minAttendanceByTargetIndex(targetIndex) {
+  if (targetIndex <= 0) return 0;
+  return Math.min(28, 2 + targetIndex * 2);
+}
 
-const ELIGIBILITY_FAIL_COOLDOWN_DAYS_BY_TARGET_BELT = {
-  "lam-dai": 0,
-  "hoang-dai": 14,
-  "huyen-dai": 21,
-};
+function minJoinedDaysByTargetIndex(targetIndex) {
+  if (targetIndex <= 0) return 0;
+  return targetIndex * 30;
+}
+
+function failCooldownDaysByTargetIndex(targetIndex) {
+  if (targetIndex <= 0) return 0;
+  return 7 + targetIndex;
+}
 
 function makeId(prefix) {
   if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
@@ -59,7 +57,7 @@ export default function ExamManager() {
   const [attendance, setAttendance] = useState(() => readAttendance());
 
   const [memberId, setMemberId] = useState("");
-  const [targetBeltId, setTargetBeltId] = useState("hoang-dai");
+  const [targetBeltId, setTargetBeltId] = useState(BELTS[1]?.id || BELTS[0]?.id || "");
   const [date, setDate] = useState(todayInput());
 
   const [technique, setTechnique] = useState(7);
@@ -111,15 +109,9 @@ export default function ExamManager() {
     const targetIndex = BELTS.findIndex((b) => b.id === target.id);
     const prevBelt = targetIndex > 0 ? BELTS[targetIndex - 1] : null;
 
-    const minSessions =
-      ELIGIBILITY_MIN_ATTENDANCE_BY_TARGET_BELT[target.id] ??
-      ELIGIBILITY_MIN_ATTENDANCE_BY_TARGET_BELT["hoang-dai"];
-    const minJoinedDays =
-      ELIGIBILITY_MIN_JOINED_DAYS_BY_TARGET_BELT[target.id] ??
-      ELIGIBILITY_MIN_JOINED_DAYS_BY_TARGET_BELT["hoang-dai"];
-    const failCooldownDays =
-      ELIGIBILITY_FAIL_COOLDOWN_DAYS_BY_TARGET_BELT[target.id] ??
-      ELIGIBILITY_FAIL_COOLDOWN_DAYS_BY_TARGET_BELT["hoang-dai"];
+    const minSessions = minAttendanceByTargetIndex(targetIndex);
+    const minJoinedDays = minJoinedDaysByTargetIndex(targetIndex);
+    const failCooldownDays = failCooldownDaysByTargetIndex(targetIndex);
 
     const today = new Date();
 
@@ -468,7 +460,7 @@ export default function ExamManager() {
               onChange={(e) => setMemberId(e.target.value)}
               className="mt-2 w-full rounded-xl border border-white/10 bg-slate-950/60 px-3 py-2 text-sm text-white outline-none focus:ring-2 focus:ring-cyan-300/30"
             >
-              <option value="">— Chọn hội viên —</option>
+              <option value="">- Chọn hội viên -</option>
               {memberList.map((m) => (
                 <option key={m.id} value={m.id}>
                   {m.name} ({m.code})
@@ -503,7 +495,7 @@ export default function ExamManager() {
           </label>
 
           <label className="block rounded-2xl border border-white/10 bg-white/5 p-3">
-            <div className="text-xs font-semibold text-slate-200">Kỹ thuật (0–10)</div>
+            <div className="text-xs font-semibold text-slate-200">Kỹ thuật (0-10)</div>
             <input
               type="number"
               min={0}
@@ -516,7 +508,7 @@ export default function ExamManager() {
           </label>
 
           <label className="block rounded-2xl border border-white/10 bg-white/5 p-3">
-            <div className="text-xs font-semibold text-slate-200">Thể lực (0–10)</div>
+            <div className="text-xs font-semibold text-slate-200">Thể lực (0-10)</div>
             <input
               type="number"
               min={0}
@@ -529,7 +521,7 @@ export default function ExamManager() {
           </label>
 
           <label className="block rounded-2xl border border-white/10 bg-white/5 p-3 sm:col-span-2">
-            <div className="text-xs font-semibold text-slate-200">Kỷ luật / thái độ (0–10)</div>
+            <div className="text-xs font-semibold text-slate-200">Kỷ luật / thái độ (0-10)</div>
             <input
               type="number"
               min={0}
@@ -625,3 +617,4 @@ export default function ExamManager() {
     </div>
   );
 }
+
