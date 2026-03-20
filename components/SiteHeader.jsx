@@ -37,7 +37,7 @@ function ProgressNavItem({ href, active, label, doneCount, remainingCount, total
       href={href}
       aria-current={active ? "page" : undefined}
       className={
-        "inline-flex min-w-[150px] flex-col rounded-2xl px-3 py-1.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-blue-400/40 " +
+        "inline-flex min-w-[160px] flex-col rounded-2xl px-3 py-1.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-blue-400/40 " +
         (active
           ? "bg-white/10 text-white"
           : "text-slate-200 hover:bg-white/10 hover:text-white")
@@ -46,14 +46,14 @@ function ProgressNavItem({ href, active, label, doneCount, remainingCount, total
       <span className="flex items-center justify-between gap-2">
         <span>{label}</span>
         <span className="inline-flex items-center gap-1 text-[11px]">
-          <span className="rounded-full border border-emerald-400/25 bg-emerald-500/15 px-1.5 py-0.5 font-semibold text-emerald-200">
+          <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full border border-emerald-400/30 bg-emerald-500/20 px-1.5 text-[10px] font-semibold leading-none text-emerald-200">
             {safeDone}
           </span>
           <span className="text-slate-300">{remainingCount}</span>
         </span>
       </span>
 
-      <span className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-white/10">
+      <span className="mt-1 h-1.5 w-full overflow-hidden rounded-full border border-slate-400/25 bg-slate-400/20">
         <span
           className="block h-full rounded-full bg-gradient-to-r from-emerald-400 to-green-500"
           style={{ width: `${percent}%` }}

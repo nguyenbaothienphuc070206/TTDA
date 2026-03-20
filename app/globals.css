@@ -51,19 +51,19 @@ html[data-theme="light"] .bg-vignette {
 
 /* Light mode readability: map common dark-UI utilities to light surfaces */
 html[data-theme="light"] .text-white {
-  color: rgb(15 23 42);
-}
-
-html[data-theme="light"] .text-slate-200 {
   color: rgb(30 41 59);
 }
 
-html[data-theme="light"] .text-slate-300 {
+html[data-theme="light"] .text-slate-200 {
   color: rgb(51 65 85);
 }
 
-html[data-theme="light"] .text-slate-400 {
+html[data-theme="light"] .text-slate-300 {
   color: rgb(71 85 105);
+}
+
+html[data-theme="light"] .text-slate-400 {
+  color: rgb(100 116 139);
 }
 
 html[data-theme="light"] .border-white\/10 {
@@ -71,15 +71,15 @@ html[data-theme="light"] .border-white\/10 {
 }
 
 html[data-theme="light"] .bg-white\/5 {
-  background-color: rgba(255, 255, 255, 0.78);
+  background-color: rgba(255, 255, 255, 0.7);
 }
 
 html[data-theme="light"] .bg-white\/10 {
-  background-color: rgba(255, 255, 255, 0.92);
+  background-color: rgba(255, 255, 255, 0.8);
 }
 
 html[data-theme="light"] .hover\:bg-white\/10:hover {
-  background-color: rgba(255, 255, 255, 1);
+  background-color: rgba(255, 255, 255, 0.9);
 }
 
 html[data-theme="light"] .bg-slate-950\/60 {
