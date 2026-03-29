@@ -975,7 +975,7 @@ export default function ProfileDashboard() {
     <div className="grid gap-4 lg:grid-cols-2">
       <section
         id="goi-premium"
-        className="scroll-mt-24 rounded-3xl border border-white/10 bg-white/5 p-6 sm:p-8 lg:col-span-2"
+        className="scroll-mt-24 rounded-3xl border border-white/10 bg-white/5 p-6 shadow-[var(--shadow-card-strong)] sm:p-8 lg:col-span-2"
       >
         <h2 className="text-xl font-semibold text-white">{copy.planTitle}</h2>
         <p className="mt-2 text-sm leading-6 text-slate-300">
@@ -983,7 +983,7 @@ export default function ProfileDashboard() {
         </p>
 
         <div className="mt-4 grid gap-3 sm:grid-cols-3">
-          <div className="rounded-2xl border border-white/10 bg-slate-950/30 p-4">
+          <div className="rounded-2xl border border-white/10 bg-slate-950/35 p-4 shadow-[var(--shadow-card)]">
             <div className="text-xs font-semibold text-slate-300">{copy.currentPlan}</div>
             <div className="mt-2 text-sm font-semibold text-white">{isPremium ? copy.planPremiumValue : copy.planFreeValue}</div>
             <div className="mt-1 text-xs text-slate-400">{copy.demoLocal}</div>
@@ -1000,14 +1000,14 @@ export default function ProfileDashboard() {
                 "mt-3 inline-flex h-11 w-full items-center justify-center rounded-2xl px-4 text-sm font-semibold transition focus:outline-none focus:ring-2 " +
                 (isPremium
                   ? "border border-white/10 bg-white/5 text-white hover:bg-white/10 focus:ring-blue-400/30"
-                  : "bg-gradient-to-r from-cyan-300 to-blue-500 text-slate-950 hover:brightness-110 focus:ring-cyan-300/50")
+                  : "bg-linear-to-r from-cyan-300 to-blue-500 text-slate-950 hover:brightness-110 focus:ring-cyan-300/50")
               }
             >
               {isPremium ? copy.turnOffPremium : copy.upgradePremiumDemo}
             </button>
           </div>
 
-          <div className="rounded-2xl border border-white/10 bg-slate-950/30 p-4 sm:col-span-2">
+          <div className="rounded-2xl border border-white/10 bg-slate-950/35 p-4 shadow-[var(--shadow-card)] sm:col-span-2">
             <div className="text-xs font-semibold text-slate-300">{copy.planBenefits}</div>
             <ul className="mt-2 grid gap-1 text-sm leading-6 text-slate-300">
               {isPremium ? (
@@ -1032,28 +1032,28 @@ export default function ProfileDashboard() {
         </div>
       </section>
 
-      <section className="rounded-3xl border border-white/10 bg-white/5 p-6 sm:p-8 lg:col-span-2">
+      <section className="rounded-3xl border border-white/10 bg-white/5 p-6 shadow-[var(--shadow-card)] sm:p-8 lg:col-span-2">
         <h2 className="text-xl font-semibold text-white">{copy.todayTitle}</h2>
         <p className="mt-2 text-sm leading-6 text-slate-300">
           {copy.todayLine(personalizedStatus.days, personalizedStatus.encouragement)}
         </p>
         <div className="mt-4 grid gap-3 sm:grid-cols-3">
-          <div className="rounded-2xl border border-white/10 bg-slate-950/30 p-4">
+          <div className="rounded-2xl border border-white/10 bg-slate-950/35 p-4 shadow-[var(--shadow-card)]">
             <div className="text-xs font-semibold text-slate-300">{copy.currentBelt}</div>
             <div className="mt-2 text-sm font-semibold text-white">{currentBelt?.title}</div>
           </div>
-          <div className="rounded-2xl border border-white/10 bg-slate-950/30 p-4">
+          <div className="rounded-2xl border border-white/10 bg-slate-950/35 p-4 shadow-[var(--shadow-card)]">
             <div className="text-xs font-semibold text-slate-300">{copy.goal}</div>
             <div className="mt-2 text-sm font-semibold text-white">{copy.goalText}</div>
           </div>
-          <div className="rounded-2xl border border-white/10 bg-slate-950/30 p-4">
+          <div className="rounded-2xl border border-white/10 bg-slate-950/35 p-4 shadow-[var(--shadow-card)]">
             <div className="text-xs font-semibold text-slate-300">{copy.quickSuggestion}</div>
             <div className="mt-2 text-sm leading-6 text-slate-300">{copy.quickSuggestionText}</div>
           </div>
         </div>
       </section>
 
-      <section className="rounded-3xl border border-white/10 bg-white/5 p-6 sm:p-8 lg:col-span-2">
+      <section className="rounded-3xl border border-white/10 bg-white/5 p-6 shadow-[var(--shadow-card)] sm:p-8 lg:col-span-2">
         <h2 className="text-xl font-semibold text-white">{copy.badgesTitle}</h2>
         <p className="mt-2 text-sm leading-6 text-slate-300">
           {copy.badgesDesc}
@@ -1062,33 +1062,33 @@ export default function ProfileDashboard() {
         {localizedBadges.length ? (
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
             {localizedBadges.map((b) => (
-              <div key={b.id} className="rounded-2xl border border-white/10 bg-slate-950/30 p-4">
+              <div key={b.id} className="rounded-2xl border border-white/10 bg-slate-950/35 p-4 shadow-[var(--shadow-card)]">
                 <div className="text-sm font-semibold text-white">{b.title}</div>
                 <div className="mt-1 text-sm leading-6 text-slate-300">{b.description}</div>
               </div>
             ))}
           </div>
         ) : (
-          <div className="mt-4 rounded-2xl border border-white/10 bg-slate-950/30 p-4 text-sm text-slate-300">
+          <div className="mt-4 rounded-2xl border border-white/10 bg-slate-950/35 p-4 text-sm text-slate-300 shadow-[var(--shadow-card)]">
             {copy.noBadges}
           </div>
         )}
       </section>
 
-      <section className="rounded-3xl border border-white/10 bg-white/5 p-6 sm:p-8 lg:col-span-2">
+      <section className="rounded-3xl border border-white/10 bg-white/5 p-6 shadow-[var(--shadow-card)] sm:p-8 lg:col-span-2">
         <h2 className="text-xl font-semibold text-white">{copy.remindersTitle}</h2>
         <p className="mt-2 text-sm leading-6 text-slate-300">
           {copy.remindersDesc}
         </p>
 
         {reminderNotice ? (
-          <div className="mt-4 rounded-2xl border border-white/10 bg-slate-950/30 p-4 text-sm text-slate-200">
+          <div className="mt-4 rounded-2xl border border-white/10 bg-slate-950/35 p-4 text-sm text-slate-200 shadow-[var(--shadow-card)]">
             {reminderNotice}
           </div>
         ) : null}
 
         <div className="mt-4 grid gap-3 sm:grid-cols-3">
-          <div className="rounded-2xl border border-white/10 bg-slate-950/30 p-4">
+          <div className="rounded-2xl border border-white/10 bg-slate-950/35 p-4 shadow-[var(--shadow-card)]">
             <div className="text-xs font-semibold text-slate-300">{copy.remindersStatus}</div>
             <div className="mt-2 text-sm font-semibold text-white">
               {reminders.enabled ? copy.remindersOn : copy.remindersOff}
@@ -1099,7 +1099,7 @@ export default function ProfileDashboard() {
           <button
             type="button"
             onClick={toggleReminders}
-            className="inline-flex h-12 items-center justify-center rounded-2xl bg-gradient-to-r from-cyan-300 to-blue-500 px-5 text-sm font-semibold text-slate-950 transition hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-cyan-300/50"
+            className="inline-flex h-12 items-center justify-center rounded-2xl bg-linear-to-r from-cyan-300 to-blue-500 px-5 text-sm font-semibold text-slate-950 transition hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-cyan-300/50"
           >
             {reminders.enabled ? copy.disableReminders : copy.enableReminders}
           </button>
@@ -1113,7 +1113,7 @@ export default function ProfileDashboard() {
           </button>
         </div>
 
-        <div className="mt-4 rounded-2xl border border-white/10 bg-slate-950/30 p-4">
+        <div className="mt-4 rounded-2xl border border-white/10 bg-slate-950/35 p-4 shadow-[var(--shadow-card)]">
           <div className="text-xs font-semibold text-slate-300">{copy.reminderThreshold}</div>
           <div className="mt-2 grid gap-3 sm:grid-cols-[1fr_auto] sm:items-center">
             <input
@@ -1141,7 +1141,7 @@ export default function ProfileDashboard() {
         </div>
       </section>
 
-      <section className="rounded-3xl border border-white/10 bg-white/5 p-6 sm:p-8">
+      <section className="rounded-3xl border border-white/10 bg-white/5 p-6 shadow-[var(--shadow-card)] sm:p-8">
         <h2 className="text-xl font-semibold text-white">{copy.profileTitle}</h2>
         <p className="mt-2 text-sm leading-6 text-slate-300">
           {copy.profileDesc}
@@ -1176,7 +1176,7 @@ export default function ProfileDashboard() {
           </Field>
         </div>
 
-        <div className="mt-4 rounded-3xl border border-white/10 bg-slate-950/30 p-6">
+        <div className="mt-4 rounded-3xl border border-white/10 bg-slate-950/35 p-6 shadow-[var(--shadow-card)]">
           <p className="text-sm font-semibold text-white">{copy.digitalCertTitle}</p>
           <p className="mt-1 text-sm leading-6 text-slate-300">
             {copy.digitalCertDesc}
@@ -1211,13 +1211,13 @@ export default function ProfileDashboard() {
         </div>
       </section>
 
-      <section className="rounded-3xl border border-white/10 bg-white/5 p-6 sm:p-8">
+      <section className="rounded-3xl border border-white/10 bg-white/5 p-6 shadow-[var(--shadow-card)] sm:p-8">
         <h2 className="text-xl font-semibold text-white">{copy.historyDiaryTitle}</h2>
         <p className="mt-2 text-sm leading-6 text-slate-300">
           {copy.historyDiaryDesc}
         </p>
 
-        <div className="mt-4 rounded-3xl border border-white/10 bg-slate-950/30 p-6">
+        <div className="mt-4 rounded-3xl border border-white/10 bg-slate-950/35 p-6 shadow-[var(--shadow-card)]">
           <p className="text-sm font-semibold text-white">{copy.beltHistoryTitle}</p>
 
           <div className="mt-3 grid gap-3 sm:grid-cols-2">
@@ -1247,7 +1247,7 @@ export default function ProfileDashboard() {
           <button
             type="button"
             onClick={addBeltHistory}
-            className="mt-3 inline-flex h-11 w-full items-center justify-center rounded-2xl bg-gradient-to-r from-cyan-300 to-blue-500 px-4 text-sm font-semibold text-slate-950 transition hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-cyan-300/50"
+            className="mt-3 inline-flex h-11 w-full items-center justify-center rounded-2xl bg-linear-to-r from-cyan-300 to-blue-500 px-4 text-sm font-semibold text-slate-950 transition hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-cyan-300/50"
           >
             {copy.addBeltMilestone}
           </button>
@@ -1284,7 +1284,7 @@ export default function ProfileDashboard() {
           )}
         </div>
 
-        <div className="mt-4 rounded-3xl border border-white/10 bg-slate-950/30 p-6">
+        <div className="mt-4 rounded-3xl border border-white/10 bg-slate-950/35 p-6 shadow-[var(--shadow-card)]">
           <p className="text-sm font-semibold text-white">{copy.diaryTitle}</p>
 
           <div className="mt-3 grid gap-3">
@@ -1370,7 +1370,7 @@ export default function ProfileDashboard() {
                   ) : null}
 
                   {d.aiReply ? (
-                    <div className="mt-3 rounded-2xl border border-white/10 bg-slate-950/30 p-4">
+                    <div className="mt-3 rounded-2xl border border-white/10 bg-slate-950/35 p-4 shadow-[var(--shadow-card)]">
                       <div className="text-xs font-semibold text-slate-300">{copy.diaryReplyLabel}</div>
                       <p className="mt-2 whitespace-pre-line text-sm leading-6 text-slate-200">
                         {d.aiReply}

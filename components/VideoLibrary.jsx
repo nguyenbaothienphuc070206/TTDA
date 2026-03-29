@@ -170,7 +170,7 @@ export default function VideoLibrary({ videos }) {
       return (
         <div
           key={id || title}
-          className="group relative overflow-hidden rounded-3xl border border-white/10 bg-white/5 p-5 shadow-[var(--shadow-card)]"
+          className="group relative overflow-hidden rounded-3xl border border-white/10 bg-white/5 p-5 shadow-[var(--shadow-card)] transition hover:-translate-y-0.5 hover:border-cyan-300/25"
         >
           <div className="absolute inset-0 opacity-0 transition-opacity group-hover:opacity-100 bg-[radial-gradient(circle_at_top,rgba(59,130,246,0.10),transparent_55%)]" />
           <div className="relative">
@@ -205,7 +205,7 @@ export default function VideoLibrary({ videos }) {
               </p>
               <Link
                 href="/ho-so#goi-premium"
-                className="inline-flex h-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-r from-blue-400 to-blue-600 px-4 text-sm font-semibold text-slate-950 transition hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-blue-400/50"
+                className="inline-flex h-11 shrink-0 items-center justify-center rounded-2xl bg-linear-to-r from-cyan-300 to-blue-500 px-4 text-sm font-semibold text-slate-950 transition hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-cyan-300/50"
               >
                 {copy.unlock}
               </Link>
@@ -219,7 +219,7 @@ export default function VideoLibrary({ videos }) {
       <Link
         key={id || title}
         href={`/video/${id}`}
-        className="group relative overflow-hidden rounded-3xl border border-white/10 bg-white/5 p-5 shadow-[var(--shadow-card)] transition will-change-transform hover:bg-white/10 hover:-translate-y-0.5 hover:scale-[1.02] hover:shadow-[var(--shadow-card-strong)] hover:border-blue-400/35 focus:outline-none focus:ring-2 focus:ring-blue-400/30"
+        className="group relative overflow-hidden rounded-3xl border border-white/10 bg-white/5 p-5 shadow-[var(--shadow-card)] transition will-change-transform hover:bg-white/10 hover:-translate-y-0.5 hover:scale-[1.02] hover:shadow-[var(--shadow-card-strong)] hover:border-cyan-300/35 focus:outline-none focus:ring-2 focus:ring-cyan-300/30"
       >
         <div className="absolute inset-0 opacity-0 transition-opacity group-hover:opacity-100 bg-[radial-gradient(circle_at_top,rgba(59,130,246,0.10),transparent_55%)]" />
         <div className="relative">
@@ -248,7 +248,7 @@ export default function VideoLibrary({ videos }) {
             </div>
           </div>
 
-          <div className="mt-4 inline-flex h-11 items-center justify-center rounded-2xl bg-gradient-to-r from-blue-400 to-blue-600 px-4 text-sm font-semibold text-slate-950 transition group-hover:brightness-110">
+          <div className="mt-4 inline-flex h-11 items-center justify-center rounded-2xl bg-linear-to-r from-cyan-300 to-blue-500 px-4 text-sm font-semibold text-slate-950 transition group-hover:brightness-110">
             {copy.watchVideo}
           </div>
         </div>
@@ -261,7 +261,7 @@ export default function VideoLibrary({ videos }) {
       {familyGroups.map((family) => (
         <section
           key={family.id}
-          className="rounded-3xl border border-white/10 bg-white/5 p-4 sm:p-5 shadow-[var(--shadow-card)]"
+          className="rounded-3xl border border-white/10 bg-white/5 p-4 shadow-[var(--shadow-card-strong)] sm:p-5"
         >
           <header>
             <h2 className="text-base sm:text-lg font-semibold text-white">{family.title}</h2>
@@ -274,7 +274,7 @@ export default function VideoLibrary({ videos }) {
               return (
                 <details
                   key={`${family.id}-${group?.belt?.id || idx}`}
-                  className="rounded-2xl border border-white/10 bg-slate-950/30 p-4"
+                  className="rounded-2xl border border-white/10 bg-slate-950/35 p-4 shadow-[var(--shadow-card)]"
                   open={idx === 0}
                 >
                   <summary className="flex cursor-pointer list-none items-center justify-between gap-3">

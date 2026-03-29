@@ -315,7 +315,7 @@ export default function VideoPlayerPanel({ video }) {
 
   if (!canAccess) {
     return (
-      <section className="rounded-3xl border border-white/10 bg-white/5 p-6 sm:p-8 shadow-[var(--shadow-card)]">
+      <section className="rounded-3xl border border-white/10 bg-white/5 p-6 shadow-[var(--shadow-card-strong)] sm:p-8">
         <h2 className="text-lg font-semibold text-white">{copy.premiumTitle}</h2>
         <p className="mt-2 text-sm leading-6 text-slate-300">
           {copy.premiumDesc}
@@ -324,7 +324,7 @@ export default function VideoPlayerPanel({ video }) {
         <div className="mt-4 flex flex-col gap-2 sm:flex-row">
           <Link
             href="/ho-so#goi-premium"
-            className="inline-flex h-11 items-center justify-center rounded-2xl bg-gradient-to-r from-blue-400 to-blue-600 px-4 text-sm font-semibold text-slate-950 transition hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-blue-400/50"
+            className="inline-flex h-11 items-center justify-center rounded-2xl bg-linear-to-r from-cyan-300 to-blue-500 px-4 text-sm font-semibold text-slate-950 transition hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-cyan-300/50"
           >
             {copy.unlockPremium}
           </Link>
@@ -344,8 +344,8 @@ export default function VideoPlayerPanel({ video }) {
   }
 
   return (
-    <section className="rounded-3xl border border-white/10 bg-white/5 p-4 sm:p-6 shadow-[var(--shadow-card)]">
-      <div className="aspect-video overflow-hidden rounded-2xl border border-white/10 bg-slate-950/40">
+    <section className="rounded-3xl border border-white/10 bg-white/5 p-4 shadow-[var(--shadow-card-strong)] sm:p-6">
+      <div className="aspect-video overflow-hidden rounded-2xl border border-white/10 bg-slate-950/45 shadow-[var(--shadow-card)]">
         {showHls ? (
           <HlsVideoPlayer
             src={source.hlsUrl}
@@ -369,7 +369,7 @@ export default function VideoPlayerPanel({ video }) {
       </div>
 
       {useEmbedFallback && source.embedUrl ? (
-        <div className="mt-3 rounded-2xl border border-white/10 bg-slate-950/30 p-3 text-xs text-slate-200">
+        <div className="mt-3 rounded-2xl border border-white/10 bg-slate-950/35 p-3 text-xs text-slate-200">
           {playerError || copy.fallbackPlaying}
           <button
             type="button"
@@ -399,7 +399,7 @@ export default function VideoPlayerPanel({ video }) {
         <OfflineVideoControls videoId={videoId} title={title} />
       </div>
 
-      <div className="mt-4 rounded-2xl border border-white/10 bg-slate-950/30 p-4">
+      <div className="mt-4 rounded-2xl border border-white/10 bg-slate-950/35 p-4 shadow-[var(--shadow-card)]">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="text-xs font-semibold text-slate-300">{copy.playbackOptions}</div>
           <div className="inline-flex items-center gap-2">
@@ -409,7 +409,7 @@ export default function VideoPlayerPanel({ video }) {
               className={
                 "inline-flex h-9 items-center justify-center rounded-xl border border-white/10 px-3 text-xs font-semibold transition focus:outline-none focus:ring-2 focus:ring-blue-400/30 " +
                 (playbackRate === 1
-                  ? "bg-white/10 text-white"
+                      ? "bg-cyan-300/20 text-cyan-100"
                   : "bg-white/5 text-slate-200 hover:bg-white/10 hover:text-white")
               }
               aria-pressed={playbackRate === 1}
@@ -422,7 +422,7 @@ export default function VideoPlayerPanel({ video }) {
               className={
                 "inline-flex h-9 items-center justify-center rounded-xl border border-white/10 px-3 text-xs font-semibold transition focus:outline-none focus:ring-2 focus:ring-blue-400/30 " +
                 (playbackRate === 0.5
-                  ? "bg-white/10 text-white"
+                      ? "bg-cyan-300/20 text-cyan-100"
                   : "bg-white/5 text-slate-200 hover:bg-white/10 hover:text-white")
               }
               aria-pressed={playbackRate === 0.5}
@@ -446,7 +446,7 @@ export default function VideoPlayerPanel({ video }) {
                     className={
                       "inline-flex h-9 items-center justify-center rounded-xl border border-white/10 px-3 text-xs font-semibold transition focus:outline-none focus:ring-2 focus:ring-blue-400/30 " +
                       (active
-                        ? "bg-white/10 text-white"
+                        ? "bg-cyan-300/20 text-cyan-100"
                         : "bg-white/5 text-slate-200 hover:bg-white/10 hover:text-white")
                     }
                     aria-pressed={active}
@@ -464,7 +464,7 @@ export default function VideoPlayerPanel({ video }) {
         </p>
       </div>
 
-      <div className="mt-4 rounded-2xl border border-white/10 bg-slate-950/30 p-4">
+      <div className="mt-4 rounded-2xl border border-white/10 bg-slate-950/35 p-4 shadow-[var(--shadow-card)]">
         <div className="text-xs font-semibold text-slate-300">{transcriptTitle}</div>
 
         {loadingTranscript ? (
@@ -476,7 +476,7 @@ export default function VideoPlayerPanel({ video }) {
                 <button
                   type="button"
                   onClick={() => onSeek(s.startSec)}
-                  className="w-full rounded-2xl border border-white/10 bg-white/5 p-3 text-left transition hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-blue-400/30"
+                  className="w-full rounded-2xl border border-white/10 bg-white/5 p-3 text-left transition hover:-translate-y-0.5 hover:border-cyan-300/25 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-cyan-300/30"
                 >
                   <div className="flex items-start gap-3">
                     <span className="mt-0.5 inline-flex shrink-0 rounded-xl border border-white/10 bg-slate-950/40 px-2 py-1 text-xs font-semibold text-slate-200">
