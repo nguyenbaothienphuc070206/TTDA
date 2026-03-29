@@ -5,7 +5,8 @@ import { useEffect } from "react";
 export default function ViewportReveal() {
   useEffect(() => {
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (reduceMotion) return undefined;
+    const perfLite = document.documentElement?.dataset?.performance === "lite";
+    if (reduceMotion || perfLite) return undefined;
 
     const sections = Array.from(document.querySelectorAll(".reveal-sections > section"));
     if (!sections.length) return undefined;

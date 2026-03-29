@@ -189,6 +189,10 @@ html[data-theme="light"] body::before {
   opacity: 0.08;
 }
 
+html[data-performance="lite"] body::before {
+  display: none;
+}
+
 * {
   -webkit-tap-highlight-color: transparent;
 }
@@ -297,6 +301,47 @@ h4 {
   background: var(--surface-1);
   backdrop-filter: blur(14px);
   box-shadow: var(--shadow-card-strong);
+}
+
+html[data-performance="lite"] .perf-heavy {
+  display: none !important;
+}
+
+html[data-performance="lite"] .surface-card,
+html[data-performance="lite"] .surface-card-strong,
+html[data-performance="lite"] .rounded-3xl.border.border-white\/10.bg-white\/5,
+html[data-performance="lite"] .rounded-\[2\.25rem\].border.border-white\/10.bg-white\/5 {
+  backdrop-filter: none;
+  box-shadow: 0 8px 20px rgba(2, 6, 23, 0.22);
+}
+
+html[data-performance="lite"] .enterprise-shell::before,
+html[data-performance="lite"] .enterprise-shell::after,
+html[data-performance="lite"] .hero-noise::after {
+  display: none;
+}
+
+html[data-performance="lite"] .bg-vignette {
+  background: none;
+}
+
+html[data-performance="lite"] .float-fast,
+html[data-performance="lite"] .float-slow,
+html[data-performance="lite"] .float-slower,
+html[data-performance="lite"] .fade-in-up,
+html[data-performance="lite"] .stagger-fade > *,
+html[data-performance="lite"] .pulse-ring,
+html[data-performance="lite"] .skeleton-shimmer {
+  animation: none !important;
+  transition: none !important;
+}
+
+html[data-performance="lite"] .reveal-pending,
+html[data-performance="lite"] .reveal-pending.is-visible {
+  opacity: 1;
+  transform: none;
+  filter: none;
+  transition: none;
 }
 
 .enterprise-shell {
