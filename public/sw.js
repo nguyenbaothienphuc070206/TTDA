@@ -1,7 +1,7 @@
 /* global self, caches, fetch, Response */
 
-const STATIC_CACHE = "vovinam-static-v5";
-const PAGE_CACHE = "vovinam-pages-v5";
+const STATIC_CACHE = "vovinam-static-v6";
+const PAGE_CACHE = "vovinam-pages-v6";
 
 // Keep the page cache small to avoid storage bloat.
 const MAX_PAGE_ENTRIES = 25;

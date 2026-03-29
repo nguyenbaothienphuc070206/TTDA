@@ -438,12 +438,6 @@ function HomeVi() {
             <Stat label="Mục tiêu" value="Đúng kỹ thuật" />
           </div>
 
-          <div className="mt-4 flex gap-2 overflow-x-auto pb-1 sm:flex-wrap">
-            <ChipLink href="#tinh-nang">Tính năng</ChipLink>
-            <ChipLink href="#vo-dao">Võ đạo</ChipLink>
-            <ChipLink href="#khoa-hoc">Khóa học</ChipLink>
-            <ChipLink href="#faq">FAQ</ChipLink>
-          </div>
         </div>
       </section>
 
