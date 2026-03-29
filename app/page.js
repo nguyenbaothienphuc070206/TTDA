@@ -83,7 +83,7 @@ function SectionHeading({ id, title, description, right }) {
 
 function FeatureCard({ title, description, icon }) {
   return (
-    <div className="surface-card enterprise-shell group relative overflow-hidden rounded-3xl p-5 transition duration-300 hover:-translate-y-1 hover:bg-white/10">
+    <div className="surface-card enterprise-shell ui3d-card group relative overflow-hidden rounded-3xl p-5 transition duration-300 hover:bg-white/10">
       <div className="accent-line absolute left-6 right-6 top-0 opacity-0 transition-opacity group-hover:opacity-100" />
       <div className="relative flex items-start gap-4">
         <div className="mt-0.5 inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border border-cyan-300/25 bg-linear-to-br from-cyan-300/20 to-blue-500/10 text-cyan-100">
@@ -100,7 +100,7 @@ function FeatureCard({ title, description, icon }) {
 
 function StepCard({ step, title, description, bullets }) {
   return (
-    <div className="surface-card enterprise-shell rounded-3xl p-6">
+    <div className="surface-card enterprise-shell ui3d-card rounded-3xl p-6">
       <div className="flex items-start gap-4">
         <div className="pulse-ring inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-linear-to-r from-cyan-300 to-blue-500 text-sm font-extrabold text-slate-950">
           {step}
@@ -137,7 +137,7 @@ function LessonPreviewCard({ lesson, levelTitle }) {
   return (
     <Link
       href={`/bai-hoc/${lesson.slug}`}
-      className="surface-card enterprise-shell group relative overflow-hidden rounded-3xl p-5 transition duration-300 hover:-translate-y-1 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-cyan-300/30"
+      className="surface-card enterprise-shell ui3d-card group relative overflow-hidden rounded-3xl p-5 transition duration-300 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-cyan-300/30"
     >
       <div className="absolute inset-0 opacity-0 transition-opacity group-hover:opacity-100 bg-[radial-gradient(circle_at_top,rgba(59,130,246,0.10),transparent_55%)]" />
       <div className="relative">
@@ -160,7 +160,7 @@ function LessonPreviewCard({ lesson, levelTitle }) {
 
 function FaqItem({ q, a }) {
   return (
-    <details className="surface-card group rounded-3xl p-5 open:bg-white/10">
+    <details className="surface-card ui3d-card group rounded-3xl p-5 open:bg-white/10">
       <summary className="cursor-pointer list-none text-sm font-semibold text-white outline-none">
         <div className="flex items-center justify-between gap-3">
           <span>{q}</span>
@@ -176,7 +176,7 @@ function FaqItem({ q, a }) {
 
 function Stat({ label, value }) {
   return (
-    <div className="surface-card rounded-2xl p-4">
+    <div className="surface-card ui3d-card rounded-2xl p-4">
       <div className="text-xs font-semibold text-slate-300">{label}</div>
       <div className="mt-2 text-2xl font-semibold tracking-tight text-white">
         {value}
@@ -189,7 +189,7 @@ function MotivationStrip({ title, message, chips }) {
   const safeChips = Array.isArray(chips) ? chips.filter(Boolean).slice(0, 3) : [];
 
   return (
-    <section className="surface-card enterprise-shell mt-6 rounded-3xl p-5 sm:p-6">
+    <section className="surface-card enterprise-shell ui3d-card mt-6 rounded-3xl p-5 sm:p-6">
       <h2 className="text-lg font-semibold text-white">{title}</h2>
       <p className="mt-2 text-sm leading-6 text-slate-300">{message}</p>
       {safeChips.length ? (
@@ -212,7 +212,7 @@ function LevelPreview({ level }) {
   const lessons = getLessonsByLevel(level.id);
 
   return (
-    <div className="surface-card enterprise-shell relative overflow-hidden rounded-3xl p-6 transition hover:bg-white/10">
+    <div className="surface-card enterprise-shell ui3d-card relative overflow-hidden rounded-3xl p-6 transition hover:bg-white/10">
       <div className="absolute inset-0 opacity-0 transition-opacity hover:opacity-100 bg-[radial-gradient(circle_at_top,rgba(59,130,246,0.10),transparent_55%)]" />
       <div className="relative">
         <div className="flex items-center justify-between gap-3">
@@ -246,7 +246,7 @@ function BeltPreview({ belt }) {
     <Link
       href="/hoc-tap"
       className={
-        "group enterprise-shell relative overflow-hidden rounded-3xl border p-6 transition duration-300 hover:-translate-y-1 focus:outline-none focus:ring-2 " +
+        "group enterprise-shell ui3d-card relative overflow-hidden rounded-3xl border p-6 transition duration-300 focus:outline-none focus:ring-2 " +
         (isHighest
           ? "border-amber-300/25 bg-slate-950/30 backdrop-blur-xl shadow-(--shadow-card) hover:bg-slate-950/20 focus:ring-amber-300/30"
           : "surface-card hover:bg-white/10 focus:ring-cyan-300/30")
@@ -294,7 +294,7 @@ function NewsCard({ item }) {
   return (
     <Link
       href={item.href}
-      className="surface-card enterprise-shell group relative overflow-hidden rounded-3xl p-5 transition duration-300 hover:-translate-y-1 hover:border-amber-300/20 focus:outline-none focus:ring-2 focus:ring-amber-300/30"
+      className="surface-card enterprise-shell ui3d-card group relative overflow-hidden rounded-3xl p-5 transition duration-300 hover:border-amber-300/20 focus:outline-none focus:ring-2 focus:ring-amber-300/30"
     >
       <div className="absolute inset-0 opacity-0 transition-opacity group-hover:opacity-100 bg-[radial-gradient(circle_at_top,rgba(250,204,21,0.10),transparent_55%)]" />
       <div className="relative">
@@ -315,7 +315,7 @@ function NewsCard({ item }) {
 function MobileQuickActions({ startLabel, scheduleLabel }) {
   return (
     <div className="mobile-quick-actions sm:hidden">
-      <div className="surface-card-strong enterprise-shell grid grid-cols-2 gap-2 rounded-2xl p-2">
+      <div className="surface-card-strong enterprise-shell ui3d-card grid grid-cols-2 gap-2 rounded-2xl p-2">
         <Link
           href="/lo-trinh"
           className="cta-primary inline-flex h-10 items-center justify-center rounded-xl px-3 text-xs font-semibold"
@@ -396,13 +396,13 @@ function HomeVi() {
   );
 
   return (
-    <div className="reveal-sections mobile-safe-bottom mx-auto w-full max-w-6xl px-4 py-8 sm:py-16">
+    <div className="ui3d-stage mobile-safe-bottom mx-auto w-full max-w-6xl px-4 py-8 sm:py-16">
       <RouteWarmup />
       <JsonLd data={buildHomeJsonLd("vi")} />
-      <section className="surface-card-strong enterprise-shell hero-noise relative overflow-hidden rounded-[2.25rem] p-7 sm:p-12">
+      <section className="surface-card-strong enterprise-shell ui3d-card hero-noise relative overflow-hidden rounded-[2.25rem] p-7 sm:p-12">
         <div className="absolute inset-0 opacity-90 bg-[radial-gradient(circle_at_top,rgba(34,211,238,0.16),transparent_58%)]" />
-        <div className="absolute -right-24 -top-20 h-64 w-64 rounded-full bg-blue-500/20 blur-3xl" />
-        <div className="absolute -left-20 -bottom-24 h-64 w-64 rounded-full bg-amber-300/10 blur-3xl" />
+        <div className="absolute -right-24 -top-20 h-64 w-64 rounded-full bg-blue-500/20 blur-3xl float-fast" />
+        <div className="absolute -left-20 -bottom-24 h-64 w-64 rounded-full bg-amber-300/10 blur-3xl float-slower" />
         <div className="relative">
           <div className="accent-line" />
           <p className="inline-flex items-center gap-2 rounded-full border border-cyan-300/25 bg-cyan-300/10 px-3 py-1 text-xs font-semibold text-cyan-100">
@@ -714,7 +714,7 @@ function HomeVi() {
           ].map((item) => (
             <div
               key={item.w}
-              className="rounded-3xl border border-white/10 bg-white/5 p-6"
+              className="rounded-3xl border border-white/10 bg-white/5 p-6 ui3d-card"
             >
               <div className="flex items-center justify-between gap-2">
                 <Pill>{item.w}</Pill>
@@ -730,7 +730,7 @@ function HomeVi() {
           ))}
         </div>
 
-        <div className="mt-4 rounded-3xl border border-white/10 bg-white/5 p-5">
+        <div className="mt-4 rounded-3xl border border-white/10 bg-white/5 p-5 ui3d-card">
           <p className="text-sm leading-6 text-slate-300">
             Mẹo: Khi bạn cảm thấy “động tác đã sạch” (đúng và kiểm soát được),
             hãy tăng <strong>một</strong> yếu tố: thời lượng <em>hoặc</em> số
@@ -773,7 +773,7 @@ function HomeVi() {
         </div>
 
         <div className="mt-4 grid gap-3 lg:grid-cols-2">
-          <div className="rounded-3xl border border-white/10 bg-white/5 p-6 sm:p-8">
+          <div className="rounded-3xl border border-white/10 bg-white/5 p-6 sm:p-8 ui3d-card">
             <h3 className="text-base font-semibold text-white">Checklist trước buổi tập</h3>
             <ul className="mt-3 grid gap-2 text-sm leading-6 text-slate-300">
               <li className="flex gap-2">
@@ -795,7 +795,7 @@ function HomeVi() {
             </ul>
           </div>
 
-          <div className="rounded-3xl border border-white/10 bg-white/5 p-6 sm:p-8">
+          <div className="rounded-3xl border border-white/10 bg-white/5 p-6 sm:p-8 ui3d-card">
             <h3 className="text-base font-semibold text-white">Dụng cụ gợi ý</h3>
             <ul className="mt-3 grid gap-2 text-sm leading-6 text-slate-300">
               <li className="flex gap-2">
@@ -863,7 +863,7 @@ function HomeVi() {
       </section>
 
       <section className="mt-12">
-        <div className="surface-card-strong enterprise-shell relative overflow-hidden rounded-[2.25rem] p-7 sm:p-12">
+        <div className="surface-card-strong enterprise-shell ui3d-card relative overflow-hidden rounded-[2.25rem] p-7 sm:p-12">
           <div className="absolute inset-0 opacity-80 bg-[radial-gradient(circle_at_top,rgba(34,211,238,0.12),transparent_55%)]" />
           <div className="relative">
             <h2 className="text-2xl font-semibold tracking-tight text-white sm:text-3xl">
@@ -1005,13 +1005,13 @@ function getGlobalHomeCopy(locale) {
 
 function HomeGlobal({ copy, locale }) {
   return (
-    <div className="reveal-sections mobile-safe-bottom mx-auto w-full max-w-6xl px-4 py-8 sm:py-16">
+    <div className="ui3d-stage mobile-safe-bottom mx-auto w-full max-w-6xl px-4 py-8 sm:py-16">
       <RouteWarmup />
       <JsonLd data={buildHomeJsonLd(locale)} />
-      <section className="surface-card-strong enterprise-shell hero-noise relative overflow-hidden rounded-[2.25rem] p-7 sm:p-12">
+      <section className="surface-card-strong enterprise-shell ui3d-card hero-noise relative overflow-hidden rounded-[2.25rem] p-7 sm:p-12">
         <div className="absolute inset-0 opacity-90 bg-[radial-gradient(circle_at_top,rgba(34,211,238,0.16),transparent_58%)]" />
-        <div className="absolute -right-24 -top-20 h-64 w-64 rounded-full bg-blue-500/20 blur-3xl" />
-        <div className="absolute -left-20 -bottom-24 h-64 w-64 rounded-full bg-amber-300/10 blur-3xl" />
+        <div className="absolute -right-24 -top-20 h-64 w-64 rounded-full bg-blue-500/20 blur-3xl float-fast" />
+        <div className="absolute -left-20 -bottom-24 h-64 w-64 rounded-full bg-amber-300/10 blur-3xl float-slower" />
         <div className="relative">
           <div className="accent-line" />
           <p className="inline-flex items-center gap-2 rounded-full border border-cyan-300/25 bg-cyan-300/10 px-3 py-1 text-xs font-semibold text-cyan-100">
@@ -1086,7 +1086,7 @@ function HomeGlobal({ copy, locale }) {
       />
 
       <section className="mt-12">
-        <div className="surface-card-strong enterprise-shell relative overflow-hidden rounded-[2.25rem] p-7 sm:p-12">
+        <div className="surface-card-strong enterprise-shell ui3d-card relative overflow-hidden rounded-[2.25rem] p-7 sm:p-12">
           <div className="absolute inset-0 opacity-80 bg-[radial-gradient(circle_at_top,rgba(34,211,238,0.12),transparent_55%)]" />
           <div className="relative">
             <h2 className="text-2xl font-semibold tracking-tight text-white sm:text-3xl">

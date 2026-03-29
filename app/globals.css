@@ -303,6 +303,60 @@ h4 {
   box-shadow: var(--shadow-card-strong);
 }
 
+.ui3d-stage {
+  perspective: 1200px;
+}
+
+.ui3d-card {
+  position: relative;
+  transform-style: preserve-3d;
+  transition:
+    transform 360ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 360ms cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 320ms ease;
+  will-change: transform;
+}
+
+.ui3d-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  opacity: 0;
+  transition: opacity 320ms ease;
+  background: linear-gradient(
+    145deg,
+    rgba(255, 255, 255, 0.14),
+    rgba(255, 255, 255, 0.02) 45%,
+    rgba(56, 189, 248, 0.12)
+  );
+}
+
+.ui3d-card:hover {
+  transform: translate3d(0, -8px, 0) rotateX(5deg) rotateY(-4deg);
+  box-shadow:
+    0 20px 44px rgba(2, 6, 23, 0.48),
+    0 0 0 1px rgba(56, 189, 248, 0.18),
+    0 0 28px rgba(59, 130, 246, 0.18);
+}
+
+.ui3d-card:hover::after {
+  opacity: 1;
+}
+
+html[data-theme="light"] .ui3d-card:hover {
+  box-shadow:
+    0 18px 40px rgba(15, 23, 42, 0.2),
+    0 0 0 1px rgba(59, 130, 246, 0.18);
+}
+
+@media (max-width: 960px) {
+  .ui3d-card:hover {
+    transform: translate3d(0, -3px, 0);
+  }
+}
+
 html[data-performance="lite"] .perf-heavy {
   display: none !important;
 }
@@ -342,6 +396,16 @@ html[data-performance="lite"] .reveal-pending.is-visible {
   transform: none;
   filter: none;
   transition: none;
+}
+
+html[data-performance="lite"] .ui3d-card,
+html[data-performance="lite"] .ui3d-card:hover {
+  transform: none !important;
+  transition: none !important;
+}
+
+html[data-performance="lite"] .ui3d-card::after {
+  display: none;
 }
 
 .enterprise-shell {
@@ -448,20 +512,16 @@ html[data-theme="light"] .headline-gradient {
 }
 
 .reveal-pending {
-  opacity: 0;
-  transform: translate3d(0, 18px, 0);
-  filter: blur(6px);
-  transition:
-    opacity 560ms cubic-bezier(0.22, 1, 0.36, 1),
-    transform 560ms cubic-bezier(0.22, 1, 0.36, 1),
-    filter 560ms cubic-bezier(0.22, 1, 0.36, 1);
-  transition-delay: var(--reveal-delay, 0ms);
+  opacity: 1;
+  transform: none;
+  filter: none;
+  transition: none;
 }
 
 .reveal-pending.is-visible {
   opacity: 1;
-  transform: translate3d(0, 0, 0);
-  filter: blur(0);
+  transform: none;
+  filter: none;
 }
 
 .mobile-safe-bottom {

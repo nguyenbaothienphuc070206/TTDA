@@ -4,7 +4,6 @@ import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 
 const PwaRegister = dynamic(() => import("@/components/PwaRegister"), { ssr: false });
-const ViewportReveal = dynamic(() => import("@/components/ViewportReveal"), { ssr: false });
 const SifuReminderAgent = dynamic(() => import("@/components/SifuReminderAgent"), { ssr: false });
 const AiCoachBubble = dynamic(() => import("@/components/AiCoachBubble"), { ssr: false });
 
@@ -51,7 +50,6 @@ export default function ClientEnhancements() {
   return (
     <>
       <PwaRegister />
-      {enhancedReady && !liteMode ? <ViewportReveal /> : null}
       {enhancedReady && !liteMode ? <SifuReminderAgent /> : null}
       {enhancedReady && !liteMode ? <AiCoachBubble /> : null}
     </>
