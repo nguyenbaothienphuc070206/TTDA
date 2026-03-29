@@ -97,7 +97,7 @@ export default function ThemeToggle() {
       {open ? (
         <div
           role="menu"
-          className="absolute right-0 mt-2 w-44 overflow-hidden rounded-2xl border border-white/10 bg-[color:var(--header-bg)] shadow-[var(--shadow-card)] backdrop-blur"
+          className="absolute right-0 z-60 mt-2 w-44 overflow-hidden rounded-2xl border border-white/10 bg-[color:var(--header-bg)] shadow-[var(--shadow-card)] backdrop-blur"
         >
           {options.map((opt) => {
             const active = theme === opt.id;

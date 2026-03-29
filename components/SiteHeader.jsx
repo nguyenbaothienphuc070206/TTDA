@@ -217,7 +217,7 @@ export default function SiteHeader() {
     <header className="sticky top-0 z-50 border-b border-white/10 bg-(--header-bg) backdrop-blur-xl">
       <div className="accent-line" />
       <div className="mx-auto w-full max-w-6xl px-4 py-2.5">
-        <div className="surface-card-strong enterprise-shell rounded-[1.75rem] px-3 py-2.5 sm:px-4">
+        <div className="surface-card-strong rounded-[1.75rem] px-3 py-2.5 sm:px-4">
           <div className="flex flex-wrap items-center gap-3">
           <Link
             href="/"
@@ -242,7 +242,7 @@ export default function SiteHeader() {
           </div>
           </div>
 
-          <nav className="mt-2 w-full overflow-x-auto pb-1 ai-scrollbar">
+          <nav className="relative mt-2 w-full overflow-x-auto overflow-y-visible pb-1 ai-scrollbar">
             <div className="flex min-w-max items-center gap-1.5 pr-1">
               <LearningNavMenu label={t("learning")} items={learningItems} isActive={isActive} />
               {navItems.map((item) => {
