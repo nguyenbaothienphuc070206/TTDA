@@ -309,12 +309,8 @@ h4 {
 
 .ui3d-card {
   position: relative;
-  transform-style: preserve-3d;
-  transition:
-    transform 360ms cubic-bezier(0.22, 1, 0.36, 1),
-    box-shadow 360ms cubic-bezier(0.22, 1, 0.36, 1),
-    border-color 320ms ease;
-  will-change: transform;
+  transform-style: flat;
+  transition: box-shadow 220ms ease, border-color 220ms ease;
 }
 
 .ui3d-card::after {
@@ -334,11 +330,10 @@ h4 {
 }
 
 .ui3d-card:hover {
-  transform: translate3d(0, -8px, 0) rotateX(5deg) rotateY(-4deg);
+  transform: none;
   box-shadow:
-    0 20px 44px rgba(2, 6, 23, 0.48),
-    0 0 0 1px rgba(56, 189, 248, 0.18),
-    0 0 28px rgba(59, 130, 246, 0.18);
+    0 14px 28px rgba(2, 6, 23, 0.32),
+    0 0 0 1px rgba(56, 189, 248, 0.12);
 }
 
 .ui3d-card:hover::after {
@@ -397,9 +392,9 @@ html[data-theme="light"] .ui3d-card:hover {
     rgba(16, 185, 129, 0.07),
     rgba(34, 211, 238, 0.06)
   );
-  background-size: 250% 250%;
-  filter: blur(16px);
-  animation: gradientFlow 11s ease-in-out infinite;
+  background-size: 100% 100%;
+  filter: none;
+  animation: none;
 }
 
 .motion-gradient-surface > :not(.absolute) {
@@ -409,16 +404,16 @@ html[data-theme="light"] .ui3d-card:hover {
 
 .motion-gradient-title {
   background-size: 230% 230%;
-  animation: gradientFlow 7s ease-in-out infinite;
+  animation: none;
 }
 
 .motion-gradient-btn {
   background-size: 180% 180%;
-  animation: gradientFlow 6s ease-in-out infinite;
+  animation: none;
 }
 
 .motion-gradient-orb {
-  animation: auraDrift 9s ease-in-out infinite;
+  animation: none;
 }
 
 @media (max-width: 960px) {
@@ -702,15 +697,15 @@ html[data-theme="light"] .headline-gradient {
 }
 
 .float-fast {
-  animation: floatY 9s ease-in-out infinite;
+  animation: none;
 }
 
 .float-slow {
-  animation: floatY 12s ease-in-out infinite;
+  animation: none;
 }
 
 .float-slower {
-  animation: floatY 16s ease-in-out infinite;
+  animation: none;
 }
 
 .progress-bar {
@@ -730,7 +725,7 @@ html[data-theme="light"] .headline-gradient {
 }
 
 .pulse-ring {
-  animation: pulseRing 2.1s ease-out infinite;
+  animation: none;
 }
 
 html[data-theme="light"] .skeleton-shimmer {
