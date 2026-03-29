@@ -16,20 +16,20 @@
   --accent-blue: rgb(59 130 246);
   --accent-gold: rgb(250 204 21);
   --accent-emerald: rgb(16 185 129);
-  --surface-1: rgba(255, 255, 255, 0.05);
-  --surface-2: rgba(255, 255, 255, 0.08);
-  --surface-border: rgba(255, 255, 255, 0.1);
+  --surface-1: rgba(255, 255, 255, 0.06);
+  --surface-2: rgba(255, 255, 255, 0.12);
+  --surface-border: rgba(255, 255, 255, 0.14);
   --ring-premium: rgba(56, 189, 248, 0.55);
 
   /* Subtle depth on dark surfaces */
   --shadow-card:
-    0 14px 40px rgba(2, 6, 23, 0.48),
-    0 0 0 1px rgba(96, 165, 250, 0.08),
-    0 0 40px rgba(34, 211, 238, 0.08);
+    0 10px 28px rgba(2, 6, 23, 0.44),
+    0 0 0 1px rgba(96, 165, 250, 0.12),
+    0 0 26px rgba(34, 211, 238, 0.06);
   --shadow-card-strong:
-    0 24px 56px rgba(2, 6, 23, 0.56),
-    0 0 0 1px rgba(96, 165, 250, 0.16),
-    0 0 52px rgba(59, 130, 246, 0.14);
+    0 18px 46px rgba(2, 6, 23, 0.52),
+    0 0 0 1px rgba(96, 165, 250, 0.2),
+    0 0 42px rgba(59, 130, 246, 0.12);
 }
 
 html[data-theme="light"] {
@@ -291,16 +291,27 @@ h4 {
 
 .surface-card {
   border: 1px solid var(--surface-border);
-  background: var(--surface-1);
+  background:
+    linear-gradient(155deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03) 42%, rgba(125, 211, 252, 0.06)),
+    var(--surface-1);
   backdrop-filter: blur(12px);
   box-shadow: var(--shadow-card);
+  transition: border-color 220ms ease, box-shadow 220ms ease, background 220ms ease;
 }
 
 .surface-card-strong {
   border: 1px solid var(--surface-border);
-  background: var(--surface-1);
+  background:
+    linear-gradient(160deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.04) 45%, rgba(34, 211, 238, 0.06)),
+    var(--surface-1);
   backdrop-filter: blur(14px);
   box-shadow: var(--shadow-card-strong);
+  transition: border-color 220ms ease, box-shadow 220ms ease, background 220ms ease;
+}
+
+.surface-card:hover,
+.surface-card-strong:hover {
+  border-color: rgba(125, 211, 252, 0.32);
 }
 
 .ui3d-stage {
@@ -547,7 +558,7 @@ html[data-performance="lite"] .motion-gradient-orb {
 }
 
 .headline-gradient {
-  background: linear-gradient(108deg, #dff7ff 0%, #9ee8ff 36%, #8ec5ff 58%, #ffe8a8 100%);
+  background: linear-gradient(108deg, #f3fbff 0%, #a7edff 34%, #77b6ff 58%, #ffd980 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -564,28 +575,32 @@ html[data-theme="light"] .headline-gradient {
   background: linear-gradient(112deg, rgba(103, 232, 249, 0.92), rgba(96, 165, 250, 0.96), rgba(16, 185, 129, 0.9));
   color: rgb(2 6 23);
   box-shadow:
-    0 12px 32px rgba(14, 116, 144, 0.34),
+    0 10px 26px rgba(14, 116, 144, 0.3),
     inset 0 1px 0 rgba(255, 255, 255, 0.38);
+  transition: transform 180ms ease, filter 180ms ease, box-shadow 180ms ease;
 }
 
 .cta-primary:hover {
-  filter: brightness(1.05);
-  transform: translateY(-1px);
+  filter: brightness(1.03);
+  transform: translateY(-1px) scale(1.01);
 }
 
 .cta-secondary {
   border: 1px solid var(--surface-border);
   background: var(--surface-1);
   color: inherit;
+  transition: transform 180ms ease, background 180ms ease, border-color 180ms ease;
 }
 
 .cta-secondary:hover {
   background: var(--surface-2);
+  border-color: rgba(125, 211, 252, 0.32);
+  transform: translateY(-1px);
 }
 
 .hero-title-enterprise {
-  font-size: clamp(1.9rem, 6vw, 3.35rem);
-  line-height: 1.06;
+  font-size: clamp(2rem, 6vw, 3.45rem);
+  line-height: 1.02;
   letter-spacing: -0.02em;
 }
 

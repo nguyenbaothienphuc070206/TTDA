@@ -17,10 +17,10 @@ function NavItem({ href, active, children }) {
       href={href}
       aria-current={active ? "page" : undefined}
       className={
-        "rounded-full px-3 py-1.5 text-sm font-medium transition focus:outline-none focus:ring-2 focus:ring-blue-400/40 " +
+        "inline-flex h-10 items-center rounded-full px-3.5 text-sm font-medium transition focus:outline-none focus:ring-2 focus:ring-blue-400/40 " +
         (active
-          ? "bg-linear-to-r from-cyan-300/30 to-blue-500/30 text-white shadow-[inset_0_0_0_1px_rgba(125,211,252,0.4),0_10px_24px_rgba(14,116,144,0.24)]"
-          : "text-slate-200 hover:-translate-y-0.5 hover:bg-white/10 hover:text-white")
+          ? "bg-linear-to-r from-cyan-300/30 to-blue-500/30 text-white shadow-[inset_0_0_0_1px_rgba(125,211,252,0.4),0_10px_24px_rgba(14,116,144,0.2)]"
+          : "text-slate-200 hover:bg-white/10 hover:text-white")
       }
     >
       {children}
@@ -38,10 +38,10 @@ function ProgressNavItem({ href, active, label, doneCount, remainingCount, total
       href={href}
       aria-current={active ? "page" : undefined}
       className={
-        "inline-flex min-w-40 flex-col rounded-2xl px-3 py-1.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-blue-400/40 " +
+        "inline-flex min-w-44 flex-col rounded-2xl px-3 py-1.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-blue-400/40 " +
         (active
           ? "bg-linear-to-r from-cyan-300/30 to-blue-500/30 text-white shadow-[inset_0_0_0_1px_rgba(125,211,252,0.4),0_10px_24px_rgba(14,116,144,0.24)]"
-          : "text-slate-200 hover:-translate-y-0.5 hover:bg-white/10 hover:text-white")
+          : "text-slate-200 hover:bg-white/10 hover:text-white")
       }
     >
       <span className="flex items-center justify-between gap-2">
@@ -216,8 +216,9 @@ export default function SiteHeader() {
   return (
     <header className="sticky top-0 z-50 border-b border-white/10 bg-(--header-bg) backdrop-blur-xl">
       <div className="accent-line" />
-      <div className="mx-auto w-full max-w-6xl px-4 py-3">
-        <div className="surface-card flex flex-wrap items-center gap-3 rounded-3xl px-3 py-2">
+      <div className="mx-auto w-full max-w-6xl px-4 py-2.5">
+        <div className="surface-card-strong enterprise-shell rounded-[1.75rem] px-3 py-2.5 sm:px-4">
+          <div className="flex flex-wrap items-center gap-3">
           <Link
             href="/"
             className="group inline-flex shrink-0 items-center gap-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400/40"
@@ -239,9 +240,10 @@ export default function SiteHeader() {
             <LanguageToggle />
             <ThemeToggle />
           </div>
+          </div>
 
-          <nav className="w-full">
-            <div className="flex flex-wrap items-center gap-1">
+          <nav className="mt-2 w-full overflow-x-auto pb-1 ai-scrollbar">
+            <div className="flex min-w-max items-center gap-1.5 pr-1">
               <LearningNavMenu label={t("learning")} items={learningItems} isActive={isActive} />
               {navItems.map((item) => {
                 const isCommunity = item.href === "/cong-dong";

@@ -38,7 +38,7 @@ export default async function VideosPage() {
 
   return (
     <div className="mx-auto w-full max-w-6xl px-4 py-10">
-      <header className="mb-6 rounded-3xl border border-white/10 bg-white/5 p-6 sm:p-8 shadow-[var(--shadow-card)] fade-in-up">
+      <header className="mb-6 surface-card-strong enterprise-shell rounded-3xl p-6 sm:p-8 fade-in-up">
         <h1 className="text-2xl font-semibold tracking-tight text-white sm:text-3xl">
           {copy.title}
         </h1>
