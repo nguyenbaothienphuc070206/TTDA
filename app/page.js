@@ -399,17 +399,17 @@ function HomeVi() {
     <div className="ui3d-stage mobile-safe-bottom mx-auto w-full max-w-6xl px-4 py-8 sm:py-16">
       <RouteWarmup />
       <JsonLd data={buildHomeJsonLd("vi")} />
-      <section className="surface-card-strong enterprise-shell ui3d-card hero-noise relative overflow-hidden rounded-[2.25rem] p-7 sm:p-12">
+      <section className="surface-card-strong enterprise-shell motion-gradient-surface ui3d-card hero-noise relative overflow-hidden rounded-[2.25rem] p-7 sm:p-12">
         <div className="absolute inset-0 opacity-90 bg-[radial-gradient(circle_at_top,rgba(34,211,238,0.16),transparent_58%)]" />
-        <div className="absolute -right-24 -top-20 h-64 w-64 rounded-full bg-blue-500/20 blur-3xl float-fast" />
-        <div className="absolute -left-20 -bottom-24 h-64 w-64 rounded-full bg-amber-300/10 blur-3xl float-slower" />
+        <div className="absolute -right-24 -top-20 h-64 w-64 rounded-full bg-blue-500/20 blur-3xl float-fast motion-gradient-orb" />
+        <div className="absolute -left-20 -bottom-24 h-64 w-64 rounded-full bg-amber-300/10 blur-3xl float-slower motion-gradient-orb" />
         <div className="relative">
           <div className="accent-line" />
           <p className="inline-flex items-center gap-2 rounded-full border border-cyan-300/25 bg-cyan-300/10 px-3 py-1 text-xs font-semibold text-cyan-100">
             Lộ trình rõ ràng • Từng bước dễ tập • Lưu tiến độ
           </p>
 
-          <h1 className="headline-gradient hero-title-enterprise mt-5 max-w-4xl font-semibold">
+          <h1 className="headline-gradient motion-gradient-title hero-title-enterprise mt-5 max-w-4xl font-semibold">
             Học Vovinam theo lộ trình đầy đủ từ Lam đai tự vệ đến Hồng đai tứ
           </h1>
           <p className="hero-subtitle-enterprise mt-4 max-w-2xl text-slate-300">
@@ -420,13 +420,13 @@ function HomeVi() {
           <div className="mt-7 flex flex-col gap-3 sm:flex-row">
             <Link
               href="/lo-trinh"
-              className="cta-primary inline-flex h-12 items-center justify-center rounded-2xl px-5 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-cyan-300/50"
+              className="cta-primary motion-gradient-btn inline-flex h-12 items-center justify-center rounded-2xl px-5 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-cyan-300/50"
             >
               Bắt đầu học
             </Link>
             <Link
               href="/lich-tap"
-              className="cta-secondary inline-flex h-12 items-center justify-center rounded-2xl px-5 text-sm font-semibold text-white transition focus:outline-none focus:ring-2 focus:ring-cyan-300/30"
+              className="cta-secondary motion-gradient-btn inline-flex h-12 items-center justify-center rounded-2xl px-5 text-sm font-semibold text-white transition focus:outline-none focus:ring-2 focus:ring-cyan-300/30"
             >
               Tạo lịch tập 7 ngày
             </Link>
@@ -863,7 +863,7 @@ function HomeVi() {
       </section>
 
       <section className="mt-12">
-        <div className="surface-card-strong enterprise-shell ui3d-card relative overflow-hidden rounded-[2.25rem] p-7 sm:p-12">
+        <div className="surface-card-strong enterprise-shell motion-gradient-surface ui3d-card relative overflow-hidden rounded-[2.25rem] p-7 sm:p-12">
           <div className="absolute inset-0 opacity-80 bg-[radial-gradient(circle_at_top,rgba(34,211,238,0.12),transparent_55%)]" />
           <div className="relative">
             <h2 className="text-2xl font-semibold tracking-tight text-white sm:text-3xl">
@@ -877,13 +877,13 @@ function HomeVi() {
             <div className="mt-6 flex flex-col gap-3 sm:flex-row">
               <Link
                 href="/lo-trinh"
-                className="cta-primary inline-flex h-12 items-center justify-center rounded-2xl px-5 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-cyan-300/50"
+                className="cta-primary motion-gradient-btn inline-flex h-12 items-center justify-center rounded-2xl px-5 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-cyan-300/50"
               >
                 Vào lộ trình
               </Link>
               <Link
                 href="/lich-tap"
-                className="cta-secondary inline-flex h-12 items-center justify-center rounded-2xl px-5 text-sm font-semibold text-white transition focus:outline-none focus:ring-2 focus:ring-cyan-300/30"
+                className="cta-secondary motion-gradient-btn inline-flex h-12 items-center justify-center rounded-2xl px-5 text-sm font-semibold text-white transition focus:outline-none focus:ring-2 focus:ring-cyan-300/30"
               >
                 Tạo lịch tập
               </Link>
@@ -1008,17 +1008,17 @@ function HomeGlobal({ copy, locale }) {
     <div className="ui3d-stage mobile-safe-bottom mx-auto w-full max-w-6xl px-4 py-8 sm:py-16">
       <RouteWarmup />
       <JsonLd data={buildHomeJsonLd(locale)} />
-      <section className="surface-card-strong enterprise-shell ui3d-card hero-noise relative overflow-hidden rounded-[2.25rem] p-7 sm:p-12">
+      <section className="surface-card-strong enterprise-shell motion-gradient-surface ui3d-card hero-noise relative overflow-hidden rounded-[2.25rem] p-7 sm:p-12">
         <div className="absolute inset-0 opacity-90 bg-[radial-gradient(circle_at_top,rgba(34,211,238,0.16),transparent_58%)]" />
-        <div className="absolute -right-24 -top-20 h-64 w-64 rounded-full bg-blue-500/20 blur-3xl float-fast" />
-        <div className="absolute -left-20 -bottom-24 h-64 w-64 rounded-full bg-amber-300/10 blur-3xl float-slower" />
+        <div className="absolute -right-24 -top-20 h-64 w-64 rounded-full bg-blue-500/20 blur-3xl float-fast motion-gradient-orb" />
+        <div className="absolute -left-20 -bottom-24 h-64 w-64 rounded-full bg-amber-300/10 blur-3xl float-slower motion-gradient-orb" />
         <div className="relative">
           <div className="accent-line" />
           <p className="inline-flex items-center gap-2 rounded-full border border-cyan-300/25 bg-cyan-300/10 px-3 py-1 text-xs font-semibold text-cyan-100">
             {copy.heroPill}
           </p>
 
-          <h1 className="headline-gradient hero-title-enterprise mt-5 max-w-4xl font-semibold">
+          <h1 className="headline-gradient motion-gradient-title hero-title-enterprise mt-5 max-w-4xl font-semibold">
             {copy.heroTitle}
           </h1>
           <p className="hero-subtitle-enterprise mt-4 max-w-2xl text-slate-300">
@@ -1028,13 +1028,13 @@ function HomeGlobal({ copy, locale }) {
           <div className="mt-7 flex flex-col gap-3 sm:flex-row">
             <Link
               href="/lo-trinh"
-              className="cta-primary inline-flex h-12 items-center justify-center rounded-2xl px-5 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-cyan-300/50"
+              className="cta-primary motion-gradient-btn inline-flex h-12 items-center justify-center rounded-2xl px-5 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-cyan-300/50"
             >
               {copy.startLearning}
             </Link>
             <Link
               href="/lich-tap"
-              className="cta-secondary inline-flex h-12 items-center justify-center rounded-2xl px-5 text-sm font-semibold text-white transition focus:outline-none focus:ring-2 focus:ring-cyan-300/30"
+              className="cta-secondary motion-gradient-btn inline-flex h-12 items-center justify-center rounded-2xl px-5 text-sm font-semibold text-white transition focus:outline-none focus:ring-2 focus:ring-cyan-300/30"
             >
               {copy.createSchedule}
             </Link>
@@ -1086,7 +1086,7 @@ function HomeGlobal({ copy, locale }) {
       />
 
       <section className="mt-12">
-        <div className="surface-card-strong enterprise-shell ui3d-card relative overflow-hidden rounded-[2.25rem] p-7 sm:p-12">
+        <div className="surface-card-strong enterprise-shell motion-gradient-surface ui3d-card relative overflow-hidden rounded-[2.25rem] p-7 sm:p-12">
           <div className="absolute inset-0 opacity-80 bg-[radial-gradient(circle_at_top,rgba(34,211,238,0.12),transparent_55%)]" />
           <div className="relative">
             <h2 className="text-2xl font-semibold tracking-tight text-white sm:text-3xl">
@@ -1099,13 +1099,13 @@ function HomeGlobal({ copy, locale }) {
             <div className="mt-6 flex flex-col gap-3 sm:flex-row">
               <Link
                 href="/lo-trinh"
-                className="cta-primary inline-flex h-12 items-center justify-center rounded-2xl px-5 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-cyan-300/50"
+                className="cta-primary motion-gradient-btn inline-flex h-12 items-center justify-center rounded-2xl px-5 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-cyan-300/50"
               >
                 {copy.startLearning}
               </Link>
               <Link
                 href="/lich-tap"
-                className="cta-secondary inline-flex h-12 items-center justify-center rounded-2xl px-5 text-sm font-semibold text-white transition focus:outline-none focus:ring-2 focus:ring-cyan-300/30"
+                className="cta-secondary motion-gradient-btn inline-flex h-12 items-center justify-center rounded-2xl px-5 text-sm font-semibold text-white transition focus:outline-none focus:ring-2 focus:ring-cyan-300/30"
               >
                 {copy.createSchedule}
               </Link>
