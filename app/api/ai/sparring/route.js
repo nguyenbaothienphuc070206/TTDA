@@ -1,7 +1,6 @@
-﻿import { NextResponse } from "next/server";
-
-import { getBeltById } from "@/data/belts";
+﻿import { getBeltById } from "@/data/belts";
 import { checkRateLimit, isBodyTooLarge } from "@/lib/apiGuards";
+import { createCompatResponder } from "@/lib/api/compatResponse";
 import { chatCompletion, hasOpenAi } from "@/lib/ai/openai";
 
 function asText(value) {
@@ -160,8 +159,9 @@ async function buildOpenAiOptions({ name, beltTitle, scenario, imageDataUrl }) {
 }
 
 export async function POST(request) {
+  const api = createCompatResponder(request);
   if (isBodyTooLarge(request, 260_000)) {
-    return NextResponse.json({ error: "Body quá lớn." }, { status: 413 });
+    return api.fail({ message: "Body quá lớn.", code: "BODY_TOO_LARGE", status: 413 });
   }
 
   const rl = checkRateLimit({
@@ -172,20 +172,19 @@ export async function POST(request) {
   });
 
   if (!rl.ok) {
-    const res = NextResponse.json(
-      { error: "Bạn thao tác quá nhanh. Vui lòng thử lại sau." },
-      { status: 429 }
-    );
-    res.headers.set("Cache-Control", "no-store");
-    res.headers.set("Retry-After", String(rl.retryAfterSec));
-    return res;
+    return api.fail({
+      message: "Bạn thao tác quá nhanh. Vui lòng thử lại sau.",
+      code: "RATE_LIMITED",
+      status: 429,
+      retryAfterSec: rl.retryAfterSec,
+    });
   }
 
   let body;
   try {
     body = await request.json();
   } catch {
-    return NextResponse.json({ error: "Body JSON không hợp lệ." }, { status: 400 });
+    return api.fail({ message: "Body JSON không hợp lệ.", code: "INVALID_JSON", status: 400 });
   }
 
   const { scenario, name, beltId, imageDataUrl } = normalizeRequest(body);
@@ -193,10 +192,11 @@ export async function POST(request) {
 
   const hasAnyInput = Boolean(scenario || imageDataUrl);
   if (!hasAnyInput) {
-    return NextResponse.json(
-      { error: "Bạn hãy nhập tình huống (hoặc chọn 1 ảnh) để AI gợi ý." },
-      { status: 400 }
-    );
+    return api.fail({
+      message: "Bạn hãy nhập tình huống (hoặc chọn 1 ảnh) để AI gợi ý.",
+      code: "VALIDATION_ERROR",
+      status: 400,
+    });
   }
 
   try {
@@ -208,17 +208,13 @@ export async function POST(request) {
         imageDataUrl,
       });
 
-      const res = NextResponse.json({ options, mode: "openai" });
-      res.headers.set("Cache-Control", "no-store");
-      return res;
+      return api.ok({ options, mode: "openai" });
     }
   } catch {
     // fall through to heuristic
   }
 
   const options = buildHeuristicOptions({ beltTitle, scenario });
-  const res = NextResponse.json({ options, mode: "heuristic" });
-  res.headers.set("Cache-Control", "no-store");
-  return res;
+  return api.ok({ options, mode: "heuristic" });
 }
 

@@ -1,7 +1,6 @@
-﻿import { NextResponse } from "next/server";
-
-import { getBeltById } from "@/data/belts";
+﻿import { getBeltById } from "@/data/belts";
 import { checkRateLimit, isBodyTooLarge } from "@/lib/apiGuards";
+import { createCompatResponder } from "@/lib/api/compatResponse";
 import { chatCompletion, hasOpenAi } from "@/lib/ai/openai";
 
 function asText(value) {
@@ -127,8 +126,9 @@ async function buildOpenAiReply({ name, beltTitle, entry }) {
 }
 
 export async function POST(request) {
+  const api = createCompatResponder(request);
   if (isBodyTooLarge(request, 20_000)) {
-    return NextResponse.json({ error: "Body quá lớn." }, { status: 413 });
+    return api.fail({ message: "Body quá lớn.", code: "BODY_TOO_LARGE", status: 413 });
   }
 
   const rl = checkRateLimit({
@@ -139,20 +139,19 @@ export async function POST(request) {
   });
 
   if (!rl.ok) {
-    const res = NextResponse.json(
-      { error: "Bạn thao tác quá nhanh. Vui lòng thử lại sau." },
-      { status: 429 }
-    );
-    res.headers.set("Cache-Control", "no-store");
-    res.headers.set("Retry-After", String(rl.retryAfterSec));
-    return res;
+    return api.fail({
+      message: "Bạn thao tác quá nhanh. Vui lòng thử lại sau.",
+      code: "RATE_LIMITED",
+      status: 429,
+      retryAfterSec: rl.retryAfterSec,
+    });
   }
 
   let body;
   try {
     body = await request.json();
   } catch {
-    return NextResponse.json({ error: "Body JSON không hợp lệ." }, { status: 400 });
+    return api.fail({ message: "Body JSON không hợp lệ.", code: "INVALID_JSON", status: 400 });
   }
 
   const entry = normalizeDiaryEntry(body?.entry);
@@ -162,30 +161,24 @@ export async function POST(request) {
 
   const hasContent = Boolean(entry.title || entry.note);
   if (!hasContent) {
-    const res = NextResponse.json({
+    return api.ok({
       reply: buildHeuristicReply({ name, beltTitle, entry }),
       mode: "heuristic",
     });
-    res.headers.set("Cache-Control", "no-store");
-    return res;
   }
 
   try {
     if (hasOpenAi()) {
       const reply = await buildOpenAiReply({ name, beltTitle, entry });
-      const res = NextResponse.json({ reply, mode: "openai" });
-      res.headers.set("Cache-Control", "no-store");
-      return res;
+      return api.ok({ reply, mode: "openai" });
     }
   } catch {
     // fall through to heuristic
   }
 
-  const res = NextResponse.json({
+  return api.ok({
     reply: buildHeuristicReply({ name, beltTitle, entry }),
     mode: "heuristic",
   });
-  res.headers.set("Cache-Control", "no-store");
-  return res;
 }
 

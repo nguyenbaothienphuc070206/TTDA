@@ -1,11 +1,11 @@
-import { NextResponse } from "next/server";
-
 import { isSameOrigin } from "@/lib/apiGuards";
+import { createCompatResponder } from "@/lib/api/compatResponse";
 import { createSupabaseRouteHandlerClient } from "@/lib/supabase/routeHandlerClient";
 
 export async function POST(request) {
+  const api = createCompatResponder(request);
   if (!isSameOrigin(request)) {
-    return NextResponse.json({ error: "Origin không hợp lệ." }, { status: 403 });
+    return api.fail({ message: "Origin không hợp lệ.", code: "INVALID_ORIGIN", status: 403 });
   }
 
   try {
@@ -15,7 +15,5 @@ export async function POST(request) {
     // Even if signOut fails, still return ok to avoid trapping users.
   }
 
-  const res = NextResponse.json({ ok: true });
-  res.headers.set("Cache-Control", "no-store");
-  return res;
+  return api.ok({ ok: true });
 }

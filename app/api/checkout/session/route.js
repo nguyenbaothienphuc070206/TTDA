@@ -1,17 +1,18 @@
-import { NextResponse } from "next/server";
+import { createCompatResponder } from "@/lib/api/compatResponse";
 
 export async function GET(request) {
+  const api = createCompatResponder(request);
   const stripeSecret = process.env.STRIPE_SECRET_KEY;
 
   if (!stripeSecret) {
-    return NextResponse.json({ error: "Stripe chưa được cấu hình." }, { status: 400 });
+    return api.fail({ message: "Stripe chưa được cấu hình.", code: "NOT_CONFIGURED", status: 400 });
   }
 
   const url = new URL(request.url);
   const sessionId = String(url.searchParams.get("session_id") || "").trim();
 
   if (!sessionId) {
-    return NextResponse.json({ error: "Thiếu session_id." }, { status: 400 });
+    return api.fail({ message: "Thiếu session_id.", code: "VALIDATION_ERROR", status: 400 });
   }
 
   const stripeRes = await fetch(
@@ -32,7 +33,7 @@ export async function GET(request) {
         ? data.error.message
         : "Stripe trả về lỗi.";
 
-    return NextResponse.json({ error: message }, { status: 502 });
+    return api.fail({ message, code: "UPSTREAM_ERROR", status: 502 });
   }
 
   const metadata = data && typeof data.metadata === "object" ? data.metadata : {};
@@ -43,7 +44,7 @@ export async function GET(request) {
     items = [];
   }
 
-  return NextResponse.json({
+  return api.ok({
     id: data?.id || sessionId,
     payment_status: String(data?.payment_status || ""),
     amount_total: typeof data?.amount_total === "number" ? data.amount_total : null,

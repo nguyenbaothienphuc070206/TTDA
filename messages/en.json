@@ -14,7 +14,8 @@
     "progress": "Progress",
     "progressAria": "View learning progress",
     "brandTitle": "Vovinam",
-    "brandSubtitle": "14 belt levels"
+    "brandSubtitle": "14 belt levels",
+    "communityUnreadAria": "{count} unread community messages"
   },
   "theme": {
     "label": "Theme",
@@ -70,6 +71,63 @@
       "admin": "Admin/Coach",
       "privacy": "Privacy policy",
       "terms": "Terms"
+    }
+  },
+  "community": {
+    "list": {
+      "title": "Community",
+      "description": "Leaderboard by belt level. Expand each belt to view profiles and start chatting.",
+      "loadError": "Unable to load leaderboard data (Supabase query failed).",
+      "envError": "Supabase service key is missing (SUPABASE_SECRET_KEY), so community data is unavailable.",
+      "memberFallback": "Student",
+      "memberLabel": "Member",
+      "peopleSuffix": "members",
+      "emptyBelt": "No members in this belt group yet.",
+      "chatCta": "Chat",
+      "searchLabel": "Search member",
+      "searchPlaceholder": "Type a name...",
+      "sortLabel": "Sort",
+      "sortNameAsc": "Name A-Z",
+      "sortNameDesc": "Name Z-A",
+      "sortNewest": "Newest first",
+      "sortOldest": "Oldest first",
+      "applyFilters": "Apply",
+      "clearFilters": "Clear",
+      "retry": "Retry",
+      "resultSummary": "Matching members"
+    },
+    "chatPage": {
+      "backArrow": "← Back to Community"
+    },
+    "chat": {
+      "defaultName": "Student",
+      "title": "Chat",
+      "withUser": "Chatting with",
+      "refresh": "Refresh",
+      "loadOlder": "Load older messages",
+      "messageListAria": "Message list",
+      "emptyState": "No messages yet. Send a hello.",
+      "loading": "Loading conversation...",
+      "loadingMore": "Loading older messages...",
+      "sending": "Sending...",
+      "typing": "The other user is typing...",
+      "retry": "Retry",
+      "placeholder": "Type a message... (Enter to send, Shift+Enter for new line)",
+      "send": "Send",
+      "read": "Read",
+      "sent": "Sent",
+      "missingReceiver": "Missing recipient.",
+      "genericError": "Unable to load chat. Please try again."
+    },
+    "inbox": {
+      "title": "Community Inbox",
+      "loading": "Loading conversations...",
+      "refresh": "Refresh",
+      "retry": "Retry",
+      "empty": "No conversations yet. Start chatting from the Community page.",
+      "fallbackName": "Student",
+      "youPrefix": "You: ",
+      "genericError": "Unable to load conversations."
     }
   }
 }

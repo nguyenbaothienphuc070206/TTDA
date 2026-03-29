@@ -1,6 +1,5 @@
-import { NextResponse } from "next/server";
-
 import { checkRateLimit, isBodyTooLarge, isSameOrigin } from "@/lib/apiGuards";
+import { createCompatResponder } from "@/lib/api/compatResponse";
 import { createSupabaseRouteHandlerClient } from "@/lib/supabase/routeHandlerClient";
 
 function isLikelyEmail(value) {
@@ -24,12 +23,13 @@ function toSafeNextPath(value, fallback) {
 }
 
 export async function POST(request) {
+  const api = createCompatResponder(request);
   if (!isSameOrigin(request)) {
-    return NextResponse.json({ error: "Origin không hợp lệ." }, { status: 403 });
+    return api.fail({ message: "Origin không hợp lệ.", code: "INVALID_ORIGIN", status: 403 });
   }
 
   if (isBodyTooLarge(request, 4_096)) {
-    return NextResponse.json({ error: "Body quá lớn." }, { status: 413 });
+    return api.fail({ message: "Body quá lớn.", code: "BODY_TOO_LARGE", status: 413 });
   }
 
   const rl = checkRateLimit({
@@ -40,13 +40,12 @@ export async function POST(request) {
   });
 
   if (!rl.ok) {
-    const res = NextResponse.json(
-      { error: "Thao tác quá nhanh. Vui lòng thử lại sau." },
-      { status: 429 }
-    );
-    res.headers.set("Cache-Control", "no-store");
-    res.headers.set("Retry-After", String(rl.retryAfterSec));
-    return res;
+    return api.fail({
+      message: "Thao tác quá nhanh. Vui lòng thử lại sau.",
+      code: "RATE_LIMITED",
+      status: 429,
+      retryAfterSec: rl.retryAfterSec,
+    });
   }
 
   let body;
@@ -54,14 +53,14 @@ export async function POST(request) {
   try {
     body = await request.json();
   } catch {
-    return NextResponse.json({ error: "Body JSON không hợp lệ." }, { status: 400 });
+    return api.fail({ message: "Body JSON không hợp lệ.", code: "INVALID_JSON", status: 400 });
   }
 
   const email = String(body?.email || "").trim();
   const next = toSafeNextPath(body?.next, "/admin");
 
   if (!isLikelyEmail(email)) {
-    return NextResponse.json({ error: "Email không hợp lệ." }, { status: 400 });
+    return api.fail({ message: "Email không hợp lệ.", code: "VALIDATION_ERROR", status: 400 });
   }
 
   const origin = request.nextUrl?.origin || "";
@@ -78,12 +77,8 @@ export async function POST(request) {
       },
     });
 
-    const res = NextResponse.json({ ok: true });
-    res.headers.set("Cache-Control", "no-store");
-    return res;
+    return api.ok({ ok: true });
   } catch {
-    const res = NextResponse.json({ error: "Không gửi được link đăng nhập." }, { status: 500 });
-    res.headers.set("Cache-Control", "no-store");
-    return res;
+    return api.fail({ message: "Không gửi được link đăng nhập.", code: "INTERNAL_ERROR", status: 500 });
   }
 }

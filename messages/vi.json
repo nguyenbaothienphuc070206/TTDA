@@ -14,7 +14,8 @@
     "progress": "Tiến độ",
     "progressAria": "Xem tiến độ học tập",
     "brandTitle": "Vovinam",
-    "brandSubtitle": "Lam đai tự vệ → ... → Hồng đai tứ"
+    "brandSubtitle": "Lam đai tự vệ → ... → Hồng đai tứ",
+    "communityUnreadAria": "{count} tin nhắn chưa đọc trong cộng đồng"
   },
   "theme": {
     "label": "Giao diện",
@@ -70,6 +71,63 @@
       "admin": "Quản trị/HLV",
       "privacy": "Chính sách bảo mật",
       "terms": "Điều khoản"
+    }
+  },
+  "community": {
+    "list": {
+      "title": "Community",
+      "description": "Bảng xếp hạng theo từng đai. Bấm vào mỗi đai để xem profile và bắt đầu chat.",
+      "loadError": "Không tải được dữ liệu bảng xếp hạng (Supabase query lỗi).",
+      "envError": "Chưa cấu hình Supabase service key (SUPABASE_SECRET_KEY) nên chưa xem được dữ liệu cộng đồng.",
+      "memberFallback": "Học viên",
+      "memberLabel": "Học viên",
+      "peopleSuffix": "người",
+      "emptyBelt": "Chưa có học viên trong nhóm này.",
+      "chatCta": "Chat",
+      "searchLabel": "Tìm học viên",
+      "searchPlaceholder": "Nhập tên...",
+      "sortLabel": "Sắp xếp",
+      "sortNameAsc": "Tên A-Z",
+      "sortNameDesc": "Tên Z-A",
+      "sortNewest": "Mới nhất trước",
+      "sortOldest": "Cũ nhất trước",
+      "applyFilters": "Áp dụng",
+      "clearFilters": "Xóa lọc",
+      "retry": "Thử lại",
+      "resultSummary": "Kết quả phù hợp"
+    },
+    "chatPage": {
+      "backArrow": "← Quay lại Community"
+    },
+    "chat": {
+      "defaultName": "Học viên",
+      "title": "Chat",
+      "withUser": "Đang chat với",
+      "refresh": "Làm mới",
+      "loadOlder": "Tải tin nhắn cũ hơn",
+      "messageListAria": "Danh sách tin nhắn",
+      "emptyState": "Chưa có tin nhắn. Hãy gửi lời chào!",
+      "loading": "Đang tải hội thoại...",
+      "loadingMore": "Đang tải tin nhắn cũ hơn...",
+      "sending": "Đang gửi...",
+      "typing": "Đối phương đang nhập...",
+      "retry": "Thử lại",
+      "placeholder": "Nhập tin nhắn... (Enter để gửi, Shift+Enter xuống dòng)",
+      "send": "Gửi",
+      "read": "Đã xem",
+      "sent": "Đã gửi",
+      "missingReceiver": "Thiếu người nhận.",
+      "genericError": "Không tải được đoạn chat. Vui lòng thử lại."
+    },
+    "inbox": {
+      "title": "Hộp thư cộng đồng",
+      "loading": "Đang tải danh sách hội thoại...",
+      "refresh": "Làm mới",
+      "retry": "Thử lại",
+      "empty": "Bạn chưa có hội thoại nào. Hãy bắt đầu chat từ trang Community.",
+      "fallbackName": "Học viên",
+      "youPrefix": "Bạn: ",
+      "genericError": "Không tải được danh sách hội thoại."
     }
   }
 }

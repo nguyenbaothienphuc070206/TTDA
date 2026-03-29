@@ -1,7 +1,6 @@
-import { NextResponse } from "next/server";
-
 import { getProductById } from "@/data/store";
 import { checkRateLimit, isBodyTooLarge, isSameOrigin } from "@/lib/apiGuards";
+import { createCompatResponder } from "@/lib/api/compatResponse";
 
 function normalizeItems(raw) {
   if (!Array.isArray(raw)) return [];
@@ -23,12 +22,13 @@ function normalizeItems(raw) {
 }
 
 export async function POST(request) {
+  const api = createCompatResponder(request);
   if (!isSameOrigin(request)) {
-    return NextResponse.json({ error: "Origin không hợp lệ." }, { status: 403 });
+    return api.fail({ message: "Origin không hợp lệ.", code: "INVALID_ORIGIN", status: 403 });
   }
 
   if (isBodyTooLarge(request, 50_000)) {
-    return NextResponse.json({ error: "Body quá lớn." }, { status: 413 });
+    return api.fail({ message: "Body quá lớn.", code: "BODY_TOO_LARGE", status: 413 });
   }
 
   const rl = checkRateLimit({
@@ -39,13 +39,12 @@ export async function POST(request) {
   });
 
   if (!rl.ok) {
-    const res = NextResponse.json(
-      { error: "Thao tác quá nhanh. Vui lòng thử lại sau." },
-      { status: 429 }
-    );
-    res.headers.set("Cache-Control", "no-store");
-    res.headers.set("Retry-After", String(rl.retryAfterSec));
-    return res;
+    return api.fail({
+      message: "Thao tác quá nhanh. Vui lòng thử lại sau.",
+      code: "RATE_LIMITED",
+      status: 429,
+      retryAfterSec: rl.retryAfterSec,
+    });
   }
 
   let body;
@@ -53,28 +52,23 @@ export async function POST(request) {
   try {
     body = await request.json();
   } catch {
-    return NextResponse.json({ error: "Body JSON không hợp lệ." }, { status: 400 });
+    return api.fail({ message: "Body JSON không hợp lệ.", code: "INVALID_JSON", status: 400 });
   }
 
   const items = normalizeItems(body?.items);
 
   if (items.length > 20) {
-    return NextResponse.json(
-      { error: "Giỏ hàng quá lớn. Tối đa 20 sản phẩm." },
-      { status: 400 }
-    );
+    return api.fail({ message: "Giỏ hàng quá lớn. Tối đa 20 sản phẩm.", code: "VALIDATION_ERROR", status: 400 });
   }
 
   if (!items.length) {
-    return NextResponse.json({ error: "Giỏ hàng trống." }, { status: 400 });
+    return api.fail({ message: "Giỏ hàng trống.", code: "VALIDATION_ERROR", status: 400 });
   }
 
   const stripeSecret = process.env.STRIPE_SECRET_KEY;
 
   if (!stripeSecret) {
-    const res = NextResponse.json({ mode: "demo", reason: "stripe_not_configured" });
-    res.headers.set("Cache-Control", "no-store");
-    return res;
+    return api.ok({ mode: "demo", reason: "stripe_not_configured" });
   }
 
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
@@ -88,10 +82,11 @@ export async function POST(request) {
   // (Stripe metadata values are strings and have length limits; keep it short.)
   const itemsJson = JSON.stringify(items);
   if (itemsJson.length > 480) {
-    return NextResponse.json(
-      { error: "Giỏ hàng quá lớn để xử lý an toàn. Hãy giảm số lượng sản phẩm." },
-      { status: 400 }
-    );
+    return api.fail({
+      message: "Giỏ hàng quá lớn để xử lý an toàn. Hãy giảm số lượng sản phẩm.",
+      code: "VALIDATION_ERROR",
+      status: 400,
+    });
   }
   params.set("metadata[items_json]", itemsJson);
 
@@ -100,10 +95,11 @@ export async function POST(request) {
     const product = getProductById(item.productId);
 
     if (!product) {
-      return NextResponse.json(
-        { error: `Không tìm thấy sản phẩm: ${item.productId}` },
-        { status: 400 }
-      );
+      return api.fail({
+        message: `Không tìm thấy sản phẩm: ${item.productId}`,
+        code: "VALIDATION_ERROR",
+        status: 400,
+      });
     }
 
     const unitAmount = Math.max(0, Math.round(Number(product.priceVnd) || 0));
@@ -129,10 +125,7 @@ export async function POST(request) {
       signal: controller.signal,
     });
   } catch {
-    return NextResponse.json(
-      { error: "Không kết nối được Stripe. Vui lòng thử lại." },
-      { status: 502 }
-    );
+    return api.fail({ message: "Không kết nối được Stripe. Vui lòng thử lại.", code: "UPSTREAM_ERROR", status: 502 });
   } finally {
     clearTimeout(timeout);
   }
@@ -145,14 +138,12 @@ export async function POST(request) {
         ? data.error.message
         : "Stripe trả về lỗi.";
 
-    return NextResponse.json({ error: message }, { status: 502 });
+    return api.fail({ message, code: "UPSTREAM_ERROR", status: 502 });
   }
 
   if (!data || typeof data.url !== "string" || !data.url) {
-    return NextResponse.json({ error: "Stripe không trả về URL checkout." }, { status: 502 });
+    return api.fail({ message: "Stripe không trả về URL checkout.", code: "UPSTREAM_ERROR", status: 502 });
   }
 
-  const res = NextResponse.json({ mode: "stripe", url: data.url });
-  res.headers.set("Cache-Control", "no-store");
-  return res;
+  return api.ok({ mode: "stripe", url: data.url });
 }

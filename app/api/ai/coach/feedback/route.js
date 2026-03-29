@@ -1,6 +1,5 @@
-import { NextResponse } from "next/server";
-
 import { checkRateLimit, isBodyTooLarge, isSameOrigin } from "@/lib/apiGuards";
+import { createCompatResponder } from "@/lib/api/compatResponse";
 import { createSupabaseRouteHandlerClient } from "@/lib/supabase/routeHandlerClient";
 
 function asText(value) {
@@ -20,12 +19,13 @@ function isUuid(value) {
 }
 
 export async function POST(request) {
+  const api = createCompatResponder(request);
   if (!isSameOrigin(request)) {
-    return NextResponse.json({ error: "Origin không hợp lệ." }, { status: 403 });
+    return api.fail({ message: "Origin không hợp lệ.", code: "INVALID_ORIGIN", status: 403 });
   }
 
   if (isBodyTooLarge(request, 4_096)) {
-    return NextResponse.json({ error: "Body quá lớn." }, { status: 413 });
+    return api.fail({ message: "Body quá lớn.", code: "BODY_TOO_LARGE", status: 413 });
   }
 
   const rl = checkRateLimit({
@@ -36,20 +36,19 @@ export async function POST(request) {
   });
 
   if (!rl.ok) {
-    const res = NextResponse.json(
-      { error: "Thao tác quá nhanh. Vui lòng thử lại sau." },
-      { status: 429 }
-    );
-    res.headers.set("Cache-Control", "no-store");
-    res.headers.set("Retry-After", String(rl.retryAfterSec));
-    return res;
+    return api.fail({
+      message: "Thao tác quá nhanh. Vui lòng thử lại sau.",
+      code: "RATE_LIMITED",
+      status: 429,
+      retryAfterSec: rl.retryAfterSec,
+    });
   }
 
   let body;
   try {
     body = await request.json();
   } catch {
-    return NextResponse.json({ error: "Body JSON không hợp lệ." }, { status: 400 });
+    return api.fail({ message: "Body JSON không hợp lệ.", code: "INVALID_JSON", status: 400 });
   }
 
   const messageId = asText(body?.messageId);
@@ -57,7 +56,7 @@ export async function POST(request) {
   const note = asText(body?.note).slice(0, 500);
 
   if (!isUuid(messageId) || !rating) {
-    return NextResponse.json({ error: "Dữ liệu không hợp lệ." }, { status: 400 });
+    return api.fail({ message: "Dữ liệu không hợp lệ.", code: "VALIDATION_ERROR", status: 400 });
   }
 
   try {
@@ -67,9 +66,7 @@ export async function POST(request) {
     } = await supabase.auth.getUser();
 
     if (!user) {
-      const res = NextResponse.json({ error: "Bạn cần đăng nhập." }, { status: 401 });
-      res.headers.set("Cache-Control", "no-store");
-      return res;
+      return api.fail({ message: "Bạn cần đăng nhập.", code: "UNAUTHORIZED", status: 401 });
     }
 
     const payload = {
@@ -88,17 +85,11 @@ export async function POST(request) {
       .upsert(payload, { onConflict: "user_id,message_id" });
 
     if (error) {
-      const res = NextResponse.json({ error: "Không lưu được phản hồi." }, { status: 500 });
-      res.headers.set("Cache-Control", "no-store");
-      return res;
+      return api.fail({ message: "Không lưu được phản hồi.", code: "INTERNAL_ERROR", status: 500 });
     }
 
-    const res = NextResponse.json({ ok: true });
-    res.headers.set("Cache-Control", "no-store");
-    return res;
+    return api.ok({ ok: true });
   } catch {
-    const res = NextResponse.json({ error: "Không lưu được phản hồi." }, { status: 500 });
-    res.headers.set("Cache-Control", "no-store");
-    return res;
+    return api.fail({ message: "Không lưu được phản hồi.", code: "INTERNAL_ERROR", status: 500 });
   }
 }

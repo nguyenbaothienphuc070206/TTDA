@@ -153,6 +153,29 @@ function Stat({ label, value }) {
   );
 }
 
+function MotivationStrip({ title, message, chips }) {
+  const safeChips = Array.isArray(chips) ? chips.filter(Boolean).slice(0, 3) : [];
+
+  return (
+    <section className="mt-6 rounded-3xl border border-white/10 bg-white/5 p-5 shadow-[var(--shadow-card)] sm:p-6">
+      <h2 className="text-lg font-semibold text-white">{title}</h2>
+      <p className="mt-2 text-sm leading-6 text-slate-300">{message}</p>
+      {safeChips.length ? (
+        <div className="mt-4 grid gap-2 sm:grid-cols-3">
+          {safeChips.map((chip) => (
+            <div
+              key={chip}
+              className="rounded-2xl border border-white/10 bg-slate-950/30 px-3 py-2 text-xs font-semibold text-slate-200"
+            >
+              {chip}
+            </div>
+          ))}
+        </div>
+      ) : null}
+    </section>
+  );
+}
+
 function LevelPreview({ level }) {
   const lessons = getLessonsByLevel(level.id);
 
@@ -316,6 +339,16 @@ function HomeVi() {
           </div>
         </div>
       </section>
+
+      <MotivationStrip
+        title="Bạn không cần hoàn hảo, bạn cần đều đặn"
+        message="Nếu hôm nay chỉ tập được 15-20 phút cũng rất tốt. Một buổi gọn gàng, đúng kỹ thuật luôn có giá trị hơn tập nhiều mà rối form."
+        chips={[
+          "Hoàn thành 1 bài là đã thắng",
+          "Giữ form trước khi tăng tốc",
+          "Mệt thì giảm nhịp, không bỏ hẳn",
+        ]}
+      />
 
       <section className="mt-10">
         <SectionHeading
@@ -792,6 +825,12 @@ function getGlobalHomeCopy(locale) {
         },
       ],
       quickLinksTitle: "Quick links",
+      motivationTitle: "You do not need perfection, you need consistency",
+      motivationMessage:
+        "Even a short 15-20 minute session counts. A clean session with control is always more valuable than chaotic volume.",
+      motivationChip1: "One completed lesson is a win",
+      motivationChip2: "Protect form before speed",
+      motivationChip3: "Scale down intensity, not commitment",
       ctaTitle: "Ready for your first focused session?",
       ctaDescription:
         "Open the roadmap, pick one suitable lesson, and train with clean form. Keep the pace controlled and safety-first.",
@@ -836,6 +875,12 @@ function getGlobalHomeCopy(locale) {
         },
       ],
       quickLinksTitle: "クイックリンク",
+      motivationTitle: "完璧より、継続が強さを作る",
+      motivationMessage:
+        "15-20分の短い練習でも十分です。量より、コントロールされた質の高い1セッションを重ねましょう。",
+      motivationChip1: "1レッスン完了は勝ち",
+      motivationChip2: "速度よりフォームを守る",
+      motivationChip3: "やめるより強度を調整する",
       ctaTitle: "最初の集中トレーニングを始めましょう",
       ctaDescription:
         "ロードマップから自分に合うレッスンを1つ選び、正確なフォームで練習しましょう。ペース管理と安全を最優先に。",
@@ -915,6 +960,12 @@ function HomeGlobal({ copy }) {
           <ChipLink href="/cong-dong">Community</ChipLink>
         </div>
       </section>
+
+      <MotivationStrip
+        title={copy.motivationTitle}
+        message={copy.motivationMessage}
+        chips={[copy.motivationChip1, copy.motivationChip2, copy.motivationChip3]}
+      />
 
       <section className="mt-12">
         <div className="relative overflow-hidden rounded-[2.25rem] border border-white/10 bg-white/5 p-7 sm:p-12">

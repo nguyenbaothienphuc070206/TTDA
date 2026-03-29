@@ -14,7 +14,8 @@
     "progress": "進捗",
     "progressAria": "学習の進捗を見る",
     "brandTitle": "Vovinam",
-    "brandSubtitle": "14段階の帯レベル"
+    "brandSubtitle": "14段階の帯レベル",
+    "communityUnreadAria": "未読コミュニティメッセージ {count} 件"
   },
   "theme": {
     "label": "テーマ",
@@ -70,6 +71,63 @@
       "admin": "管理/コーチ",
       "privacy": "プライバシーポリシー",
       "terms": "利用規約"
+    }
+  },
+  "community": {
+    "list": {
+      "title": "コミュニティ",
+      "description": "帯ごとのランキングです。帯を開いてプロフィールを確認し、チャットできます。",
+      "loadError": "ランキングデータを読み込めませんでした（Supabase クエリエラー）。",
+      "envError": "Supabase service key（SUPABASE_SECRET_KEY）が未設定のため、コミュニティデータを取得できません。",
+      "memberFallback": "門下生",
+      "memberLabel": "メンバー",
+      "peopleSuffix": "人",
+      "emptyBelt": "この帯グループにはまだメンバーがいません。",
+      "chatCta": "チャット",
+      "searchLabel": "メンバー検索",
+      "searchPlaceholder": "名前を入力...",
+      "sortLabel": "並び順",
+      "sortNameAsc": "名前 A-Z",
+      "sortNameDesc": "名前 Z-A",
+      "sortNewest": "新しい順",
+      "sortOldest": "古い順",
+      "applyFilters": "適用",
+      "clearFilters": "クリア",
+      "retry": "再試行",
+      "resultSummary": "一致したメンバー"
+    },
+    "chatPage": {
+      "backArrow": "← Community に戻る"
+    },
+    "chat": {
+      "defaultName": "学習者",
+      "title": "チャット",
+      "withUser": "チャット中:",
+      "refresh": "更新",
+      "loadOlder": "以前のメッセージを読み込む",
+      "messageListAria": "メッセージ一覧",
+      "emptyState": "まだメッセージがありません。まずは挨拶を送ってみましょう。",
+      "loading": "会話を読み込み中...",
+      "loadingMore": "以前のメッセージを読み込み中...",
+      "sending": "送信中...",
+      "typing": "相手が入力中です...",
+      "retry": "再試行",
+      "placeholder": "メッセージを入力... (Enterで送信、Shift+Enterで改行)",
+      "send": "送信",
+      "read": "既読",
+      "sent": "送信済み",
+      "missingReceiver": "受信者がありません。",
+      "genericError": "チャットを読み込めませんでした。もう一度お試しください。"
+    },
+    "inbox": {
+      "title": "コミュニティ受信箱",
+      "loading": "会話一覧を読み込み中...",
+      "refresh": "更新",
+      "retry": "再試行",
+      "empty": "まだ会話がありません。コミュニティページからチャットを開始してください。",
+      "fallbackName": "門下生",
+      "youPrefix": "あなた: ",
+      "genericError": "会話一覧を読み込めませんでした。"
     }
   }
 }

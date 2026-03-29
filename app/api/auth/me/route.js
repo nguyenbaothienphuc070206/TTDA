@@ -1,9 +1,9 @@
-import { NextResponse } from "next/server";
-
+import { createCompatResponder } from "@/lib/api/compatResponse";
 import { createSupabaseRouteHandlerClient } from "@/lib/supabase/routeHandlerClient";
 import { getAppRoleForUserId } from "@/lib/supabase/roles";
 
 export async function GET(request) {
+  const api = createCompatResponder(request);
   try {
     const supabase = createSupabaseRouteHandlerClient();
 
@@ -12,21 +12,19 @@ export async function GET(request) {
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Chưa đăng nhập." }, { status: 401 });
+      return api.fail({ message: "Chưa đăng nhập.", code: "UNAUTHORIZED", status: 401 });
     }
 
     const role = await getAppRoleForUserId(supabase, user.id);
 
-    const res = NextResponse.json({
+    return api.ok({
       user: {
         id: user.id,
         email: user.email || null,
       },
       role,
     });
-    res.headers.set("Cache-Control", "no-store");
-    return res;
   } catch {
-    return NextResponse.json({ error: "Không đọc được session." }, { status: 500 });
+    return api.fail({ message: "Không đọc được session.", code: "INTERNAL_ERROR", status: 500 });
   }
 }

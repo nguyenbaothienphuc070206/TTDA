@@ -1,6 +1,4 @@
-﻿import { NextResponse } from "next/server";
-
-import { TECHNIQUES, TECHNIQUE_CATEGORIES } from "@/data/wiki";
+﻿import { TECHNIQUES, TECHNIQUE_CATEGORIES } from "@/data/wiki";
 import { VIDEOS } from "@/data/videos";
 import { getLessonBySlug } from "@/data/lessons";
 import {
@@ -17,6 +15,7 @@ import {
 import { createEmbedding, chatCompletion, hasOpenAi, streamChatCompletion } from "@/lib/ai/openai";
 import { recommendVideos } from "@/lib/ai/recommendVideos";
 import { checkRateLimit, isBodyTooLarge } from "@/lib/apiGuards";
+import { createCompatResponder } from "@/lib/api/compatResponse";
 import { createSupabaseRouteHandlerClient } from "@/lib/supabase/routeHandlerClient";
 import { createSupabaseServiceClient } from "@/lib/supabase/serviceClient";
 
@@ -280,8 +279,9 @@ function buildContextBlock(sources, beltId) {
 }
 
 export async function POST(request) {
+  const api = createCompatResponder(request);
   if (isBodyTooLarge(request, 30_000)) {
-    return NextResponse.json({ error: "Body quá lớn." }, { status: 413 });
+    return api.fail({ message: "Body quá lớn.", code: "BODY_TOO_LARGE", status: 413 });
   }
 
   const rl = checkRateLimit({
@@ -292,13 +292,12 @@ export async function POST(request) {
   });
 
   if (!rl.ok) {
-    const res = NextResponse.json(
-      { error: "Bạn hỏi quá nhanh. Vui lòng chờ một chút." },
-      { status: 429 }
-    );
-    res.headers.set("Cache-Control", "no-store");
-    res.headers.set("Retry-After", String(rl.retryAfterSec));
-    return res;
+    return api.fail({
+      message: "Bạn hỏi quá nhanh. Vui lòng chờ một chút.",
+      code: "RATE_LIMITED",
+      status: 429,
+      retryAfterSec: rl.retryAfterSec,
+    });
   }
 
   try {
@@ -306,15 +305,16 @@ export async function POST(request) {
     try {
       body = await request.json();
     } catch {
-      return NextResponse.json({ error: "Body JSON không hợp lệ." }, { status: 400 });
+      return api.fail({ message: "Body JSON không hợp lệ.", code: "INVALID_JSON", status: 400 });
     }
 
     const rawQuery = asText(body?.query);
     if (rawQuery.length > 500) {
-      return NextResponse.json(
-        { error: "Câu hỏi quá dài. Hãy giữ dưới 500 ký tự." },
-        { status: 400 }
-      );
+      return api.fail({
+        message: "Câu hỏi quá dài. Hãy giữ dưới 500 ký tự.",
+        code: "VALIDATION_ERROR",
+        status: 400,
+      });
     }
 
     const query = rawQuery;
@@ -322,10 +322,11 @@ export async function POST(request) {
     const history = sanitizeHistory(body?.history);
 
     if (query.length < 2) {
-      return NextResponse.json(
-        { error: "Câu hỏi quá ngắn. Hãy nhập tối thiểu 2 ký tự." },
-        { status: 400 }
-      );
+      return api.fail({
+        message: "Câu hỏi quá ngắn. Hãy nhập tối thiểu 2 ký tự.",
+        code: "VALIDATION_ERROR",
+        status: 400,
+      });
     }
 
     const videoId = asText(context?.videoId).slice(0, 64);
@@ -354,7 +355,7 @@ export async function POST(request) {
     const recommendedVideos = recommendVideos({ query, sources, userBeltId: beltId });
 
     if (!top) {
-      const res = NextResponse.json({
+      return api.ok({
         answer: AI_COACH_NOT_FOUND_MESSAGE,
         sources: [],
         recommendedVideos: recommendedVideos.map((v) => ({
@@ -365,8 +366,6 @@ export async function POST(request) {
         })),
         mode,
       });
-      res.headers.set("Cache-Control", "no-store");
-      return res;
     }
 
     const system = buildAiCoachSystemPrompt({ beltId });
@@ -462,7 +461,7 @@ export async function POST(request) {
         }
       }
 
-      const res = NextResponse.json({
+      return api.ok({
         answer: md,
         sources: sources.map((s) => ({
           id: s.id,
@@ -483,8 +482,6 @@ export async function POST(request) {
         assistantMessageId: assistantMessageId || null,
         mode,
       });
-      res.headers.set("Cache-Control", "no-store");
-      return res;
     }
 
     if (!doStream) {
@@ -514,7 +511,7 @@ export async function POST(request) {
         }
       }
 
-      const res = NextResponse.json({
+      return api.ok({
         answer,
         sources: sources.map((s) => ({
           id: s.id,
@@ -535,8 +532,6 @@ export async function POST(request) {
         assistantMessageId: assistantMessageId || null,
         mode,
       });
-      res.headers.set("Cache-Control", "no-store");
-      return res;
     }
 
     // Streaming (SSE)
@@ -627,15 +622,15 @@ export async function POST(request) {
         "Content-Type": "text/event-stream; charset=utf-8",
         "Cache-Control": "no-store",
         Connection: "keep-alive",
+        "x-request-id": api.requestId,
       },
     });
   } catch {
-    const res = NextResponse.json(
-      { error: "Không xử lý được yêu cầu. Vui lòng thử lại." },
-      { status: 500 }
-    );
-    res.headers.set("Cache-Control", "no-store");
-    return res;
+    return api.fail({
+      message: "Không xử lý được yêu cầu. Vui lòng thử lại.",
+      code: "INTERNAL_ERROR",
+      status: 500,
+    });
   }
 }
 

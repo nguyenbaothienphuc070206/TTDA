@@ -1,7 +1,6 @@
-import { NextResponse } from "next/server";
-
 import { getVideoById } from "@/data/videos";
 import { checkRateLimit, isBodyTooLarge } from "@/lib/apiGuards";
+import { createCompatResponder } from "@/lib/api/compatResponse";
 import { chatCompletion, hasOpenAi } from "@/lib/ai/openai";
 
 function asText(value) {
@@ -133,8 +132,9 @@ async function buildOpenAiSegments(video) {
 }
 
 export async function POST(request) {
+  const api = createCompatResponder(request);
   if (isBodyTooLarge(request, 10_000)) {
-    return NextResponse.json({ error: "Body quá lớn." }, { status: 413 });
+    return api.fail({ message: "Body quá lớn.", code: "BODY_TOO_LARGE", status: 413 });
   }
 
   const rl = checkRateLimit({
@@ -145,60 +145,53 @@ export async function POST(request) {
   });
 
   if (!rl.ok) {
-    const res = NextResponse.json(
-      { error: "Bạn thao tác quá nhanh. Vui lòng thử lại sau." },
-      { status: 429 }
-    );
-    res.headers.set("Cache-Control", "no-store");
-    res.headers.set("Retry-After", String(rl.retryAfterSec));
-    return res;
+    return api.fail({
+      message: "Bạn thao tác quá nhanh. Vui lòng thử lại sau.",
+      code: "RATE_LIMITED",
+      status: 429,
+      retryAfterSec: rl.retryAfterSec,
+    });
   }
 
   let body;
   try {
     body = await request.json();
   } catch {
-    return NextResponse.json({ error: "Body JSON không hợp lệ." }, { status: 400 });
+    return api.fail({ message: "Body JSON không hợp lệ.", code: "INVALID_JSON", status: 400 });
   }
 
   const videoId = asText(body?.videoId).slice(0, 64);
   if (!videoId) {
-    return NextResponse.json({ error: "Thiếu videoId." }, { status: 400 });
+    return api.fail({ message: "Thiếu videoId.", code: "VALIDATION_ERROR", status: 400 });
   }
 
   const video = getVideoById(videoId);
   if (!video) {
-    return NextResponse.json({ error: "Không tìm thấy video." }, { status: 404 });
+    return api.fail({ message: "Không tìm thấy video.", code: "NOT_FOUND", status: 404 });
   }
 
   try {
     if (hasOpenAi()) {
       const out = await buildOpenAiSegments(video);
-      const res = NextResponse.json({
+      return api.ok({
         segments: out.segments,
         mode: out.mode,
         durationSec: out.durationSec,
       });
-      res.headers.set("Cache-Control", "no-store");
-      return res;
     }
 
     const heuristic = buildHeuristicSegments(video);
-    const res = NextResponse.json({
+    return api.ok({
       segments: heuristic.segments,
       mode: "heuristic",
       durationSec: heuristic.durationSec,
     });
-    res.headers.set("Cache-Control", "no-store");
-    return res;
   } catch {
     const heuristic = buildHeuristicSegments(video);
-    const res = NextResponse.json({
+    return api.ok({
       segments: heuristic.segments,
       mode: "heuristic",
       durationSec: heuristic.durationSec,
     });
-    res.headers.set("Cache-Control", "no-store");
-    return res;
   }
 }

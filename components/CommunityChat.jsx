@@ -1,137 +1,143 @@
-﻿"use client";
+"use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
-import { useLocale } from "next-intl";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { useLocale, useTranslations } from "next-intl";
 
-function safeJsonParse(text, fallback) {
-  try {
-    const parsed = JSON.parse(text);
-    return parsed ?? fallback;
-  } catch {
-    return fallback;
-  }
+import {
+  fetchCommunityMessages,
+  markConversationRead,
+  sendTypingPing,
+  sendCommunityMessage,
+} from "@/lib/community/messagesApi";
+import { createSupabaseBrowserClient } from "@/lib/supabase/browserClient";
+
+const PAGE_SIZE = 30;
+
+function asText(value) {
+  return String(value || "").trim();
 }
 
-function makeId() {
-  if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
-    return crypto.randomUUID();
-  }
+function formatTime(isoText, locale) {
+  const value = asText(isoText);
+  if (!value) return "";
 
-  return `m_${Date.now()}_${Math.random().toString(16).slice(2)}`;
-}
+  const ts = Date.parse(value);
+  if (!Number.isFinite(ts)) return "";
 
-function getCopy(locale) {
-  const id = String(locale || "vi").toLowerCase();
-
-  if (id === "en") {
-    return {
-      defaultName: "Student",
-      title: "Chat",
-      withUser: "Chatting with",
-      clearChat: "Clear chat",
-      messageListAria: "Message list",
-      emptyState: "No messages yet. Send a hello!",
-      placeholder: "Type a message... (Enter to send, Shift+Enter for new line)",
-      send: "Send",
-      missingReceiver: "Missing recipient.",
-      note: "Note: This is a demo chat (stored locally on this device). For real multi-user chat, add a messages table + RLS.",
-      demoReplies: [
-        "Got it!",
-        "Looks good. Warm up well first.",
-        "How far did you get in practice?",
-        "I'm online for a bit, ping me.",
-      ],
-      timeLocale: "en-US",
-    };
-  }
-
-  if (id === "ja") {
-    return {
-      defaultName: "学習者",
-      title: "チャット",
-      withUser: "チャット中:",
-      clearChat: "チャットを消去",
-      messageListAria: "メッセージ一覧",
-      emptyState: "まだメッセージがありません。まずは挨拶を送ってみましょう。",
-      placeholder: "メッセージを入力... (Enterで送信、Shift+Enterで改行)",
-      send: "送信",
-      missingReceiver: "受信者がありません。",
-      note: "注: これはデモチャットです (この端末にローカル保存)。実際の複数人チャットには、messages テーブルと RLS の追加が必要です。",
-      demoReplies: [
-        "了解です!",
-        "いいですね。しっかり準備運動しましょう。",
-        "練習はどこまで進みましたか?",
-        "少しの間オンラインです。気軽にどうぞ。",
-      ],
-      timeLocale: "ja-JP",
-    };
-  }
-
-  return {
-    defaultName: "Học viên",
-    title: "Chat",
-    withUser: "Đang chat với",
-    clearChat: "Xóa chat",
-    messageListAria: "Danh sách tin nhắn",
-    emptyState: "Chưa có tin nhắn. Hãy gửi lời chào!",
-    placeholder: "Nhập tin nhắn... (Enter để gửi, Shift+Enter xuống dòng)",
-    send: "Gửi",
-    missingReceiver: "Thiếu người nhận.",
-    note: "Ghi chú: Đây là chat demo (lưu cục bộ trên thiết bị). Để chat thật nhiều người, cần thêm bảng tin nhắn + RLS.",
-    demoReplies: [
-      "Ok bạn nhé!",
-      "Chuẩn rồi - nhớ khởi động kỹ nha.",
-      "Bạn tập tới đâu rồi?",
-      "Mình đang online chút xíu, nhắn mình nha.",
-    ],
-    timeLocale: "vi-VN",
-  };
-}
-
-function formatTime(ms, locale) {
-  const n = Number(ms);
-  if (!Number.isFinite(n) || n <= 0) return "";
-  return new Date(n).toLocaleTimeString(locale || "vi-VN", {
+  return new Date(ts).toLocaleTimeString(locale || "vi-VN", {
     hour: "2-digit",
     minute: "2-digit",
   });
 }
 
+function toTimeValue(isoText) {
+  const ts = Date.parse(asText(isoText));
+  return Number.isFinite(ts) ? ts : 0;
+}
+
+function mergeMessages(listA, listB) {
+  const map = new Map();
+
+  for (const item of [...(Array.isArray(listA) ? listA : []), ...(Array.isArray(listB) ? listB : [])]) {
+    const id = asText(item?.id);
+    if (!id) continue;
+    map.set(id, item);
+  }
+
+  return Array.from(map.values()).sort((a, b) => toTimeValue(a?.createdAt) - toTimeValue(b?.createdAt));
+}
+
 export default function CommunityChat({ toUserId, toName }) {
+  const t = useTranslations("community.chat");
   const locale = useLocale();
-  const copy = getCopy(locale);
-  const toId = String(toUserId || "").trim();
-  const name = String(toName || "").trim() || copy.defaultName;
+  const toId = asText(toUserId);
+  const name = asText(toName) || t("defaultName");
 
-  const storageKey = useMemo(() => {
-    return toId ? `vovinam_dm_${toId}` : "";
-  }, [toId]);
-
-  const [messages, setMessages] = useState(() => {
-    if (typeof window === "undefined") return [];
-    if (!toId) return [];
-
-    try {
-      const raw = window.localStorage.getItem(`vovinam_dm_${toId}`);
-      const parsed = safeJsonParse(raw, []);
-      const list = Array.isArray(parsed) ? parsed : [];
-      return list.slice(-200);
-    } catch {
-      return [];
-    }
-  });
+  const [viewerId, setViewerId] = useState("");
+  const [messages, setMessages] = useState([]);
+  const [nextCursor, setNextCursor] = useState("");
+  const [hasLoaded, setHasLoaded] = useState(false);
+  const [loadingInitial, setLoadingInitial] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [isThemTyping, setIsThemTyping] = useState(false);
+  const [error, setError] = useState("");
   const [draft, setDraft] = useState("");
+
   const listRef = useRef(null);
+  const channelRef = useRef(null);
+  const typingTimerRef = useRef(null);
+  const lastTypingPingMsRef = useRef(0);
+
+  const loadMessages = useCallback(
+    async ({ cursor = "", append = false, silent = false } = {}) => {
+      if (!toId) return;
+
+      if (!silent) {
+        if (append) {
+          setLoadingMore(true);
+        } else if (!hasLoaded) {
+          setLoadingInitial(true);
+        }
+      }
+
+      try {
+        setError("");
+        const data = await fetchCommunityMessages({
+          toUserId: toId,
+          cursor,
+          limit: PAGE_SIZE,
+        });
+
+        const incoming = Array.isArray(data?.messages) ? data.messages : [];
+
+        if (data?.viewerId) {
+          setViewerId(asText(data.viewerId));
+        }
+
+        setMessages((prev) => {
+          if (append) {
+            return mergeMessages(prev, incoming);
+          }
+          return hasLoaded ? mergeMessages(prev, incoming) : incoming;
+        });
+
+        setNextCursor(asText(data?.nextCursor));
+        setHasLoaded(true);
+
+        const hasUnreadIncoming = incoming.some((m) => !m?.isMine && !m?.readAt);
+        if (hasUnreadIncoming) {
+          await markConversationRead({ toUserId: toId }).catch(() => null);
+          setMessages((prev) =>
+            prev.map((m) => {
+              if (m?.isMine || m?.readAt) return m;
+              return { ...m, readAt: new Date().toISOString() };
+            })
+          );
+        }
+      } catch (e) {
+        const message = asText(e?.message);
+        setError(message || t("genericError"));
+      } finally {
+        if (!silent) {
+          setLoadingInitial(false);
+          setLoadingMore(false);
+        }
+      }
+    },
+    [hasLoaded, t, toId]
+  );
 
   useEffect(() => {
-    if (!storageKey) return;
+    setViewerId("");
+    setMessages([]);
+    setNextCursor("");
+    setHasLoaded(false);
+    setError("");
 
-    try {
-      window.localStorage.setItem(storageKey, JSON.stringify(messages.slice(-200)));
-    } catch {
-      // ignore
-    }
-  }, [messages, storageKey]);
+    if (!toId) return;
+    loadMessages({ append: false });
+  }, [toId, loadMessages]);
 
   useEffect(() => {
     const el = listRef.current;
@@ -139,29 +145,120 @@ export default function CommunityChat({ toUserId, toName }) {
     el.scrollTop = el.scrollHeight;
   }, [messages.length]);
 
-  const pushMessage = (msg) => {
-    setMessages((prev) => {
-      const next = [...prev, msg];
-      return next.slice(-200);
-    });
-  };
+  useEffect(() => {
+    if (channelRef.current) {
+      createSupabaseBrowserClient().removeChannel(channelRef.current);
+      channelRef.current = null;
+    }
 
-  const send = () => {
-    const text = String(draft || "").trim();
+    if (!viewerId || !toId) return;
+
+    const supabase = createSupabaseBrowserClient();
+    const channel = supabase
+      .channel(`community-dm-${viewerId}-${toId}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "community_messages",
+          filter: `recipient_id=eq.${viewerId}`,
+        },
+        (payload) => {
+          const senderId = asText(payload?.new?.sender_id);
+          if (senderId !== toId) return;
+          loadMessages({ append: false, silent: true });
+        }
+      )
+      .on(
+        "postgres_changes",
+        {
+          event: "UPDATE",
+          schema: "public",
+          table: "community_messages",
+          filter: `sender_id=eq.${viewerId}`,
+        },
+        (payload) => {
+          const recipientId = asText(payload?.new?.recipient_id);
+          if (recipientId !== toId) return;
+          loadMessages({ append: false, silent: true });
+        }
+      )
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "community_typing_state",
+          filter: `recipient_id=eq.${viewerId}`,
+        },
+        (payload) => {
+          const senderId = asText(payload?.new?.sender_id);
+          if (senderId !== toId) return;
+
+          setIsThemTyping(true);
+
+          if (typingTimerRef.current) {
+            clearTimeout(typingTimerRef.current);
+          }
+
+          typingTimerRef.current = window.setTimeout(() => {
+            setIsThemTyping(false);
+            typingTimerRef.current = null;
+          }, 6_500);
+        }
+      )
+      .subscribe();
+
+    channelRef.current = channel;
+
+    return () => {
+      supabase.removeChannel(channel);
+      channelRef.current = null;
+
+      if (typingTimerRef.current) {
+        clearTimeout(typingTimerRef.current);
+        typingTimerRef.current = null;
+      }
+    };
+  }, [viewerId, toId, loadMessages]);
+
+  useEffect(() => {
+    if (!viewerId || !toId) return;
+    const text = asText(draft);
     if (!text) return;
 
     const now = Date.now();
-    pushMessage({ id: makeId(), from: "me", text, at: now });
-    setDraft("");
+    if (now - lastTypingPingMsRef.current < 2_000) {
+      return;
+    }
 
-    // Demo reply to make the chat feel alive (local-only).
-    const replies = copy.demoReplies;
+    lastTypingPingMsRef.current = now;
+    sendTypingPing({ toUserId: toId }).catch(() => null);
+  }, [draft, viewerId, toId]);
 
-    const pick = replies[Math.floor(Math.random() * replies.length)];
+  const send = async () => {
+    const text = asText(draft);
+    if (!text || sending) return;
 
-    window.setTimeout(() => {
-      pushMessage({ id: makeId(), from: "them", text: pick, at: Date.now() });
-    }, 650);
+    setSending(true);
+    setError("");
+
+    try {
+      const sent = await sendCommunityMessage({ toUserId: toId, body: text });
+      setDraft("");
+
+      if (sent && sent.id) {
+        setMessages((prev) => mergeMessages(prev, [sent]));
+      }
+
+      await loadMessages({ append: false, silent: true });
+    } catch (e) {
+      const message = asText(e?.message);
+      setError(message || t("genericError"));
+    } finally {
+      setSending(false);
+    }
   };
 
   const onKeyDown = (e) => {
@@ -174,7 +271,7 @@ export default function CommunityChat({ toUserId, toName }) {
   if (!toId) {
     return (
       <div className="rounded-3xl border border-white/10 bg-white/5 p-6">
-        <div className="text-sm text-slate-300">{copy.missingReceiver}</div>
+        <div className="text-sm text-slate-300">{t("missingReceiver")}</div>
       </div>
     );
   }
@@ -183,67 +280,96 @@ export default function CommunityChat({ toUserId, toName }) {
     <div className="rounded-3xl border border-white/10 bg-white/5 p-6">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="text-xl font-semibold text-white">{copy.title}</h1>
+          <h1 className="text-xl font-semibold text-white">{t("title")}</h1>
           <p className="mt-1 text-sm text-slate-300">
-            {copy.withUser} <span className="font-semibold text-white">{name}</span>
+            {t("withUser")} <span className="font-semibold text-white">{name}</span>
           </p>
         </div>
 
         <button
           type="button"
-          onClick={() => setMessages([])}
+          onClick={() => loadMessages({ append: false })}
           className="inline-flex h-10 items-center justify-center rounded-2xl border border-white/10 bg-white/5 px-4 text-sm font-semibold text-white transition hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-blue-400/30"
         >
-          {copy.clearChat}
+          {t("refresh")}
         </button>
       </div>
 
+      {error ? (
+        <div className="mt-3 rounded-2xl border border-rose-400/25 bg-rose-500/10 p-3 text-sm text-rose-100">
+          <div>{error}</div>
+          <button
+            type="button"
+            onClick={() => loadMessages({ append: false })}
+            className="mt-2 inline-flex h-8 items-center justify-center rounded-xl border border-rose-300/30 bg-rose-400/10 px-3 text-xs font-semibold text-rose-50 transition hover:bg-rose-400/20"
+          >
+            {t("retry")}
+          </button>
+        </div>
+      ) : null}
+
+      {isThemTyping ? (
+        <div className="mt-2 text-xs font-semibold text-cyan-200">{t("typing")}</div>
+      ) : null}
+
       <div
         ref={listRef}
-        className="mt-4 h-[420px] overflow-auto rounded-2xl border border-white/10 bg-slate-950/30 p-3 ai-scrollbar"
-        aria-label={copy.messageListAria}
+        className="mt-4 h-105 overflow-auto rounded-2xl border border-white/10 bg-slate-950/30 p-3 ai-scrollbar"
+        aria-label={t("messageListAria")}
       >
-        {messages.length ? (
+        {loadingInitial ? (
+          <div className="text-sm text-slate-300">{t("loading")}</div>
+        ) : messages.length ? (
           <div className="grid gap-2">
             {messages.map((m, idx) => {
-              const mine = m?.from === "me";
-              const text = String(m?.text || "");
-              const time = formatTime(m?.at, copy.timeLocale);
-              const key = typeof m?.id === "string" && m.id ? m.id : `k_${m?.at || 0}_${idx}`;
+              const mine = Boolean(m?.isMine);
+              const text = asText(m?.body);
+              const time = formatTime(m?.createdAt, locale);
+              const key = asText(m?.id) || `k_${idx}`;
+              const status = mine ? (m?.readAt ? t("read") : t("sent")) : "";
 
               return (
-                <div
-                  key={key}
-                  className={mine ? "flex justify-end" : "flex justify-start"}
-                >
+                <div key={key} className={mine ? "flex justify-end" : "flex justify-start"}>
                   <div
                     className={
                       "max-w-[85%] rounded-2xl border px-3 py-2 text-sm leading-6 shadow-sm " +
                       (mine
-                        ? "border-cyan-300/25 bg-gradient-to-r from-cyan-300/15 to-blue-500/10 text-white"
+                        ? "border-cyan-300/25 bg-linear-to-r from-cyan-300/15 to-blue-500/10 text-white"
                         : "border-white/10 bg-white/5 text-slate-100")
                     }
                   >
-                    <div className="whitespace-pre-wrap break-words">{text}</div>
-                    {time ? (
-                      <div className="mt-1 text-[11px] text-slate-300/80">{time}</div>
-                    ) : null}
+                    <div className="whitespace-pre-wrap wrap-break-word">{text}</div>
+                    <div className="mt-1 flex items-center justify-between gap-2 text-[11px] text-slate-300/80">
+                      <span>{time}</span>
+                      {status ? <span>{status}</span> : null}
+                    </div>
                   </div>
                 </div>
               );
             })}
           </div>
         ) : (
-          <div className="text-sm text-slate-300">{copy.emptyState}</div>
+          <div className="text-sm text-slate-300">{t("emptyState")}</div>
         )}
       </div>
+
+      {nextCursor ? (
+        <button
+          type="button"
+          onClick={() => loadMessages({ cursor: nextCursor, append: true })}
+          disabled={loadingMore}
+          className="mt-3 inline-flex h-10 items-center justify-center rounded-2xl border border-white/10 bg-white/5 px-4 text-sm font-semibold text-white transition hover:bg-white/10 disabled:opacity-60"
+        >
+          {loadingMore ? t("loadingMore") : t("loadOlder")}
+        </button>
+      ) : null}
 
       <div className="mt-3 grid gap-2">
         <textarea
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
           onKeyDown={onKeyDown}
-          placeholder={copy.placeholder}
+          placeholder={t("placeholder")}
           rows={3}
           className="w-full resize-none rounded-2xl border border-white/10 bg-slate-950/60 px-3 py-2 text-sm text-white outline-none focus:ring-2 focus:ring-cyan-300/30"
         />
@@ -251,16 +377,12 @@ export default function CommunityChat({ toUserId, toName }) {
         <button
           type="button"
           onClick={send}
-          className="inline-flex h-11 items-center justify-center rounded-2xl bg-gradient-to-r from-cyan-300 to-blue-500 px-5 text-sm font-semibold text-slate-950 transition hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-cyan-300/50"
+          disabled={sending || !asText(draft)}
+          className="inline-flex h-11 items-center justify-center rounded-2xl bg-linear-to-r from-cyan-300 to-blue-500 px-5 text-sm font-semibold text-slate-950 transition hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-cyan-300/50 disabled:opacity-60"
         >
-          {copy.send}
+          {sending ? t("sending") : t("send")}
         </button>
       </div>
-
-      <p className="mt-3 text-xs leading-5 text-slate-300">
-        {copy.note}
-      </p>
     </div>
   );
 }
-
