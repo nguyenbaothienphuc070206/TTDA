@@ -517,6 +517,17 @@ html[data-performance="lite"] .motion-gradient-orb {
   position: relative;
 }
 
+.hero-compact {
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  min-height: 0;
+}
+
+.hero-compact > .relative {
+  width: 100%;
+}
+
 .hero-noise::after {
   content: "";
   position: absolute;

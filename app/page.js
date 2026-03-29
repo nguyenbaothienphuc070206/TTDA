@@ -399,7 +399,7 @@ function HomeVi() {
     <div className="ui3d-stage mobile-safe-bottom mx-auto w-full max-w-6xl px-4 py-6 sm:py-10">
       <RouteWarmup />
       <JsonLd data={buildHomeJsonLd("vi")} />
-      <section className="surface-card-strong enterprise-shell motion-gradient-surface ui3d-card hero-noise relative overflow-hidden rounded-[2rem] p-5 sm:p-8">
+      <section className="surface-card-strong enterprise-shell motion-gradient-surface ui3d-card hero-noise hero-compact relative overflow-hidden rounded-[2rem] p-5 sm:p-8">
         <div className="absolute inset-0 opacity-90 bg-[radial-gradient(circle_at_top,rgba(34,211,238,0.16),transparent_58%)]" />
         <div className="absolute -right-24 -top-20 h-64 w-64 rounded-full bg-blue-500/20 blur-3xl float-fast motion-gradient-orb" />
         <div className="absolute -left-20 -bottom-24 h-64 w-64 rounded-full bg-amber-300/10 blur-3xl float-slower motion-gradient-orb" />
@@ -430,12 +430,6 @@ function HomeVi() {
             >
               Tạo lịch tập 7 ngày
             </Link>
-          </div>
-
-          <div className="mt-5 grid gap-2.5 sm:grid-cols-3">
-            <Stat label="Tổng bài học" value={LESSONS.length} />
-            <Stat label="Cấp đai" value={BELTS.length} />
-            <Stat label="Mục tiêu" value="Đúng kỹ thuật" />
           </div>
 
         </div>
@@ -998,7 +992,7 @@ function HomeGlobal({ copy, locale }) {
     <div className="ui3d-stage mobile-safe-bottom mx-auto w-full max-w-6xl px-4 py-6 sm:py-10">
       <RouteWarmup />
       <JsonLd data={buildHomeJsonLd(locale)} />
-      <section className="surface-card-strong enterprise-shell motion-gradient-surface ui3d-card hero-noise relative overflow-hidden rounded-[2rem] p-5 sm:p-8">
+      <section className="surface-card-strong enterprise-shell motion-gradient-surface ui3d-card hero-noise hero-compact relative overflow-hidden rounded-[2rem] p-5 sm:p-8">
         <div className="absolute inset-0 opacity-90 bg-[radial-gradient(circle_at_top,rgba(34,211,238,0.16),transparent_58%)]" />
         <div className="absolute -right-24 -top-20 h-64 w-64 rounded-full bg-blue-500/20 blur-3xl float-fast motion-gradient-orb" />
         <div className="absolute -left-20 -bottom-24 h-64 w-64 rounded-full bg-amber-300/10 blur-3xl float-slower motion-gradient-orb" />
@@ -1030,11 +1024,6 @@ function HomeGlobal({ copy, locale }) {
             </Link>
           </div>
 
-          <div className="mt-5 grid gap-2.5 sm:grid-cols-3">
-            <Stat label={copy.statLessons} value={LESSONS.length} />
-            <Stat label={copy.statBelts} value={BELTS.length} />
-            <Stat label={copy.statGoal} value={copy.statGoalValue} />
-          </div>
         </div>
       </section>
 
