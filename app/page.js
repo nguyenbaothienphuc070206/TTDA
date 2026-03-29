@@ -20,12 +20,44 @@ import {
 import { BELTS } from "@/data/belts";
 import { LEVELS, LESSONS, getLessonsByLevel } from "@/data/lessons";
 import { NEWS } from "@/data/news";
+import JsonLd from "@/components/JsonLd";
+import RouteWarmup from "@/components/RouteWarmup";
+
+export const metadata = {
+  title: "Vovinam Learning - Học Vovinam Theo Lộ Trình",
+  description:
+    "Nền tảng học Vovinam theo lộ trình rõ ràng: bài học từng bước, video kỹ thuật, lịch tập 7 ngày và theo dõi tiến độ.",
+  openGraph: {
+    title: "Vovinam Learning",
+    description:
+      "Học Vovinam theo cấp đai với trải nghiệm hiện đại, rõ ràng, tối ưu cho tự luyện và phát triển kỹ thuật.",
+    type: "website",
+    url: "/",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Vovinam Learning",
+    description:
+      "Lộ trình Vovinam đầy đủ từ nền tảng đến nâng cao, kèm lịch tập và tiến độ cá nhân.",
+  },
+};
 
 function ChipLink({ href, children }) {
+  const cls =
+    "inline-flex items-center justify-center rounded-full border border-white/15 bg-white/5 px-3 py-1.5 text-xs font-semibold text-slate-200 transition hover:-translate-y-0.5 hover:bg-white/10 hover:text-white focus:outline-none focus:ring-2 focus:ring-cyan-300/30";
+
+  if (String(href || "").startsWith("/")) {
+    return (
+      <Link href={href} prefetch className={cls}>
+        {children}
+      </Link>
+    );
+  }
+
   return (
     <a
       href={href}
-      className="inline-flex items-center justify-center rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-semibold text-slate-200 transition hover:bg-white/10 hover:text-white focus:outline-none focus:ring-2 focus:ring-cyan-300/30"
+      className={cls}
     >
       {children}
     </a>
@@ -39,6 +71,9 @@ function SectionHeading({ id, title, description, right }) {
       className="flex scroll-mt-28 flex-col gap-2 sm:flex-row sm:items-end sm:justify-between"
     >
       <div>
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-200/80">
+          Enterprise Training Flow
+        </p>
         <h2 className="text-xl font-semibold text-white sm:text-2xl">{title}</h2>
         {description ? (
           <p className="mt-1 text-sm leading-6 text-slate-300">{description}</p>
@@ -51,10 +86,10 @@ function SectionHeading({ id, title, description, right }) {
 
 function FeatureCard({ title, description, icon }) {
   return (
-    <div className="group relative overflow-hidden rounded-3xl border border-white/10 bg-white/5 p-5 transition hover:bg-white/10">
-      <div className="absolute inset-0 opacity-0 transition-opacity group-hover:opacity-100 bg-[radial-gradient(circle_at_top,rgba(34,211,238,0.10),transparent_55%)]" />
+    <div className="surface-card enterprise-shell group relative overflow-hidden rounded-3xl p-5 transition duration-300 hover:-translate-y-1 hover:bg-white/10">
+      <div className="accent-line absolute left-6 right-6 top-0 opacity-0 transition-opacity group-hover:opacity-100" />
       <div className="relative flex items-start gap-4">
-        <div className="mt-0.5 inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border border-white/10 bg-gradient-to-br from-cyan-300/15 to-blue-500/10 text-cyan-200">
+        <div className="mt-0.5 inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border border-cyan-300/25 bg-linear-to-br from-cyan-300/20 to-blue-500/10 text-cyan-100">
           {icon ? <span className="text-lg">{icon}</span> : null}
         </div>
         <div className="min-w-0">
@@ -68,9 +103,9 @@ function FeatureCard({ title, description, icon }) {
 
 function StepCard({ step, title, description, bullets }) {
   return (
-    <div className="rounded-3xl border border-white/10 bg-white/5 p-6">
+    <div className="surface-card enterprise-shell rounded-3xl p-6">
       <div className="flex items-start gap-4">
-        <div className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-r from-cyan-300 to-blue-500 text-sm font-extrabold text-slate-950">
+        <div className="pulse-ring inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-linear-to-r from-cyan-300 to-blue-500 text-sm font-extrabold text-slate-950">
           {step}
         </div>
         <div className="min-w-0">
@@ -95,7 +130,7 @@ function StepCard({ step, title, description, bullets }) {
 
 function Pill({ children }) {
   return (
-    <span className="rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-xs font-semibold text-slate-200">
+    <span className="rounded-full border border-white/15 bg-white/5 px-2.5 py-1 text-xs font-semibold text-slate-200">
       {children}
     </span>
   );
@@ -105,7 +140,7 @@ function LessonPreviewCard({ lesson, levelTitle }) {
   return (
     <Link
       href={`/bai-hoc/${lesson.slug}`}
-      className="group relative overflow-hidden rounded-3xl border border-white/10 bg-white/5 p-5 transition hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-cyan-300/30"
+      className="surface-card enterprise-shell group relative overflow-hidden rounded-3xl p-5 transition duration-300 hover:-translate-y-1 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-cyan-300/30"
     >
       <div className="absolute inset-0 opacity-0 transition-opacity group-hover:opacity-100 bg-[radial-gradient(circle_at_top,rgba(59,130,246,0.10),transparent_55%)]" />
       <div className="relative">
@@ -128,7 +163,7 @@ function LessonPreviewCard({ lesson, levelTitle }) {
 
 function FaqItem({ q, a }) {
   return (
-    <details className="group rounded-3xl border border-white/10 bg-white/5 p-5 open:bg-white/10">
+    <details className="surface-card group rounded-3xl p-5 open:bg-white/10">
       <summary className="cursor-pointer list-none text-sm font-semibold text-white outline-none">
         <div className="flex items-center justify-between gap-3">
           <span>{q}</span>
@@ -144,7 +179,7 @@ function FaqItem({ q, a }) {
 
 function Stat({ label, value }) {
   return (
-    <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+    <div className="surface-card rounded-2xl p-4">
       <div className="text-xs font-semibold text-slate-300">{label}</div>
       <div className="mt-2 text-2xl font-semibold tracking-tight text-white">
         {value}
@@ -157,7 +192,7 @@ function MotivationStrip({ title, message, chips }) {
   const safeChips = Array.isArray(chips) ? chips.filter(Boolean).slice(0, 3) : [];
 
   return (
-    <section className="mt-6 rounded-3xl border border-white/10 bg-white/5 p-5 shadow-[var(--shadow-card)] sm:p-6">
+    <section className="surface-card enterprise-shell mt-6 rounded-3xl p-5 sm:p-6">
       <h2 className="text-lg font-semibold text-white">{title}</h2>
       <p className="mt-2 text-sm leading-6 text-slate-300">{message}</p>
       {safeChips.length ? (
@@ -180,7 +215,7 @@ function LevelPreview({ level }) {
   const lessons = getLessonsByLevel(level.id);
 
   return (
-    <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-white/5 p-6 transition hover:bg-white/10">
+    <div className="surface-card enterprise-shell relative overflow-hidden rounded-3xl p-6 transition hover:bg-white/10">
       <div className="absolute inset-0 opacity-0 transition-opacity hover:opacity-100 bg-[radial-gradient(circle_at_top,rgba(59,130,246,0.10),transparent_55%)]" />
       <div className="relative">
         <div className="flex items-center justify-between gap-3">
@@ -214,10 +249,10 @@ function BeltPreview({ belt }) {
     <Link
       href="/hoc-tap"
       className={
-        "group relative overflow-hidden rounded-3xl border p-6 transition focus:outline-none focus:ring-2 " +
+        "group enterprise-shell relative overflow-hidden rounded-3xl border p-6 transition duration-300 hover:-translate-y-1 focus:outline-none focus:ring-2 " +
         (isHighest
-          ? "border-amber-300/25 bg-slate-950/30 backdrop-blur-xl shadow-[var(--shadow-card)] hover:bg-slate-950/20 focus:ring-amber-300/30"
-          : "border-white/10 bg-white/5 hover:bg-white/10 focus:ring-cyan-300/30")
+          ? "border-amber-300/25 bg-slate-950/30 backdrop-blur-xl shadow-(--shadow-card) hover:bg-slate-950/20 focus:ring-amber-300/30"
+          : "surface-card hover:bg-white/10 focus:ring-cyan-300/30")
       }
     >
       <div
@@ -262,7 +297,7 @@ function NewsCard({ item }) {
   return (
     <Link
       href={item.href}
-      className="group relative overflow-hidden rounded-3xl border border-white/10 bg-slate-950/30 backdrop-blur-xl p-5 shadow-[var(--shadow-card)] transition hover:bg-slate-950/20 hover:border-amber-300/20 focus:outline-none focus:ring-2 focus:ring-amber-300/30"
+      className="surface-card enterprise-shell group relative overflow-hidden rounded-3xl p-5 transition duration-300 hover:-translate-y-1 hover:border-amber-300/20 focus:outline-none focus:ring-2 focus:ring-amber-300/30"
     >
       <div className="absolute inset-0 opacity-0 transition-opacity group-hover:opacity-100 bg-[radial-gradient(circle_at_top,rgba(250,204,21,0.10),transparent_55%)]" />
       <div className="relative">
@@ -280,6 +315,80 @@ function NewsCard({ item }) {
   );
 }
 
+function MobileQuickActions({ startLabel, scheduleLabel }) {
+  return (
+    <div className="mobile-quick-actions sm:hidden">
+      <div className="surface-card-strong enterprise-shell grid grid-cols-2 gap-2 rounded-2xl p-2">
+        <Link
+          href="/lo-trinh"
+          className="cta-primary inline-flex h-10 items-center justify-center rounded-xl px-3 text-xs font-semibold"
+        >
+          {startLabel}
+        </Link>
+        <Link
+          href="/lich-tap"
+          className="cta-secondary inline-flex h-10 items-center justify-center rounded-xl px-3 text-xs font-semibold text-white"
+        >
+          {scheduleLabel}
+        </Link>
+      </div>
+    </div>
+  );
+}
+
+function buildHomeJsonLd(locale) {
+  const siteUrl = String(process.env.NEXT_PUBLIC_SITE_URL || "https://vovinam-learning.vn").replace(/\/$/, "");
+  const localeId = String(locale || "vi").toLowerCase();
+  const pagePath = localeId === "vi" ? "/" : `/${localeId}`;
+  const pageUrl = `${siteUrl}${pagePath}`;
+
+  return {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "@id": `${siteUrl}/#website`,
+        url: siteUrl,
+        name: "Vovinam Learning",
+        inLanguage: localeId,
+        potentialAction: {
+          "@type": "SearchAction",
+          target: `${siteUrl}/learning?query={search_term_string}`,
+          "query-input": "required name=search_term_string",
+        },
+      },
+      {
+        "@type": "Organization",
+        "@id": `${siteUrl}/#organization`,
+        name: "Vovinam Learning",
+        url: siteUrl,
+      },
+      {
+        "@type": "WebPage",
+        "@id": `${pageUrl}#webpage`,
+        url: pageUrl,
+        name: "Vovinam Learning Home",
+        isPartOf: {
+          "@id": `${siteUrl}/#website`,
+        },
+        inLanguage: localeId,
+        description:
+          "Trang chủ học Vovinam với lộ trình, kỹ thuật, video và kế hoạch luyện tập theo tuần.",
+      },
+      {
+        "@type": "ItemList",
+        name: "Featured Lessons",
+        itemListElement: LESSONS.slice(0, 6).map((lesson, index) => ({
+          "@type": "ListItem",
+          position: index + 1,
+          url: `${siteUrl}/bai-hoc/${lesson.slug}`,
+          name: lesson.title,
+        })),
+      },
+    ],
+  };
+}
+
 function HomeVi() {
   const featured = BELTS.slice(0, 6)
     .map((belt) => getLessonsByLevel(belt.lessonLevel)[0])
@@ -290,20 +399,23 @@ function HomeVi() {
   );
 
   return (
-    <div className="mx-auto w-full max-w-6xl px-4 py-10 sm:py-16">
-      <section className="relative overflow-hidden rounded-[2.25rem] border border-white/10 bg-white/5 p-7 shadow-[var(--shadow-card-strong)] sm:p-12">
+    <div className="reveal-sections mobile-safe-bottom mx-auto w-full max-w-6xl px-4 py-8 sm:py-16">
+      <RouteWarmup />
+      <JsonLd data={buildHomeJsonLd("vi")} />
+      <section className="surface-card-strong enterprise-shell hero-noise relative overflow-hidden rounded-[2.25rem] p-7 sm:p-12">
         <div className="absolute inset-0 opacity-90 bg-[radial-gradient(circle_at_top,rgba(34,211,238,0.16),transparent_58%)]" />
         <div className="absolute -right-24 -top-20 h-64 w-64 rounded-full bg-blue-500/20 blur-3xl" />
         <div className="absolute -left-20 -bottom-24 h-64 w-64 rounded-full bg-amber-300/10 blur-3xl" />
         <div className="relative">
+          <div className="accent-line" />
           <p className="inline-flex items-center gap-2 rounded-full border border-cyan-300/25 bg-cyan-300/10 px-3 py-1 text-xs font-semibold text-cyan-100">
             Lộ trình rõ ràng • Từng bước dễ tập • Lưu tiến độ
           </p>
 
-          <h1 className="mt-5 max-w-4xl text-3xl font-semibold tracking-tight text-white sm:text-5xl sm:leading-[1.05]">
+          <h1 className="headline-gradient hero-title-enterprise mt-5 max-w-4xl font-semibold">
             Học Vovinam theo lộ trình đầy đủ từ Lam đai tự vệ đến Hồng đai tứ
           </h1>
-          <p className="mt-4 max-w-2xl text-base leading-7 text-slate-300 sm:text-lg">
+          <p className="hero-subtitle-enterprise mt-4 max-w-2xl text-slate-300">
             Mỗi bài có mục tiêu, hướng dẫn từng bước, lỗi thường gặp và gợi ý tự
             luyện. Bạn có thể đánh dấu hoàn thành để theo dõi tiến độ.
           </p>
@@ -311,13 +423,13 @@ function HomeVi() {
           <div className="mt-7 flex flex-col gap-3 sm:flex-row">
             <Link
               href="/lo-trinh"
-              className="inline-flex h-12 items-center justify-center rounded-2xl bg-gradient-to-r from-cyan-300 to-blue-500 px-5 text-sm font-semibold text-slate-950 transition hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-cyan-300/50"
+              className="cta-primary inline-flex h-12 items-center justify-center rounded-2xl px-5 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-cyan-300/50"
             >
               Bắt đầu học
             </Link>
             <Link
               href="/lich-tap"
-              className="inline-flex h-12 items-center justify-center rounded-2xl border border-white/10 bg-white/5 px-5 text-sm font-semibold text-white transition hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-cyan-300/30"
+              className="cta-secondary inline-flex h-12 items-center justify-center rounded-2xl px-5 text-sm font-semibold text-white transition focus:outline-none focus:ring-2 focus:ring-cyan-300/30"
             >
               Tạo lịch tập 7 ngày
             </Link>
@@ -359,7 +471,7 @@ function HomeVi() {
           description="Tập để khỏe - tự tin - kỷ luật. Tập đúng kỹ thuật và giữ tâm thế bình tĩnh." 
         />
 
-        <div className="mt-5 grid gap-3 lg:grid-cols-3">
+        <div className="mt-5 grid gap-3 md:grid-cols-2 lg:grid-cols-3">
           <FeatureCard
             title="Kỷ luật & đều đặn"
             description="Tập đều quan trọng hơn tập nặng. Tăng dần nhẹ mỗi tuần để bền." 
@@ -393,7 +505,7 @@ function HomeVi() {
           }
         />
 
-        <div className="mt-5 grid gap-3 lg:grid-cols-3">
+        <div className="mt-5 grid gap-3 md:grid-cols-2 lg:grid-cols-3">
           {BELTS.map((b) => (
             <BeltPreview key={b.id} belt={b} />
           ))}
@@ -415,7 +527,7 @@ function HomeVi() {
           }
         />
 
-        <div className="mt-5 grid gap-3 lg:grid-cols-3">
+        <div className="mt-5 grid gap-3 md:grid-cols-2 lg:grid-cols-3">
           {NEWS.slice(0, 3).map((n) => (
             <NewsCard key={n.id} item={n} />
           ))}
@@ -437,7 +549,7 @@ function HomeVi() {
           }
         />
 
-        <div className="mt-5 grid gap-3 lg:grid-cols-3">
+        <div className="mt-5 grid gap-3 md:grid-cols-2 lg:grid-cols-3">
           <FeatureCard
             title="Bài học từng bước"
             description="Mỗi bài có mục tiêu, bước tập, lỗi thường gặp và gợi ý để bạn tập đúng." 
@@ -478,7 +590,7 @@ function HomeVi() {
           description="Cách học này giúp bạn tiến bộ ổn, ít chấn thương, và không bị “tập cho có”."
         />
 
-        <div className="mt-5 grid gap-3 lg:grid-cols-3">
+        <div className="mt-5 grid gap-3 md:grid-cols-2 lg:grid-cols-3">
           <StepCard
             step="1"
             title="Bắt đầu từ nền tảng"
@@ -527,7 +639,7 @@ function HomeVi() {
           }
         />
 
-        <div className="mt-5 grid gap-3 lg:grid-cols-3">
+        <div className="mt-5 grid gap-3 md:grid-cols-2 lg:grid-cols-3">
           {featured.map((lesson) => (
             <LessonPreviewCard
               key={lesson.slug}
@@ -576,7 +688,7 @@ function HomeVi() {
           }
         />
 
-        <div className="mt-5 grid gap-3 lg:grid-cols-4">
+        <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
           {[
             {
               w: "Tuần 1",
@@ -609,7 +721,7 @@ function HomeVi() {
             >
               <div className="flex items-center justify-between gap-2">
                 <Pill>{item.w}</Pill>
-                <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-white/10 bg-gradient-to-br from-cyan-300/15 to-blue-500/10 text-cyan-200">
+                <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-white/10 bg-linear-to-br from-cyan-300/15 to-blue-500/10 text-cyan-200">
                   <FontAwesomeIcon icon={item.icon} className="h-5 w-5" />
                 </span>
               </div>
@@ -645,7 +757,7 @@ function HomeVi() {
           }
         />
 
-        <div className="mt-5 grid gap-3 lg:grid-cols-3">
+        <div className="mt-5 grid gap-3 md:grid-cols-2 lg:grid-cols-3">
           <FeatureCard
             title="Khởi động đúng"
             description="Ưu tiên cổ chân, gối, hông và vai. Khởi động nhẹ rồi tăng dần."
@@ -754,7 +866,7 @@ function HomeVi() {
       </section>
 
       <section className="mt-12">
-        <div className="relative overflow-hidden rounded-[2.25rem] border border-white/10 bg-white/5 p-7 sm:p-12">
+        <div className="surface-card-strong enterprise-shell relative overflow-hidden rounded-[2.25rem] p-7 sm:p-12">
           <div className="absolute inset-0 opacity-80 bg-[radial-gradient(circle_at_top,rgba(34,211,238,0.12),transparent_55%)]" />
           <div className="relative">
             <h2 className="text-2xl font-semibold tracking-tight text-white sm:text-3xl">
@@ -768,13 +880,13 @@ function HomeVi() {
             <div className="mt-6 flex flex-col gap-3 sm:flex-row">
               <Link
                 href="/lo-trinh"
-                className="inline-flex h-12 items-center justify-center rounded-2xl bg-gradient-to-r from-cyan-300 to-blue-500 px-5 text-sm font-semibold text-slate-950 transition hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-cyan-300/50"
+                className="cta-primary inline-flex h-12 items-center justify-center rounded-2xl px-5 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-cyan-300/50"
               >
                 Vào lộ trình
               </Link>
               <Link
                 href="/lich-tap"
-                className="inline-flex h-12 items-center justify-center rounded-2xl border border-white/10 bg-white/5 px-5 text-sm font-semibold text-white transition hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-cyan-300/30"
+                className="cta-secondary inline-flex h-12 items-center justify-center rounded-2xl px-5 text-sm font-semibold text-white transition focus:outline-none focus:ring-2 focus:ring-cyan-300/30"
               >
                 Tạo lịch tập
               </Link>
@@ -782,6 +894,8 @@ function HomeVi() {
           </div>
         </div>
       </section>
+
+      <MobileQuickActions startLabel="Bắt đầu học" scheduleLabel="Lịch 7 ngày" />
     </div>
   );
 }
@@ -892,35 +1006,38 @@ function getGlobalHomeCopy(locale) {
   return null;
 }
 
-function HomeGlobal({ copy }) {
+function HomeGlobal({ copy, locale }) {
   return (
-    <div className="mx-auto w-full max-w-6xl px-4 py-10 sm:py-16">
-      <section className="relative overflow-hidden rounded-[2.25rem] border border-white/10 bg-white/5 p-7 shadow-[var(--shadow-card-strong)] sm:p-12">
+    <div className="reveal-sections mobile-safe-bottom mx-auto w-full max-w-6xl px-4 py-8 sm:py-16">
+      <RouteWarmup />
+      <JsonLd data={buildHomeJsonLd(locale)} />
+      <section className="surface-card-strong enterprise-shell hero-noise relative overflow-hidden rounded-[2.25rem] p-7 sm:p-12">
         <div className="absolute inset-0 opacity-90 bg-[radial-gradient(circle_at_top,rgba(34,211,238,0.16),transparent_58%)]" />
         <div className="absolute -right-24 -top-20 h-64 w-64 rounded-full bg-blue-500/20 blur-3xl" />
         <div className="absolute -left-20 -bottom-24 h-64 w-64 rounded-full bg-amber-300/10 blur-3xl" />
         <div className="relative">
+          <div className="accent-line" />
           <p className="inline-flex items-center gap-2 rounded-full border border-cyan-300/25 bg-cyan-300/10 px-3 py-1 text-xs font-semibold text-cyan-100">
             {copy.heroPill}
           </p>
 
-          <h1 className="mt-5 max-w-4xl text-3xl font-semibold tracking-tight text-white sm:text-5xl sm:leading-[1.05]">
+          <h1 className="headline-gradient hero-title-enterprise mt-5 max-w-4xl font-semibold">
             {copy.heroTitle}
           </h1>
-          <p className="mt-4 max-w-2xl text-base leading-7 text-slate-300 sm:text-lg">
+          <p className="hero-subtitle-enterprise mt-4 max-w-2xl text-slate-300">
             {copy.heroDescription}
           </p>
 
           <div className="mt-7 flex flex-col gap-3 sm:flex-row">
             <Link
               href="/lo-trinh"
-              className="inline-flex h-12 items-center justify-center rounded-2xl bg-gradient-to-r from-cyan-300 to-blue-500 px-5 text-sm font-semibold text-slate-950 transition hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-cyan-300/50"
+              className="cta-primary inline-flex h-12 items-center justify-center rounded-2xl px-5 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-cyan-300/50"
             >
               {copy.startLearning}
             </Link>
             <Link
               href="/lich-tap"
-              className="inline-flex h-12 items-center justify-center rounded-2xl border border-white/10 bg-white/5 px-5 text-sm font-semibold text-white transition hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-cyan-300/30"
+              className="cta-secondary inline-flex h-12 items-center justify-center rounded-2xl px-5 text-sm font-semibold text-white transition focus:outline-none focus:ring-2 focus:ring-cyan-300/30"
             >
               {copy.createSchedule}
             </Link>
@@ -941,7 +1058,7 @@ function HomeGlobal({ copy }) {
           description={copy.highlightsDescription}
         />
 
-        <div className="mt-5 grid gap-3 lg:grid-cols-2">
+        <div className="mt-5 grid gap-3 md:grid-cols-2">
           {copy.features.map((feature) => (
             <FeatureCard
               key={feature.title}
@@ -972,7 +1089,7 @@ function HomeGlobal({ copy }) {
       />
 
       <section className="mt-12">
-        <div className="relative overflow-hidden rounded-[2.25rem] border border-white/10 bg-white/5 p-7 sm:p-12">
+        <div className="surface-card-strong enterprise-shell relative overflow-hidden rounded-[2.25rem] p-7 sm:p-12">
           <div className="absolute inset-0 opacity-80 bg-[radial-gradient(circle_at_top,rgba(34,211,238,0.12),transparent_55%)]" />
           <div className="relative">
             <h2 className="text-2xl font-semibold tracking-tight text-white sm:text-3xl">
@@ -985,13 +1102,13 @@ function HomeGlobal({ copy }) {
             <div className="mt-6 flex flex-col gap-3 sm:flex-row">
               <Link
                 href="/lo-trinh"
-                className="inline-flex h-12 items-center justify-center rounded-2xl bg-gradient-to-r from-cyan-300 to-blue-500 px-5 text-sm font-semibold text-slate-950 transition hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-cyan-300/50"
+                className="cta-primary inline-flex h-12 items-center justify-center rounded-2xl px-5 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-cyan-300/50"
               >
                 {copy.startLearning}
               </Link>
               <Link
                 href="/lich-tap"
-                className="inline-flex h-12 items-center justify-center rounded-2xl border border-white/10 bg-white/5 px-5 text-sm font-semibold text-white transition hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-cyan-300/30"
+                className="cta-secondary inline-flex h-12 items-center justify-center rounded-2xl px-5 text-sm font-semibold text-white transition focus:outline-none focus:ring-2 focus:ring-cyan-300/30"
               >
                 {copy.createSchedule}
               </Link>
@@ -999,6 +1116,8 @@ function HomeGlobal({ copy }) {
           </div>
         </div>
       </section>
+
+      <MobileQuickActions startLabel={copy.startLearning} scheduleLabel={copy.createSchedule} />
     </div>
   );
 }
@@ -1011,6 +1130,6 @@ export default async function Home() {
     return <HomeVi />;
   }
 
-  return <HomeGlobal copy={globalCopy} />;
+  return <HomeGlobal copy={globalCopy} locale={locale} />;
 }
 

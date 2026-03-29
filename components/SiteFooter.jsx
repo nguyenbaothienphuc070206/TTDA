@@ -7,7 +7,7 @@ function FooterLink({ href, children }) {
   return (
     <Link
       href={href}
-      className="text-sm text-slate-300 transition hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-400/30 rounded-lg"
+      className="rounded-lg text-sm text-slate-300 transition hover:-translate-y-0.5 hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-400/30"
     >
       {children}
     </Link>
@@ -35,7 +35,7 @@ export default async function SiteFooter() {
   return (
     <footer className="border-t border-white/10 bg-slate-950/15">
       <div className="mx-auto w-full max-w-6xl px-4 py-12">
-        <div className="relative overflow-hidden rounded-[2.25rem] border border-white/10 bg-white/5 p-6 shadow-[var(--shadow-card-strong)] sm:p-8">
+        <div className="surface-card-strong enterprise-shell relative overflow-hidden rounded-[2.25rem] p-6 sm:p-8">
           <div className="absolute inset-0 opacity-80 bg-[radial-gradient(circle_at_top,rgba(34,211,238,0.12),transparent_55%)]" />
           <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
@@ -50,13 +50,13 @@ export default async function SiteFooter() {
             <div className="flex flex-col gap-2 sm:flex-row">
               <Link
                 href="/learning"
-                className="inline-flex h-11 items-center justify-center rounded-2xl bg-linear-to-r from-cyan-300 to-blue-500 px-4 text-sm font-semibold text-slate-950 transition hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-blue-400/50"
+                className="cta-primary inline-flex h-11 items-center justify-center rounded-2xl px-4 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-blue-400/50"
               >
                 {t("startLearning")}
               </Link>
               <Link
                 href="/lich-tap"
-                className="inline-flex h-11 items-center justify-center rounded-2xl border border-white/10 bg-white/5 px-4 text-sm font-semibold text-white transition hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-blue-400/30"
+                className="cta-secondary inline-flex h-11 items-center justify-center rounded-2xl px-4 text-sm font-semibold text-white transition focus:outline-none focus:ring-2 focus:ring-blue-400/30"
               >
                 {t("createSchedule")}
               </Link>
@@ -64,10 +64,10 @@ export default async function SiteFooter() {
           </div>
         </div>
 
-        <div className="mt-10 grid gap-8 rounded-[2rem] border border-white/10 bg-white/5 p-6 shadow-[var(--shadow-card)] sm:grid-cols-2 lg:grid-cols-4">
+        <div className="surface-card enterprise-shell mt-10 grid gap-8 rounded-4xl p-6 sm:grid-cols-2 lg:grid-cols-4">
           <div>
             <div className="inline-flex items-center gap-2">
-              <span className="inline-flex h-9 w-9 items-center justify-center rounded-2xl bg-linear-to-br from-cyan-300 to-blue-500 text-slate-950 font-extrabold shadow-sm">
+              <span className="pulse-ring inline-flex h-9 w-9 items-center justify-center rounded-2xl bg-linear-to-br from-cyan-300 to-blue-500 text-slate-950 font-extrabold shadow-sm">
                 V
               </span>
               <div className="leading-tight">
@@ -168,7 +168,7 @@ export default async function SiteFooter() {
                   href={emergencySupportUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex h-11 w-full items-center justify-center rounded-2xl border border-white/10 bg-white/5 px-4 text-sm font-semibold text-white transition hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-blue-400/30"
+                  className="cta-secondary inline-flex h-11 w-full items-center justify-center rounded-2xl px-4 text-sm font-semibold text-white transition focus:outline-none focus:ring-2 focus:ring-blue-400/30"
                 >
                   {t("emergencySupport")}
                 </a>

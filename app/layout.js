@@ -9,6 +9,7 @@ import PwaRegister from "@/components/PwaRegister";
 import SifuReminderAgent from "@/components/SifuReminderAgent";
 import SiteFooter from "@/components/SiteFooter";
 import SiteHeader from "@/components/SiteHeader";
+import ViewportReveal from "@/components/ViewportReveal";
 
 const beVietnam = Be_Vietnam_Pro({
   variable: "--font-be-vietnam-pro",
@@ -52,14 +53,21 @@ export default async function RootLayout({ children }) {
       </head>
       <body
         id="top"
-        className={`${beVietnam.variable} ${geistMono.variable} antialiased flex min-h-screen flex-col bg-[color:var(--app-bg)] text-[color:var(--app-fg)]`}
+        className={`${beVietnam.variable} ${geistMono.variable} antialiased flex min-h-screen flex-col bg-(--app-bg) text-(--app-fg)`}
       >
         <NextIntlClientProvider locale={locale} messages={messages}>
+          <a
+            href="#main-content"
+            className="sr-only focus:not-sr-only fixed left-4 top-4 z-100 rounded-xl border border-white/20 bg-slate-950/90 px-4 py-2 text-sm font-semibold text-white"
+          >
+            Bỏ qua menu, tới nội dung chính
+          </a>
           <AnimatedBackground />
+          <ViewportReveal />
           <PwaRegister />
           <SifuReminderAgent />
           <SiteHeader />
-          <main className="flex-1">{children}</main>
+          <main id="main-content" className="flex-1">{children}</main>
           <SiteFooter />
           <AiCoachBubble />
         </NextIntlClientProvider>

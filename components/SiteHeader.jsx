@@ -19,8 +19,8 @@ function NavItem({ href, active, children }) {
       className={
         "rounded-full px-3 py-1.5 text-sm font-medium transition focus:outline-none focus:ring-2 focus:ring-blue-400/40 " +
         (active
-          ? "bg-linear-to-r from-cyan-300/20 to-blue-500/20 text-white shadow-[inset_0_0_0_1px_rgba(125,211,252,0.25)]"
-          : "text-slate-200 hover:bg-white/10 hover:text-white")
+          ? "bg-linear-to-r from-cyan-300/30 to-blue-500/30 text-white shadow-[inset_0_0_0_1px_rgba(125,211,252,0.4),0_10px_24px_rgba(14,116,144,0.24)]"
+          : "text-slate-200 hover:-translate-y-0.5 hover:bg-white/10 hover:text-white")
       }
     >
       {children}
@@ -40,8 +40,8 @@ function ProgressNavItem({ href, active, label, doneCount, remainingCount, total
       className={
         "inline-flex min-w-40 flex-col rounded-2xl px-3 py-1.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-blue-400/40 " +
         (active
-          ? "bg-linear-to-r from-cyan-300/20 to-blue-500/20 text-white shadow-[inset_0_0_0_1px_rgba(125,211,252,0.25)]"
-          : "text-slate-200 hover:bg-white/10 hover:text-white")
+          ? "bg-linear-to-r from-cyan-300/30 to-blue-500/30 text-white shadow-[inset_0_0_0_1px_rgba(125,211,252,0.4),0_10px_24px_rgba(14,116,144,0.24)]"
+          : "text-slate-200 hover:-translate-y-0.5 hover:bg-white/10 hover:text-white")
       }
     >
       <span className="flex items-center justify-between gap-2">
@@ -95,8 +95,8 @@ function LearningNavMenu({ label, items, isActive }) {
         className={
           "inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium transition focus:outline-none focus:ring-2 focus:ring-blue-400/40 " +
           (active
-            ? "bg-linear-to-r from-cyan-300/20 to-blue-500/20 text-white shadow-[inset_0_0_0_1px_rgba(125,211,252,0.25)]"
-            : "text-slate-200 hover:bg-white/10 hover:text-white")
+            ? "bg-linear-to-r from-cyan-300/30 to-blue-500/30 text-white shadow-[inset_0_0_0_1px_rgba(125,211,252,0.4),0_10px_24px_rgba(14,116,144,0.24)]"
+            : "text-slate-200 hover:-translate-y-0.5 hover:bg-white/10 hover:text-white")
         }
         aria-haspopup="menu"
         aria-expanded={open}
@@ -108,7 +108,7 @@ function LearningNavMenu({ label, items, isActive }) {
       {open ? (
         <div
           role="menu"
-          className="absolute left-0 z-50 mt-2 w-44 overflow-hidden rounded-2xl border border-white/10 bg-(--header-bg) shadow-(--shadow-card) backdrop-blur"
+          className="surface-card absolute left-0 z-50 mt-2 w-44 overflow-hidden rounded-2xl"
         >
           {items.map((item) => {
             const itemActive = isActive(item.href);
@@ -215,13 +215,14 @@ export default function SiteHeader() {
 
   return (
     <header className="sticky top-0 z-50 border-b border-white/10 bg-(--header-bg) backdrop-blur-xl">
+      <div className="accent-line" />
       <div className="mx-auto w-full max-w-6xl px-4 py-3">
-        <div className="flex flex-wrap items-center gap-3 rounded-3xl border border-white/10 bg-white/5 px-3 py-2 shadow-[var(--shadow-card)]">
+        <div className="surface-card enterprise-shell flex flex-wrap items-center gap-3 rounded-3xl px-3 py-2">
           <Link
             href="/"
             className="group inline-flex shrink-0 items-center gap-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400/40"
           >
-            <span className="inline-flex h-9 w-9 items-center justify-center rounded-2xl bg-linear-to-br from-blue-400 to-blue-600 text-slate-950 font-extrabold shadow-sm">
+            <span className="pulse-ring inline-flex h-9 w-9 items-center justify-center rounded-2xl bg-linear-to-br from-cyan-300 to-blue-600 text-slate-950 font-extrabold shadow-sm">
               V
             </span>
             <span className="leading-tight">
