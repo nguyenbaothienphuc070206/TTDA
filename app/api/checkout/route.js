@@ -1,6 +1,7 @@
 import { getProductById } from "@/data/store";
 import { checkRateLimit, isBodyTooLarge, isSameOrigin } from "@/lib/apiGuards";
 import { createCompatResponder } from "@/lib/api/compatResponse";
+import { fetchWithResilience } from "@/lib/api/upstreamResilience";
 
 function normalizeItems(raw) {
   if (!Array.isArray(raw)) return [];
@@ -110,24 +111,30 @@ export async function POST(request) {
     params.set(`line_items[${i}][quantity]`, String(item.qty));
   }
 
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 10_000);
+  const stripeReq = await fetchWithResilience("https://api.stripe.com/v1/checkout/sessions", {
+    service: "stripe_checkout_create",
+    timeoutMs: 10_000,
+    retries: 1,
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${stripeSecret}`,
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+    body: params.toString(),
+  });
 
-  let stripeRes;
-  try {
-    stripeRes = await fetch("https://api.stripe.com/v1/checkout/sessions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${stripeSecret}`,
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-      body: params.toString(),
-      signal: controller.signal,
+  if (!stripeReq.ok && !stripeReq.response) {
+    return api.fail({
+      message: "Không kết nối được Stripe. Vui lòng thử lại.",
+      code: stripeReq.type === "circuit_open" ? "UPSTREAM_CIRCUIT_OPEN" : "UPSTREAM_ERROR",
+      status: 502,
     });
-  } catch {
+  }
+
+  const stripeRes = stripeReq.response;
+
+  if (!stripeRes) {
     return api.fail({ message: "Không kết nối được Stripe. Vui lòng thử lại.", code: "UPSTREAM_ERROR", status: 502 });
-  } finally {
-    clearTimeout(timeout);
   }
 
   const data = await stripeRes.json().catch(() => null);

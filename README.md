@@ -170,6 +170,30 @@ Ghi chú: trình duyệt web không hỗ trợ mesh Bluetooth đầy đủ như 
 - Tat ca call AI/Community/Auth quan trong di qua `GET|POST|PUT /api/gateway?target=...`.
 - Rate limit phan tan va security headers duoc xu ly tai `proxy.js` (theo yeu cau Next.js 16, khong dung file middleware.js rieng).
 
+## Resilience & Observability (moi)
+
+Da bo sung co che retry/timeout/circuit-breaker cho upstream Stripe trong:
+
+- `app/api/checkout/route.js`
+- `app/api/checkout/session/route.js`
+
+Helper dung chung:
+
+- `lib/api/upstreamResilience.js`
+
+Bien moi truong tuy chinh:
+
+- `UPSTREAM_CB_FAILURE_THRESHOLD` (mac dinh `5`)
+- `UPSTREAM_CB_OPEN_MS` (mac dinh `30000`)
+
+Gateway co them header do tre:
+
+- `x-gateway-latency-ms`
+
+Bat audit log gateway (tuỳ chọn):
+
+- `GATEWAY_AUDIT_LOG=1`
+
 ## Supabase Auth + RLS (Admin/Coach)
 
 Khu vực `/admin` dùng **Supabase Auth** (Google OAuth hoặc Email OTP) và **RLS**.

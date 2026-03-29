@@ -27,6 +27,7 @@ function stripHopByHopHeaders(headers) {
 }
 
 async function proxyRequest(request, method) {
+  const startedAt = Date.now();
   const api = createCompatResponder(request);
   const url = new URL(request.url);
   const target = asText(url.searchParams.get("target"));
@@ -97,6 +98,21 @@ async function proxyRequest(request, method) {
   response.headers.set("Cache-Control", "no-store");
   response.headers.set("x-gateway-target", spec.target);
   response.headers.set("x-request-id", api.requestId);
+  response.headers.set("x-gateway-latency-ms", String(Math.max(0, Date.now() - startedAt)));
+
+  if (String(process.env.GATEWAY_AUDIT_LOG || "").trim() === "1") {
+    const safePath = path.pathname;
+    const entry = {
+      at: new Date().toISOString(),
+      requestId: api.requestId,
+      target: spec.target,
+      method: safeMethod,
+      status: upstream.status,
+      latencyMs: Math.max(0, Date.now() - startedAt),
+      path: safePath,
+    };
+    console.log(`[gateway] ${JSON.stringify(entry)}`);
+  }
 
   return response;
 }
