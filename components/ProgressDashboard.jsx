@@ -66,7 +66,7 @@ function getCopy(locale) {
 function ProgressBar({ percent }) {
   const p = Math.max(0, Math.min(100, Number(percent) || 0));
   return (
-    <div className="h-2 w-full overflow-hidden rounded-full bg-white/10">
+    <div className="h-2 w-full overflow-hidden rounded-full border border-white/10 bg-slate-950/40">
       <div
         className="h-full bg-gradient-to-r from-cyan-300 to-blue-500 progress-bar"
         style={{ width: `${p}%` }}
@@ -77,7 +77,7 @@ function ProgressBar({ percent }) {
 
 function TopList({ title, items, resolve, hrefFor, emptyLabel }) {
   return (
-    <div className="rounded-3xl border border-white/10 bg-white/5 p-6">
+    <div className="rounded-3xl border border-white/10 bg-white/5 p-6 shadow-[var(--shadow-card)]">
       <div className="text-sm font-semibold text-white">{title}</div>
       {items.length === 0 ? (
         <p className="mt-2 text-sm text-slate-300">{emptyLabel}</p>
@@ -161,7 +161,7 @@ export default function ProgressDashboard() {
 
   return (
     <div className="grid gap-4">
-      <section className="rounded-3xl border border-white/10 bg-white/5 p-6 sm:p-8">
+      <section className="rounded-3xl border border-white/10 bg-white/5 p-6 shadow-[var(--shadow-card-strong)] sm:p-8">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h2 className="text-xl font-semibold text-white">{copy.overview}</h2>
@@ -169,7 +169,7 @@ export default function ProgressDashboard() {
               {copy.overviewDesc(doneCount, total)}
             </p>
           </div>
-          <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-white">
+          <div className="rounded-2xl border border-cyan-300/20 bg-slate-950/35 px-4 py-2 text-sm font-semibold text-cyan-100">
             {percent}%
           </div>
         </div>
@@ -181,7 +181,7 @@ export default function ProgressDashboard() {
         <div className="mt-4 grid gap-3 sm:grid-cols-3">
           <Link
             href="/lo-trinh"
-            className="inline-flex h-11 items-center justify-center rounded-2xl bg-gradient-to-r from-cyan-300 to-blue-500 px-4 text-sm font-semibold text-slate-950 transition hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-cyan-300/50"
+            className="inline-flex h-11 items-center justify-center rounded-2xl bg-linear-to-r from-cyan-300 to-blue-500 px-4 text-sm font-semibold text-slate-950 transition hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-cyan-300/50"
           >
             {copy.continueLearning}
           </Link>
@@ -200,7 +200,7 @@ export default function ProgressDashboard() {
         </div>
       </section>
 
-      <section className="rounded-3xl border border-white/10 bg-white/5 p-6 sm:p-8">
+      <section className="rounded-3xl border border-white/10 bg-white/5 p-6 shadow-[var(--shadow-card)] sm:p-8">
         <h2 className="text-xl font-semibold text-white">{copy.completedLessons}</h2>
         {doneLessons.length === 0 ? (
           <p className="mt-2 text-sm text-slate-300">{copy.noCompletedLessons}</p>

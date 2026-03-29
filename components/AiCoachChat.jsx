@@ -277,7 +277,7 @@ function SourceItem({ source, copy }) {
   const href = String(source?.url || "").trim();
 
   return (
-    <li className="rounded-2xl border border-white/10 bg-slate-950/30 backdrop-blur-xl p-3">
+    <li className="rounded-2xl border border-white/10 bg-slate-950/35 p-3 shadow-[var(--shadow-card)]">
       <div className="flex items-center justify-between gap-3">
         <div className="min-w-0">
           <div className="text-sm font-semibold text-white truncate">
@@ -614,7 +614,7 @@ export default function AiCoachChat({ context }) {
 
   return (
     !isPremium ? (
-      <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-slate-950/30 backdrop-blur-xl shadow-[var(--shadow-card)] flex flex-col h-[calc(100vh-theme(spacing.16))] lg:sticky lg:top-16">
+      <div className="relative flex h-[calc(100vh-theme(spacing.16))] flex-col overflow-hidden rounded-3xl border border-white/10 bg-slate-950/30 shadow-[var(--shadow-card-strong)] backdrop-blur-xl lg:sticky lg:top-16">
         <div
           aria-hidden
           className="pointer-events-none absolute -inset-8 rounded-[2.75rem] bg-[radial-gradient(circle_at_bottom_right,rgba(250,204,21,0.16),transparent_60%)] blur-2xl"
@@ -633,7 +633,7 @@ export default function AiCoachChat({ context }) {
             </div>
           </div>
 
-          <div className="mt-4 rounded-3xl border border-white/10 bg-slate-950/30 p-5 text-sm leading-6 text-slate-200">
+          <div className="mt-4 rounded-3xl border border-white/10 bg-slate-950/35 p-5 text-sm leading-6 text-slate-200 shadow-[var(--shadow-card)]">
             <div className="text-xs font-semibold text-slate-300">{copy.premiumUnlock}</div>
             <ul className="mt-2 grid gap-1">
               <li>• {copy.premiumFeat1}</li>
@@ -645,7 +645,7 @@ export default function AiCoachChat({ context }) {
           <div className="mt-auto pt-4">
             <Link
               href="/ho-so#goi-premium"
-              className="inline-flex h-11 w-full items-center justify-center rounded-2xl bg-gradient-to-r from-amber-300 to-amber-500 px-5 text-sm font-semibold text-slate-950 transition hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-amber-300/40"
+              className="inline-flex h-11 w-full items-center justify-center rounded-2xl bg-linear-to-r from-amber-300 to-amber-500 px-5 text-sm font-semibold text-slate-950 transition hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-amber-300/40"
             >
               {copy.upgrade}
             </Link>
@@ -656,7 +656,7 @@ export default function AiCoachChat({ context }) {
         </div>
       </div>
     ) : (
-    <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-slate-950/30 backdrop-blur-xl shadow-[var(--shadow-card)] flex flex-col h-[calc(100vh-theme(spacing.16))] lg:sticky lg:top-16">
+    <div className="relative flex h-[calc(100vh-theme(spacing.16))] flex-col overflow-hidden rounded-3xl border border-white/10 bg-slate-950/30 shadow-[var(--shadow-card-strong)] backdrop-blur-xl lg:sticky lg:top-16">
       <div
         aria-hidden
         className="pointer-events-none absolute -inset-8 rounded-[2.75rem] bg-[radial-gradient(circle_at_bottom_right,rgba(250,204,21,0.16),transparent_60%)] blur-2xl"
@@ -676,7 +676,7 @@ export default function AiCoachChat({ context }) {
         <div
           ref={scrollRef}
           onScroll={onScroll}
-          className="ai-scrollbar mt-4 flex-1 min-h-0 overflow-y-auto rounded-3xl border border-white/10 bg-slate-950/30 p-4"
+          className="ai-scrollbar mt-4 min-h-0 flex-1 overflow-y-auto rounded-3xl border border-white/10 bg-slate-950/35 p-4"
         >
           {hasChat ? (
             <div className="grid gap-3">
@@ -705,7 +705,7 @@ export default function AiCoachChat({ context }) {
                   <Link
                     key={v.id}
                     href={v.url || `/video/${v.id}`}
-                    className="rounded-2xl border border-white/10 bg-slate-950/30 backdrop-blur-xl p-4 transition hover:border-amber-300/25 hover:bg-slate-950/20"
+                    className="rounded-2xl border border-white/10 bg-slate-950/35 p-4 transition hover:-translate-y-0.5 hover:border-amber-300/25 hover:bg-slate-950/20"
                   >
                     <div className="text-sm font-semibold text-white">{v.title}</div>
                     {v.summary ? (
@@ -746,7 +746,7 @@ export default function AiCoachChat({ context }) {
           <button
             type="submit"
             disabled={loading}
-            className="inline-flex h-11 items-center justify-center rounded-2xl bg-gradient-to-r from-amber-300 to-amber-500 px-5 text-sm font-semibold text-slate-950 transition hover:brightness-110 disabled:opacity-60 focus:outline-none focus:ring-2 focus:ring-amber-300/40"
+            className="inline-flex h-11 items-center justify-center rounded-2xl bg-linear-to-r from-amber-300 to-amber-500 px-5 text-sm font-semibold text-slate-950 transition hover:brightness-110 disabled:opacity-60 focus:outline-none focus:ring-2 focus:ring-amber-300/40"
           >
             {loading ? copy.answering : copy.ask}
           </button>

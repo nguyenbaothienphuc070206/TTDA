@@ -59,7 +59,7 @@ export default function CommunityInbox() {
 
   if (loading) {
     return (
-      <div className="rounded-3xl border border-white/10 bg-white/5 p-6 text-sm text-slate-300">
+      <div className="rounded-3xl border border-white/10 bg-white/5 p-6 text-sm text-slate-300 shadow-[var(--shadow-card)]">
         {t("loading")}
       </div>
     );
@@ -82,14 +82,14 @@ export default function CommunityInbox() {
 
   if (!items.length) {
     return (
-      <div className="rounded-3xl border border-white/10 bg-white/5 p-6 text-sm text-slate-300">
+      <div className="rounded-3xl border border-white/10 bg-white/5 p-6 text-sm text-slate-300 shadow-[var(--shadow-card)]">
         {t("empty")}
       </div>
     );
   }
 
   return (
-    <div className="rounded-3xl border border-white/10 bg-white/5 p-4 sm:p-6">
+    <div className="rounded-3xl border border-white/10 bg-white/5 p-4 shadow-[var(--shadow-card-strong)] sm:p-6">
       <div className="mb-3 flex items-center justify-between gap-2">
         <h1 className="text-xl font-semibold text-white">{t("title")}</h1>
         <button
@@ -115,7 +115,7 @@ export default function CommunityInbox() {
             <Link
               key={partnerId}
               href={`/cong-dong/chat?to=${encodeURIComponent(partnerId)}`}
-              className="flex items-center justify-between gap-3 rounded-2xl border border-white/10 bg-white/5 p-3 transition hover:bg-white/10"
+              className="flex items-center justify-between gap-3 rounded-2xl border border-white/10 bg-slate-950/30 p-3 transition hover:-translate-y-0.5 hover:border-cyan-300/25 hover:bg-slate-950/20"
             >
               <div className="flex min-w-0 items-center gap-3">
                 {avatarUrl ? (

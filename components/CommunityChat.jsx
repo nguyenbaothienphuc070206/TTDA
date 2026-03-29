@@ -277,7 +277,7 @@ export default function CommunityChat({ toUserId, toName }) {
   }
 
   return (
-    <div className="rounded-3xl border border-white/10 bg-white/5 p-6">
+    <div className="rounded-3xl border border-white/10 bg-white/5 p-6 shadow-[var(--shadow-card-strong)]">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <h1 className="text-xl font-semibold text-white">{t("title")}</h1>
@@ -314,7 +314,7 @@ export default function CommunityChat({ toUserId, toName }) {
 
       <div
         ref={listRef}
-        className="mt-4 h-105 overflow-auto rounded-2xl border border-white/10 bg-slate-950/30 p-3 ai-scrollbar"
+        className="mt-4 h-105 overflow-auto rounded-2xl border border-white/10 bg-slate-950/35 p-3 ai-scrollbar"
         aria-label={t("messageListAria")}
       >
         {loadingInitial ? (
@@ -332,10 +332,10 @@ export default function CommunityChat({ toUserId, toName }) {
                 <div key={key} className={mine ? "flex justify-end" : "flex justify-start"}>
                   <div
                     className={
-                      "max-w-[85%] rounded-2xl border px-3 py-2 text-sm leading-6 shadow-sm " +
+                      "max-w-[85%] rounded-2xl border px-3 py-2 text-sm leading-6 shadow-[var(--shadow-card)] " +
                       (mine
-                        ? "border-cyan-300/25 bg-linear-to-r from-cyan-300/15 to-blue-500/10 text-white"
-                        : "border-white/10 bg-white/5 text-slate-100")
+                        ? "border-cyan-300/30 bg-linear-to-r from-cyan-300/20 to-blue-500/15 text-white"
+                        : "border-white/10 bg-slate-950/30 text-slate-100")
                     }
                   >
                     <div className="whitespace-pre-wrap wrap-break-word">{text}</div>
@@ -371,7 +371,7 @@ export default function CommunityChat({ toUserId, toName }) {
           onKeyDown={onKeyDown}
           placeholder={t("placeholder")}
           rows={3}
-          className="w-full resize-none rounded-2xl border border-white/10 bg-slate-950/60 px-3 py-2 text-sm text-white outline-none focus:ring-2 focus:ring-cyan-300/30"
+          className="w-full resize-none rounded-2xl border border-white/10 bg-slate-950/55 px-3 py-2 text-sm text-white outline-none focus:ring-2 focus:ring-cyan-300/30"
         />
 
         <button

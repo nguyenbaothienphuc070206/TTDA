@@ -146,7 +146,7 @@ function Pill({ children }) {
 
 function ComboCard({ title, description, items, totalVnd }) {
   return (
-    <div className="rounded-3xl border border-white/10 bg-slate-950/30 p-5">
+    <div className="rounded-3xl border border-white/10 bg-slate-950/35 p-5 shadow-[var(--shadow-card)] transition hover:-translate-y-0.5 hover:border-cyan-300/25">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <div className="text-sm font-semibold text-white">{title}</div>
@@ -255,13 +255,13 @@ export default function Storefront() {
   }, [copy]);
 
   return (
-    <div className="rounded-3xl border border-white/10 bg-white/5 p-6 sm:p-8">
+    <div className="rounded-3xl border border-white/10 bg-white/5 p-6 shadow-[var(--shadow-card-strong)] sm:p-8">
       <h2 className="text-xl font-semibold text-white">{copy.title}</h2>
       <p className="mt-2 text-sm leading-6 text-slate-300">
         {copy.description}
       </p>
 
-      <div className="mt-4 rounded-2xl border border-white/10 bg-slate-950/30 p-4 text-sm leading-6 text-slate-300">
+      <div className="mt-4 rounded-2xl border border-cyan-300/15 bg-slate-950/35 p-4 text-sm leading-6 text-slate-300">
         {copy.affiliateNote}
       </div>
 
@@ -285,7 +285,7 @@ export default function Storefront() {
       {categories.length ? (
         <div className="mt-6 grid gap-6">
           {categories.map((cat) => (
-            <section key={cat.id} className="rounded-3xl border border-white/10 bg-slate-950/20 p-5">
+            <section key={cat.id} className="rounded-3xl border border-white/10 bg-slate-950/25 p-5 shadow-[var(--shadow-card)]">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div className="text-sm font-semibold text-white">{cat.title}</div>
                 <div className="text-xs text-slate-300">{copy.itemCount(cat.items.length)}</div>
@@ -304,7 +304,7 @@ export default function Storefront() {
                   ];
 
                   return (
-                    <div key={p.id} className="rounded-3xl border border-white/10 bg-slate-950/30 p-5">
+                    <div key={p.id} className="rounded-3xl border border-white/10 bg-slate-950/35 p-5 shadow-[var(--shadow-card)] transition hover:-translate-y-0.5 hover:border-cyan-300/30">
                       <div className="flex flex-wrap items-start justify-between gap-3">
                         <div>
                           <div className="text-sm font-semibold text-white">{p.name}</div>
@@ -328,7 +328,7 @@ export default function Storefront() {
                             href={href}
                             target="_blank"
                             rel="noreferrer"
-                            className="inline-flex h-11 w-full items-center justify-center rounded-2xl bg-gradient-to-r from-cyan-300 to-blue-500 px-4 text-sm font-semibold text-slate-950 transition hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-cyan-300/50"
+                            className="inline-flex h-11 w-full items-center justify-center rounded-2xl bg-linear-to-r from-cyan-300 to-blue-500 px-4 text-sm font-semibold text-slate-950 transition hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-cyan-300/50"
                           >
                             {copy.buyAt(partnerName)}
                           </a>

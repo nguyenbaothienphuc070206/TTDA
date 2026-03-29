@@ -148,9 +148,9 @@ function daysBetween(nowMs, thenMs) {
 function ProgressBar({ percent }) {
   const p = Math.max(0, Math.min(100, Number(percent) || 0));
   return (
-    <div className="h-2 w-full overflow-hidden rounded-full bg-white/10">
+    <div className="h-2 w-full overflow-hidden rounded-full border border-white/10 bg-slate-950/40">
       <div
-        className="h-full bg-gradient-to-r from-blue-400 to-blue-600 progress-bar"
+        className="h-full bg-linear-to-r from-cyan-300 to-blue-500 progress-bar"
         style={{ width: `${p}%` }}
       />
     </div>
@@ -203,7 +203,7 @@ function BeltCard({ belt, doneSlugs, copy }) {
   );
 
   return (
-    <section className="group relative overflow-hidden rounded-3xl border border-white/10 bg-white/5 p-6 shadow-[var(--shadow-card)] transition hover:scale-[1.02] hover:border-blue-400/30 hover:bg-white/10 hover:shadow-[var(--shadow-card-strong)]">
+    <section className="group relative overflow-hidden rounded-3xl border border-white/10 bg-white/5 p-6 shadow-[var(--shadow-card)] transition hover:-translate-y-0.5 hover:scale-[1.01] hover:border-cyan-300/35 hover:bg-white/10 hover:shadow-[var(--shadow-card-strong)]">
       <div className="absolute inset-0 opacity-0 transition-opacity group-hover:opacity-100 bg-[radial-gradient(circle_at_top,rgba(59,130,246,0.10),transparent_55%)]" />
 
       <div className="relative">
@@ -221,7 +221,7 @@ function BeltCard({ belt, doneSlugs, copy }) {
         </div>
 
         <div className="mt-4 grid gap-3 sm:grid-cols-2">
-          <div className="rounded-2xl border border-white/10 bg-slate-950/30 p-4 shadow-[var(--shadow-card)]">
+          <div className="rounded-2xl border border-white/10 bg-slate-950/35 p-4 shadow-[var(--shadow-card)]">
             <div className="text-xs font-semibold text-slate-300">{copy.progress}</div>
             <div className="mt-3">
               <ProgressBar percent={percent} />
@@ -231,7 +231,7 @@ function BeltCard({ belt, doneSlugs, copy }) {
             </p>
           </div>
 
-          <div className="rounded-2xl border border-white/10 bg-slate-950/30 p-4 shadow-[var(--shadow-card)]">
+          <div className="rounded-2xl border border-white/10 bg-slate-950/35 p-4 shadow-[var(--shadow-card)]">
             <div className="text-xs font-semibold text-slate-300">{copy.resources}</div>
             <div className="mt-3 grid gap-2 text-sm text-slate-300">
               <div className="flex items-center justify-between">
@@ -250,7 +250,7 @@ function BeltCard({ belt, doneSlugs, copy }) {
         <div className="mt-4 flex flex-col gap-2 sm:flex-row">
           <Link
             href="/lo-trinh"
-            className="inline-flex h-11 items-center justify-center rounded-2xl bg-gradient-to-r from-blue-400 to-blue-600 px-4 text-sm font-semibold text-slate-950 transition hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-blue-400/50"
+            className="inline-flex h-11 items-center justify-center rounded-2xl bg-linear-to-r from-cyan-300 to-blue-500 px-4 text-sm font-semibold text-slate-950 transition hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-cyan-300/50"
           >
             {copy.viewRoadmap}
           </Link>
@@ -268,7 +268,7 @@ function BeltCard({ belt, doneSlugs, copy }) {
           </Link>
         </div>
 
-        <div className="mt-4 rounded-2xl border border-white/10 bg-slate-950/30 p-4 shadow-[var(--shadow-card)]">
+        <div className="mt-4 rounded-2xl border border-white/10 bg-slate-950/35 p-4 shadow-[var(--shadow-card)]">
           <div className="text-xs font-semibold text-slate-300">{copy.quickSuggestion}</div>
           <ul className="mt-2 grid gap-1 text-sm leading-6 text-slate-300">
             {lessons.slice(0, 3).map((l) => (
@@ -436,7 +436,7 @@ export default function LearningDashboard() {
   return (
     <div className="grid gap-4">
       {showNudge ? (
-        <div className="rounded-3xl border border-white/10 bg-white/5 p-6 sm:p-8 shadow-[var(--shadow-card)]">
+        <div className="rounded-3xl border border-cyan-300/20 bg-linear-to-r from-cyan-300/10 to-blue-500/10 p-6 sm:p-8 shadow-[var(--shadow-card)]">
           <p className="text-sm leading-6 text-slate-300">
             {(() => {
               const profile = readProfile();
@@ -448,7 +448,7 @@ export default function LearningDashboard() {
         </div>
       ) : null}
 
-      <div className="rounded-3xl border border-white/10 bg-white/5 p-6 sm:p-8 shadow-[var(--shadow-card)]">
+      <div className="rounded-3xl border border-white/10 bg-white/5 p-6 sm:p-8 shadow-[var(--shadow-card-strong)]">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h2 className="text-xl font-semibold text-white">{copy.overviewTitle}</h2>
@@ -456,14 +456,14 @@ export default function LearningDashboard() {
               {copy.overviewDesc(overallDone, totalLessons)}
             </p>
           </div>
-          <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-white">
+          <div className="rounded-2xl border border-cyan-300/20 bg-slate-950/35 px-4 py-2 text-sm font-semibold text-cyan-100">
             {overallPercent}%
           </div>
         </div>
 
-        <div className="mt-4 h-2 w-full overflow-hidden rounded-full bg-white/10">
+        <div className="mt-4 h-2 w-full overflow-hidden rounded-full border border-white/10 bg-slate-950/40">
           <div
-            className="h-full bg-gradient-to-r from-blue-400 to-blue-600 progress-bar"
+            className="h-full bg-linear-to-r from-cyan-300 to-blue-500 progress-bar"
             style={{ width: `${overallPercent}%` }}
           />
         </div>
@@ -495,8 +495,8 @@ export default function LearningDashboard() {
             onClick={toggleOffline}
             className={
               offlineEnabled
-                ? "inline-flex h-11 items-center justify-center rounded-2xl border border-white/10 bg-white/5 px-4 text-sm font-semibold text-white transition hover:bg-white/10 disabled:opacity-60 focus:outline-none focus:ring-2 focus:ring-blue-400/30"
-                : "inline-flex h-11 items-center justify-center rounded-2xl bg-gradient-to-r from-blue-400 to-blue-600 px-4 text-sm font-semibold text-slate-950 transition hover:brightness-110 disabled:opacity-60 focus:outline-none focus:ring-2 focus:ring-blue-400/40"
+                ? "inline-flex h-11 items-center justify-center rounded-2xl border border-white/10 bg-white/5 px-4 text-sm font-semibold text-white transition hover:bg-white/10 disabled:opacity-60 focus:outline-none focus:ring-2 focus:ring-cyan-300/30"
+                : "inline-flex h-11 items-center justify-center rounded-2xl bg-linear-to-r from-cyan-300 to-blue-500 px-4 text-sm font-semibold text-slate-950 transition hover:brightness-110 disabled:opacity-60 focus:outline-none focus:ring-2 focus:ring-cyan-300/40"
             }
           >
             {offlineBusy
