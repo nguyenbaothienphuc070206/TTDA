@@ -242,8 +242,8 @@ export default function SiteHeader() {
           </div>
           </div>
 
-          <nav className="relative mt-2 w-full overflow-x-auto overflow-y-visible pb-1 ai-scrollbar">
-            <div className="flex min-w-max items-center gap-1.5 pr-1">
+          <nav className="relative mt-2 w-full pb-1">
+            <div className="flex flex-wrap items-center gap-1.5">
               <LearningNavMenu label={t("learning")} items={learningItems} isActive={isActive} />
               {navItems.map((item) => {
                 const isCommunity = item.href === "/cong-dong";
