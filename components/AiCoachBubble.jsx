@@ -11,6 +11,7 @@ import { Sparkles, ThumbsDown, ThumbsUp, X } from "lucide-react";
 import { LESSONS, getLessonBySlug } from "@/data/lessons";
 import { readDoneSlugs } from "@/lib/progress";
 import { readProfile } from "@/lib/profile";
+import { callGateway } from "@/lib/api/gatewayClient";
 import MascotIcon from "@/components/MascotIcon";
 
 const CHAT_STORE_KEY = "vovinam_ai_chat_v1";
@@ -382,10 +383,10 @@ export default function AiCoachBubble() {
     });
 
     try {
-      await fetch("/api/ai/coach/feedback", {
+      await callGateway({
+        target: "aiCoachFeedback",
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messageId: id, rating: r, pagePath: pathname }),
+        payload: { messageId: id, rating: r, pagePath: pathname },
       });
     } catch {
       // ignore
@@ -491,14 +492,12 @@ export default function AiCoachBubble() {
 
       setActiveContext(mergedContext);
 
-      const res = await fetch("/api/ai/coach", {
+      const res = await callGateway({
+        target: "aiCoachAsk",
         method: "POST",
         signal: ctrl.signal,
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "text/event-stream",
-        },
-        body: JSON.stringify({
+        accept: "text/event-stream",
+        payload: {
           query: question,
           context: mergedContext,
           stream: true,
@@ -506,7 +505,7 @@ export default function AiCoachBubble() {
           beltId,
           name,
           sessionId: activeSessionId,
-        }),
+        },
       });
 
       const ct = res.headers.get("content-type") || "";

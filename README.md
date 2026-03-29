@@ -69,6 +69,107 @@ Nếu bạn deploy thật và muốn `sitemap.xml`/`robots.txt` dùng đúng dom
 1. Copy `.env.example` → `.env.local`
 2. Điền `NEXT_PUBLIC_SITE_URL=https://your-domain.com`
 
+## Hardening cho tải lớn (100M+ users)
+
+Để chạy an toàn ở quy mô lớn, app đã có thêm lớp chặn quá tải ở edge cho toàn bộ `/api/*` và tăng cường security headers.
+
+Thiết lập thêm trong `.env.local` (và môi trường production):
+
+- `RATE_LIMIT_UPSTASH_REDIS_REST_URL`
+- `RATE_LIMIT_UPSTASH_REDIS_REST_TOKEN`
+- `RATE_LIMIT_GLOBAL_WINDOW_SEC` (mặc định: `60`)
+- `RATE_LIMIT_GLOBAL_LIMIT_WRITE` (mặc định: `240` request / window / IP)
+- `RATE_LIMIT_GLOBAL_LIMIT_READ` (mặc định: `1200` request / window / IP)
+- `TRUSTED_PROXY_COUNT` (mặc định: `1`, số hop proxy tin cậy khi parse `x-forwarded-for`)
+
+Khuyến nghị production:
+
+- Luôn đặt app sau CDN/WAF (Cloudflare/Akamai/Fastly).
+- Dùng Redis managed đa vùng để rate-limit phân tán (không dùng memory local).
+- Bật monitoring cho `429`, `5xx`, và `x-rate-limit-mode` để phát hiện degraded mode.
+
+## PHASE 2 - Polymorphic Data Ingestion Engine
+
+Endpoint mới: `POST /api/ai/ingest`
+
+Mục tiêu:
+
+- Gom dữ liệu đa hình cho AI Coach: `text`, `image`, `video`, `pose`, `audio`, `progress`.
+- Chuẩn hóa payload về định dạng thống nhất để dễ phân tích thời gian thực.
+
+Ví dụ payload:
+
+```json
+{
+  "modality": "video",
+  "durationMs": 18000,
+  "fps": 30,
+  "frameCount": 540,
+  "motionScore": 0.72,
+  "keyframes": [{ "tsMs": 1200, "confidence": 0.89, "hint": "front kick" }]
+}
+```
+
+## PHASE 8 - Core API Gateway
+
+Endpoint mới: `GET|POST /api/gateway?target=<target>`
+
+Mục tiêu:
+
+- Làm cổng API trung tâm để frontend gọi vào 1 cửa.
+- Allow-list target nội bộ (AI Coach, Checkout, Community, Ingest).
+- Kế thừa rate limit + no-store + request-id để vận hành ổn định khi tải lớn.
+
+Ví dụ target hiện có:
+
+- `aiCoachAsk`, `aiCoachFeedback`
+- `checkoutCreate`, `checkoutSession`
+- `communityMessagesGet`, `communityMessagesSend`
+- `aiIngest`
+
+## PHASE 11 - Biometric Identity (Passkey)
+
+Endpoint mới: `POST /api/auth/passkey`
+
+Các action:
+
+- `register_options`
+- `register_verify`
+- `login_options`
+- `login_verify`
+- `logout`
+
+UI đã tích hợp trong khu vực hồ sơ (`UserAuthPanel`) để dùng Face ID / Touch ID / Windows Hello qua WebAuthn.
+
+Biến môi trường khuyến nghị:
+
+- `PASSKEY_RP_ID`
+- `PASSKEY_RP_NAME`
+- `PASSKEY_EXPECTED_ORIGINS` (danh sách origin, phân tách bằng dấu phẩy)
+- `PASSKEY_UPSTASH_REDIS_REST_URL` (khuyến nghị cho multi-instance)
+- `PASSKEY_UPSTASH_REDIS_REST_TOKEN` (khuyến nghị cho multi-instance)
+
+Nếu không cấu hình Redis cho passkey, hệ thống sẽ fallback sang memory local (phù hợp demo/single-instance).
+
+## PHASE 19 - Offline Mesh Transaction Network
+
+UI mới: `OfflineMeshPanel` ở trang học tập.
+
+Khả năng:
+
+- Tạo gói dữ liệu tiến độ offline.
+- Chia sẻ gần bằng QR / Web Share (`vovinam-mesh://...`).
+- Nhập gói từ thiết bị khác.
+- Xếp hàng sync khi offline và tự đồng bộ lại khi online qua gateway (`aiIngest`, modality `progress`).
+
+Ghi chú: trình duyệt web không hỗ trợ mesh Bluetooth đầy đủ như app native; bản này dùng mô hình offline-first + near-share để đạt trải nghiệm tương đương cho phần lớn tình huống thực tế.
+
+## Trạng thái kiến truc API
+
+- Frontend da chuyen sang mo hinh `gateway-first` thong qua `lib/api/gatewayClient.js`.
+- Tat ca call AI/Community/Auth quan trong di qua `GET|POST|PUT /api/gateway?target=...`.
+- Rate limit phan tan va security headers duoc xu ly tai `proxy.js` (theo yeu cau Next.js 16, khong dung file middleware.js rieng).
+
 ## Supabase Auth + RLS (Admin/Coach)
 
 Khu vực `/admin` dùng **Supabase Auth** (Google OAuth hoặc Email OTP) và **RLS**.

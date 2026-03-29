@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useSearchParams } from "next/navigation";
 
 import { createSupabaseBrowserClient } from "@/lib/supabase/browserClient";
+import { callGateway } from "@/lib/api/gatewayClient";
 
 function Message({ tone, children }) {
   const styles =
@@ -60,10 +61,10 @@ export default function AdminLoginForm() {
     setBusy(true);
 
     try {
-      const res = await fetch("/api/auth/otp", {
+      const res = await callGateway({
+        target: "authOtp",
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, next: "/admin" }),
+        payload: { email, next: "/admin" },
       });
 
       const data = await res.json().catch(() => null);

@@ -9,6 +9,7 @@ import OfflineVideoControls from "@/components/OfflineVideoControls";
 import YouTubeEmbed from "@/components/YouTubeEmbed";
 import { isFreeBeltId } from "@/data/belts";
 import { readProfile } from "@/lib/profile";
+import { callGateway } from "@/lib/api/gatewayClient";
 
 const TRANSCRIPT_KEY_PREFIX = "vovinam_video_transcript_v1:";
 
@@ -253,10 +254,10 @@ export default function VideoPlayerPanel({ video }) {
       setTranscriptError("");
 
       try {
-        const res = await fetch("/api/ai/transcript", {
+        const res = await callGateway({
+          target: "aiTranscript",
           method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ videoId }),
+          payload: { videoId },
         });
 
         const data = await res.json().catch(() => null);

@@ -6,6 +6,7 @@ import { useLocale } from "next-intl";
 
 import { getBeltById } from "@/data/belts";
 import { readProfile } from "@/lib/profile";
+import { callGateway } from "@/lib/api/gatewayClient";
 
 function getCopy(locale) {
   const id = String(locale || "vi").toLowerCase();
@@ -256,10 +257,10 @@ export default function AiSparringSimulator() {
         imageDataUrl: imageDataUrl || undefined,
       };
 
-      const res = await fetch("/api/ai/sparring", {
+      const res = await callGateway({
+        target: "aiSparring",
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
+        payload,
         signal: ctrl.signal,
       });
 

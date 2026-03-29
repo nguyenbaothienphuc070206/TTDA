@@ -9,6 +9,7 @@ import remarkGfm from "remark-gfm";
 import { Sparkles, ThumbsDown, ThumbsUp } from "lucide-react";
 
 import { readProfile } from "@/lib/profile";
+import { callGateway } from "@/lib/api/gatewayClient";
 import MascotIcon from "@/components/MascotIcon";
 
 const CHAT_STORE_KEY = "vovinam_ai_chat_v1";
@@ -343,10 +344,10 @@ export default function AiCoachChat({ context }) {
     });
 
     try {
-      await fetch("/api/ai/coach/feedback", {
+      await callGateway({
+        target: "aiCoachFeedback",
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messageId: id, rating: r, pagePath: pathname }),
+        payload: { messageId: id, rating: r, pagePath: pathname },
       });
     } catch {
       // ignore
@@ -444,14 +445,12 @@ export default function AiCoachChat({ context }) {
         [...history, { role: "user", content: q }, { role: "assistant", content: "" }].slice(-8)
       );
 
-      const res = await fetch("/api/ai/coach", {
+      const res = await callGateway({
+        target: "aiCoachAsk",
         method: "POST",
         signal: ctrl.signal,
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "text/event-stream",
-        },
-        body: JSON.stringify({
+        accept: "text/event-stream",
+        payload: {
           query: q,
           context: context || null,
           stream: true,
@@ -459,7 +458,7 @@ export default function AiCoachChat({ context }) {
           beltId,
           name,
           sessionId: activeSessionId,
-        }),
+        },
       });
 
       const ct = res.headers.get("content-type") || "";

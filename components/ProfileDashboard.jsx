@@ -10,6 +10,7 @@ import { base64UrlEncodeJson } from "@/lib/base64url";
 import { computeBadges } from "@/lib/badges";
 import { readDoneSlugs } from "@/lib/progress";
 import { readProfile, writeProfile } from "@/lib/profile";
+import { callGateway } from "@/lib/api/gatewayClient";
 
 function formatDateByLocale(ms, locale) {
   const n = Number(ms);
@@ -857,10 +858,10 @@ export default function ProfileDashboard() {
         },
       };
 
-      const res = await fetch("/api/ai/diary", {
+      const res = await callGateway({
+        target: "aiDiary",
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
+        payload,
       });
 
       const data = await res.json().catch(() => null);

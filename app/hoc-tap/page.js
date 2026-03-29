@@ -1,5 +1,6 @@
 import LearningDashboard from "@/components/LearningDashboard";
 import MotivationPanel from "@/components/MotivationPanel";
+import OfflineMeshPanel from "@/components/OfflineMeshPanel";
 import Link from "next/link";
 import { getLocale } from "next-intl/server";
 
@@ -112,6 +113,10 @@ export default async function LearningDashboardPage() {
       </div>
 
       <LearningDashboard />
+
+      <div className="mt-6">
+        <OfflineMeshPanel />
+      </div>
     </div>
   );
 }

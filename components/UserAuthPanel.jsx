@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { useLocale } from "next-intl";
 
 import { createSupabaseBrowserClient } from "@/lib/supabase/browserClient";
+import { callGateway } from "@/lib/api/gatewayClient";
+import { loginWithPasskey, logoutPasskey, registerPasskey } from "@/lib/auth/passkeyClient";
 
 function getCopy(locale) {
   const id = String(locale || "vi").toLowerCase();
@@ -22,6 +24,15 @@ function getCopy(locale) {
       email: "Email:",
       role: "Role:",
       defaultRole: "user",
+      passkeyTitle: "Biometric passkey",
+      passkeyDesc: "Use Face ID / Touch ID / Windows Hello for quick sign-in on this device.",
+      passkeyCreate: "Create passkey",
+      passkeyLogin: "Sign in with passkey",
+      passkeyLogout: "Sign out passkey",
+      passkeyBusy: "Processing passkey...",
+      passkeyOk: "Passkey is ready.",
+      passkeyLoginOk: "Signed in via passkey.",
+      passkeyError: "Passkey failed. Please try again.",
     };
   }
 
@@ -39,6 +50,15 @@ function getCopy(locale) {
       email: "メール:",
       role: "ロール:",
       defaultRole: "user",
+      passkeyTitle: "生体認証パスキー",
+      passkeyDesc: "Face ID / Touch ID / Windows Hello でこの端末に素早くログインできます。",
+      passkeyCreate: "パスキーを作成",
+      passkeyLogin: "パスキーでログイン",
+      passkeyLogout: "パスキーをログアウト",
+      passkeyBusy: "パスキー処理中...",
+      passkeyOk: "パスキーの準備ができました。",
+      passkeyLoginOk: "パスキーでログインしました。",
+      passkeyError: "パスキーに失敗しました。再試行してください。",
     };
   }
 
@@ -55,6 +75,15 @@ function getCopy(locale) {
     email: "Email:",
     role: "Role:",
     defaultRole: "user",
+    passkeyTitle: "Passkey sinh trắc học",
+    passkeyDesc: "Dùng Face ID / Touch ID / Windows Hello để đăng nhập nhanh trên thiết bị này.",
+    passkeyCreate: "Tạo passkey",
+    passkeyLogin: "Đăng nhập passkey",
+    passkeyLogout: "Đăng xuất passkey",
+    passkeyBusy: "Đang xử lý passkey...",
+    passkeyOk: "Đã sẵn sàng passkey.",
+    passkeyLoginOk: "Đã đăng nhập bằng passkey.",
+    passkeyError: "Passkey lỗi, vui lòng thử lại.",
   };
 }
 
@@ -75,12 +104,18 @@ export default function UserAuthPanel() {
   const [role, setRole] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
+  const [passkeyBusy, setPasskeyBusy] = useState(false);
+  const [passkeyMessage, setPasskeyMessage] = useState("");
+  const [passkeySigned, setPasskeySigned] = useState(false);
 
   const refresh = async () => {
     setError("");
 
     try {
-      const res = await fetch("/api/auth/me", { cache: "no-store" });
+      const res = await callGateway({
+        target: "authMe",
+        method: "GET",
+      });
       const data = await res.json().catch(() => null);
 
       if (!res.ok) {
@@ -136,12 +171,59 @@ export default function UserAuthPanel() {
     setBusy(true);
 
     try {
-      await fetch("/api/auth/logout", { method: "POST" });
+      await callGateway({
+        target: "authLogout",
+        method: "POST",
+      });
     } catch {
       // ignore
     } finally {
       setBusy(false);
       refresh();
+    }
+  };
+
+  const onPasskeyRegister = async () => {
+    setError("");
+    setPasskeyBusy(true);
+    setPasskeyMessage("");
+
+    try {
+      await registerPasskey();
+      setPasskeyMessage(copy.passkeyOk);
+    } catch {
+      setPasskeyMessage(copy.passkeyError);
+    } finally {
+      setPasskeyBusy(false);
+    }
+  };
+
+  const onPasskeyLogin = async () => {
+    setError("");
+    setPasskeyBusy(true);
+    setPasskeyMessage("");
+
+    try {
+      await loginWithPasskey();
+      setPasskeySigned(true);
+      setPasskeyMessage(copy.passkeyLoginOk);
+    } catch {
+      setPasskeyMessage(copy.passkeyError);
+    } finally {
+      setPasskeyBusy(false);
+    }
+  };
+
+  const onPasskeyLogout = async () => {
+    setPasskeyBusy(true);
+    setPasskeyMessage("");
+    try {
+      await logoutPasskey();
+      setPasskeySigned(false);
+    } catch {
+      // ignore
+    } finally {
+      setPasskeyBusy(false);
     }
   };
 
@@ -202,6 +284,46 @@ export default function UserAuthPanel() {
           </Message>
         </div>
       ) : null}
+
+      <div className="mt-4 rounded-2xl border border-white/10 bg-slate-950/35 p-4">
+        <div className="text-sm font-semibold text-white">{copy.passkeyTitle}</div>
+        <div className="mt-1 text-xs leading-5 text-slate-300">{copy.passkeyDesc}</div>
+
+        <div className="mt-3 flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={onPasskeyRegister}
+            disabled={passkeyBusy}
+            className="inline-flex h-10 items-center justify-center rounded-xl border border-white/10 bg-white/5 px-4 text-xs font-semibold text-white transition hover:bg-white/10 disabled:opacity-60"
+          >
+            {passkeyBusy ? copy.passkeyBusy : copy.passkeyCreate}
+          </button>
+
+          <button
+            type="button"
+            onClick={onPasskeyLogin}
+            disabled={passkeyBusy}
+            className="inline-flex h-10 items-center justify-center rounded-xl bg-gradient-to-r from-cyan-300 to-blue-500 px-4 text-xs font-semibold text-slate-950 transition hover:brightness-110 disabled:opacity-60"
+          >
+            {passkeyBusy ? copy.passkeyBusy : copy.passkeyLogin}
+          </button>
+
+          {passkeySigned ? (
+            <button
+              type="button"
+              onClick={onPasskeyLogout}
+              disabled={passkeyBusy}
+              className="inline-flex h-10 items-center justify-center rounded-xl border border-white/10 bg-white/5 px-4 text-xs font-semibold text-white transition hover:bg-white/10 disabled:opacity-60"
+            >
+              {copy.passkeyLogout}
+            </button>
+          ) : null}
+        </div>
+
+        {passkeyMessage ? (
+          <div className="mt-3 text-xs text-slate-300">{passkeyMessage}</div>
+        ) : null}
+      </div>
     </div>
   );
 }

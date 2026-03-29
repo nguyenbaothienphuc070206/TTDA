@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { callGateway } from "@/lib/api/gatewayClient";
 
 export default function AdminLogoutButton() {
   const router = useRouter();
@@ -11,7 +12,10 @@ export default function AdminLogoutButton() {
     setBusy(true);
 
     try {
-      await fetch("/api/auth/logout", { method: "POST" });
+      await callGateway({
+        target: "authLogout",
+        method: "POST",
+      });
     } finally {
       router.replace("/admin/login");
       router.refresh();

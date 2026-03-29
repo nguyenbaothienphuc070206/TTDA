@@ -1,6 +1,7 @@
 ﻿"use client";
 
 import { useEffect, useState } from "react";
+import { callGateway } from "@/lib/api/gatewayClient";
 
 function Box({ title, children }) {
   return (
@@ -20,7 +21,10 @@ export default function RbacPanel() {
       setError("");
 
       try {
-        const res = await fetch("/api/auth/me", { cache: "no-store" });
+        const res = await callGateway({
+          target: "authMe",
+          method: "GET",
+        });
         const data = await res.json().catch(() => null);
 
         if (!res.ok) {
