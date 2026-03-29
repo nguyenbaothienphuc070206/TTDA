@@ -396,10 +396,10 @@ function HomeVi() {
   );
 
   return (
-    <div className="ui3d-stage mobile-safe-bottom mx-auto w-full max-w-6xl px-4 py-8 sm:py-16">
+    <div className="ui3d-stage mobile-safe-bottom mx-auto w-full max-w-6xl px-4 py-6 sm:py-10">
       <RouteWarmup />
       <JsonLd data={buildHomeJsonLd("vi")} />
-      <section className="surface-card-strong enterprise-shell motion-gradient-surface ui3d-card hero-noise relative overflow-hidden rounded-[2.25rem] p-7 sm:p-12">
+      <section className="surface-card-strong enterprise-shell motion-gradient-surface ui3d-card hero-noise relative overflow-hidden rounded-[2rem] p-5 sm:p-8">
         <div className="absolute inset-0 opacity-90 bg-[radial-gradient(circle_at_top,rgba(34,211,238,0.16),transparent_58%)]" />
         <div className="absolute -right-24 -top-20 h-64 w-64 rounded-full bg-blue-500/20 blur-3xl float-fast motion-gradient-orb" />
         <div className="absolute -left-20 -bottom-24 h-64 w-64 rounded-full bg-amber-300/10 blur-3xl float-slower motion-gradient-orb" />
@@ -409,43 +409,39 @@ function HomeVi() {
             Lộ trình rõ ràng • Từng bước dễ tập • Lưu tiến độ
           </p>
 
-          <h1 className="headline-gradient motion-gradient-title hero-title-enterprise mt-5 max-w-4xl font-semibold">
+          <h1 className="headline-gradient motion-gradient-title hero-title-enterprise mt-3 max-w-3xl font-semibold">
             Học Vovinam theo lộ trình đầy đủ từ Lam đai tự vệ đến Hồng đai tứ
           </h1>
-          <p className="hero-subtitle-enterprise mt-4 max-w-2xl text-slate-300">
+          <p className="hero-subtitle-enterprise mt-2 max-w-2xl text-slate-300">
             Mỗi bài có mục tiêu, hướng dẫn từng bước, lỗi thường gặp và gợi ý tự
             luyện. Bạn có thể đánh dấu hoàn thành để theo dõi tiến độ.
           </p>
 
-          <div className="mt-7 flex flex-col gap-3 sm:flex-row">
+          <div className="mt-5 flex flex-col gap-2.5 sm:flex-row">
             <Link
               href="/lo-trinh"
-              className="cta-primary motion-gradient-btn inline-flex h-12 items-center justify-center rounded-2xl px-5 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-cyan-300/50"
+              className="cta-primary motion-gradient-btn inline-flex h-11 items-center justify-center rounded-2xl px-5 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-cyan-300/50"
             >
               Bắt đầu học
             </Link>
             <Link
               href="/lich-tap"
-              className="cta-secondary motion-gradient-btn inline-flex h-12 items-center justify-center rounded-2xl px-5 text-sm font-semibold text-white transition focus:outline-none focus:ring-2 focus:ring-cyan-300/30"
+              className="cta-secondary motion-gradient-btn inline-flex h-11 items-center justify-center rounded-2xl px-5 text-sm font-semibold text-white transition focus:outline-none focus:ring-2 focus:ring-cyan-300/30"
             >
               Tạo lịch tập 7 ngày
             </Link>
           </div>
 
-          <div className="mt-8 grid gap-3 sm:grid-cols-3">
+          <div className="mt-5 grid gap-2.5 sm:grid-cols-3">
             <Stat label="Tổng bài học" value={LESSONS.length} />
             <Stat label="Cấp đai" value={BELTS.length} />
             <Stat label="Mục tiêu" value="Đúng kỹ thuật" />
           </div>
 
-          <div className="mt-6 flex flex-wrap gap-2">
+          <div className="mt-4 flex gap-2 overflow-x-auto pb-1 sm:flex-wrap">
             <ChipLink href="#tinh-nang">Tính năng</ChipLink>
             <ChipLink href="#vo-dao">Võ đạo</ChipLink>
             <ChipLink href="#khoa-hoc">Khóa học</ChipLink>
-            <ChipLink href="#tin-tuc">Thi đấu</ChipLink>
-            <ChipLink href="#cach-hoc">Cách học</ChipLink>
-            <ChipLink href="#bai-noi-bat">Bài nổi bật</ChipLink>
-            <ChipLink href="#ke-hoach">Kế hoạch 4 tuần</ChipLink>
             <ChipLink href="#faq">FAQ</ChipLink>
           </div>
         </div>
@@ -1005,10 +1001,10 @@ function getGlobalHomeCopy(locale) {
 
 function HomeGlobal({ copy, locale }) {
   return (
-    <div className="ui3d-stage mobile-safe-bottom mx-auto w-full max-w-6xl px-4 py-8 sm:py-16">
+    <div className="ui3d-stage mobile-safe-bottom mx-auto w-full max-w-6xl px-4 py-6 sm:py-10">
       <RouteWarmup />
       <JsonLd data={buildHomeJsonLd(locale)} />
-      <section className="surface-card-strong enterprise-shell motion-gradient-surface ui3d-card hero-noise relative overflow-hidden rounded-[2.25rem] p-7 sm:p-12">
+      <section className="surface-card-strong enterprise-shell motion-gradient-surface ui3d-card hero-noise relative overflow-hidden rounded-[2rem] p-5 sm:p-8">
         <div className="absolute inset-0 opacity-90 bg-[radial-gradient(circle_at_top,rgba(34,211,238,0.16),transparent_58%)]" />
         <div className="absolute -right-24 -top-20 h-64 w-64 rounded-full bg-blue-500/20 blur-3xl float-fast motion-gradient-orb" />
         <div className="absolute -left-20 -bottom-24 h-64 w-64 rounded-full bg-amber-300/10 blur-3xl float-slower motion-gradient-orb" />
@@ -1018,29 +1014,29 @@ function HomeGlobal({ copy, locale }) {
             {copy.heroPill}
           </p>
 
-          <h1 className="headline-gradient motion-gradient-title hero-title-enterprise mt-5 max-w-4xl font-semibold">
+          <h1 className="headline-gradient motion-gradient-title hero-title-enterprise mt-3 max-w-3xl font-semibold">
             {copy.heroTitle}
           </h1>
-          <p className="hero-subtitle-enterprise mt-4 max-w-2xl text-slate-300">
+          <p className="hero-subtitle-enterprise mt-2 max-w-2xl text-slate-300">
             {copy.heroDescription}
           </p>
 
-          <div className="mt-7 flex flex-col gap-3 sm:flex-row">
+          <div className="mt-5 flex flex-col gap-2.5 sm:flex-row">
             <Link
               href="/lo-trinh"
-              className="cta-primary motion-gradient-btn inline-flex h-12 items-center justify-center rounded-2xl px-5 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-cyan-300/50"
+              className="cta-primary motion-gradient-btn inline-flex h-11 items-center justify-center rounded-2xl px-5 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-cyan-300/50"
             >
               {copy.startLearning}
             </Link>
             <Link
               href="/lich-tap"
-              className="cta-secondary motion-gradient-btn inline-flex h-12 items-center justify-center rounded-2xl px-5 text-sm font-semibold text-white transition focus:outline-none focus:ring-2 focus:ring-cyan-300/30"
+              className="cta-secondary motion-gradient-btn inline-flex h-11 items-center justify-center rounded-2xl px-5 text-sm font-semibold text-white transition focus:outline-none focus:ring-2 focus:ring-cyan-300/30"
             >
               {copy.createSchedule}
             </Link>
           </div>
 
-          <div className="mt-8 grid gap-3 sm:grid-cols-3">
+          <div className="mt-5 grid gap-2.5 sm:grid-cols-3">
             <Stat label={copy.statLessons} value={LESSONS.length} />
             <Stat label={copy.statBelts} value={BELTS.length} />
             <Stat label={copy.statGoal} value={copy.statGoalValue} />
