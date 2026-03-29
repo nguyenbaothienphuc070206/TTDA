@@ -42,7 +42,7 @@ export const BELTS = [
     description:
       "Hoàn thiện hệ lam đai với chuỗi quyền, phản đòn và khóa gỡ nền để lên cấp cao hơn.",
     lessonLevel: "lam-dai-tam",
-    freeTier: true,
+    freeTier: false,
   },
   {
     id: "hoang-dai",
