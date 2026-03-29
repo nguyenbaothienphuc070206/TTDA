@@ -179,7 +179,7 @@ export default async function SiteFooter() {
 
         <div className="mt-6 flex flex-col gap-3 border-t border-white/10 pt-6 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-xs text-slate-400">
-            © {year} {t("brandName")} • {t("copyright")}
+            © {year} Vovinam Learning. Nâng tầm võ Việt qua lăng kính công nghệ. Kiến tạo bởi SVS (Swinburne VN HCMC).
           </p>
 
           <div className="flex flex-wrap items-center gap-3 text-xs">
