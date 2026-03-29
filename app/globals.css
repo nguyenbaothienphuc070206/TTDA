@@ -9,23 +9,35 @@
   --font-body: var(--font-sans);
   --font-heading: var(--font-sans);
 
-  --app-bg: rgb(2 6 23);
-  --app-fg: rgb(248 250 252);
-  --header-bg: rgba(2, 6, 23, 0.70);
+  --app-bg: rgb(3 10 32);
+  --app-fg: rgb(241 245 255);
+  --header-bg: rgba(3, 10, 32, 0.72);
+  --accent-cyan: rgb(34 211 238);
+  --accent-blue: rgb(59 130 246);
+  --accent-gold: rgb(250 204 21);
 
   /* Subtle depth on dark surfaces */
-  --shadow-card: 0 10px 30px rgba(0, 0, 0, 0.35);
-  --shadow-card-strong: 0 18px 44px rgba(0, 0, 0, 0.45);
+  --shadow-card:
+    0 14px 40px rgba(2, 6, 23, 0.48),
+    0 0 0 1px rgba(96, 165, 250, 0.08),
+    0 0 40px rgba(34, 211, 238, 0.08);
+  --shadow-card-strong:
+    0 24px 56px rgba(2, 6, 23, 0.56),
+    0 0 0 1px rgba(96, 165, 250, 0.16),
+    0 0 52px rgba(59, 130, 246, 0.14);
 }
 
 html[data-theme="light"] {
-  /* Off-white (less glare than pure slate-50) */
-  --app-bg: rgb(248 250 252);
+  --app-bg: rgb(246 248 252);
   --app-fg: rgb(15 23 42);
-  --header-bg: rgba(248, 250, 252, 0.94);
+  --header-bg: rgba(246, 248, 252, 0.88);
 
-  --shadow-card: 0 10px 30px rgba(15, 23, 42, 0.08);
-  --shadow-card-strong: 0 18px 44px rgba(15, 23, 42, 0.12);
+  --shadow-card:
+    0 14px 34px rgba(15, 23, 42, 0.10),
+    0 0 0 1px rgba(59, 130, 246, 0.08);
+  --shadow-card-strong:
+    0 20px 48px rgba(15, 23, 42, 0.14),
+    0 0 0 1px rgba(59, 130, 246, 0.12);
 }
 
 html[data-theme="light"] .bg-grid {
@@ -34,10 +46,10 @@ html[data-theme="light"] .bg-grid {
 
 html[data-theme="light"] .bg-app-gradient {
   background:
-    radial-gradient(900px circle at 15% 10%, rgba(34, 211, 238, 0.16), transparent 58%),
-    radial-gradient(900px circle at 85% 20%, rgba(59, 130, 246, 0.14), transparent 58%),
-    radial-gradient(900px circle at 55% 95%, rgba(250, 204, 21, 0.10), transparent 62%),
-    linear-gradient(180deg, rgba(248, 250, 252, 1) 0%, rgba(241, 245, 249, 0.98) 50%, rgba(248, 250, 252, 1) 100%);
+    radial-gradient(900px circle at 12% 8%, rgba(34, 211, 238, 0.22), transparent 58%),
+    radial-gradient(900px circle at 84% 14%, rgba(59, 130, 246, 0.20), transparent 58%),
+    radial-gradient(1000px circle at 52% 96%, rgba(245, 158, 11, 0.13), transparent 62%),
+    linear-gradient(180deg, rgba(246, 248, 252, 1) 0%, rgba(240, 244, 250, 0.98) 50%, rgba(246, 248, 252, 1) 100%);
 }
 
 html[data-theme="light"] .bg-vignette {
@@ -104,8 +116,8 @@ html[data-theme="light"] ::selection {
 
 html[data-theme="vodo"] {
   /* Deep Navy (luxury) */
-  --app-bg: rgb(2 12 40);
-  --header-bg: rgba(2, 12, 40, 0.72);
+  --app-bg: rgb(2 10 36);
+  --header-bg: rgba(2, 10, 36, 0.75);
 
   /* Subtle blue glow on cards */
   --shadow-card:
@@ -151,6 +163,21 @@ html[data-theme="vodo"] .bg-vignette {
 html,
 body {
   height: 100%;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: -5;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.05) 0.55px, transparent 0.55px);
+  background-size: 2px 2px;
+  opacity: 0.16;
+}
+
+html[data-theme="light"] body::before {
+  opacity: 0.08;
 }
 
 * {
@@ -215,10 +242,10 @@ h4 {
 
 .bg-app-gradient {
   background:
-    radial-gradient(900px circle at 15% 10%, rgba(34, 211, 238, 0.18), transparent 55%),
-    radial-gradient(900px circle at 85% 20%, rgba(59, 130, 246, 0.18), transparent 55%),
-    radial-gradient(900px circle at 55% 95%, rgba(250, 204, 21, 0.10), transparent 60%),
-    linear-gradient(180deg, rgba(2, 6, 23, 1) 0%, rgba(2, 6, 23, 0.94) 50%, rgba(2, 6, 23, 1) 100%);
+    radial-gradient(950px circle at 12% 8%, rgba(34, 211, 238, 0.24), transparent 55%),
+    radial-gradient(900px circle at 84% 16%, rgba(59, 130, 246, 0.24), transparent 55%),
+    radial-gradient(1000px circle at 52% 96%, rgba(250, 204, 21, 0.12), transparent 62%),
+    linear-gradient(180deg, rgba(3, 10, 32, 1) 0%, rgba(3, 10, 32, 0.96) 50%, rgba(3, 10, 32, 1) 100%);
 }
 
 .bg-grid {
@@ -234,9 +261,19 @@ h4 {
   background: radial-gradient(
     1200px circle at 50% 10%,
     rgba(0, 0, 0, 0) 0%,
-    rgba(2, 6, 23, 0.55) 55%,
-    rgba(2, 6, 23, 0.95) 100%
+    rgba(2, 10, 32, 0.62) 55%,
+    rgba(2, 10, 32, 0.96) 100%
   );
+}
+
+.rounded-3xl.border.border-white\/10.bg-white\/5 {
+  backdrop-filter: blur(10px);
+  box-shadow: var(--shadow-card);
+}
+
+.rounded-\[2\.25rem\].border.border-white\/10.bg-white\/5 {
+  backdrop-filter: blur(12px);
+  box-shadow: var(--shadow-card-strong);
 }
 
 @keyframes floatY {

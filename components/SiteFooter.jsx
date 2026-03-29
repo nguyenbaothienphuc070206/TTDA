@@ -33,9 +33,9 @@ export default async function SiteFooter() {
   })).filter((family) => family.belts.length > 0);
 
   return (
-    <footer className="border-t border-white/10">
+    <footer className="border-t border-white/10 bg-slate-950/15">
       <div className="mx-auto w-full max-w-6xl px-4 py-12">
-        <div className="relative overflow-hidden rounded-[2.25rem] border border-white/10 bg-white/5 p-6 sm:p-8">
+        <div className="relative overflow-hidden rounded-[2.25rem] border border-white/10 bg-white/5 p-6 shadow-[var(--shadow-card-strong)] sm:p-8">
           <div className="absolute inset-0 opacity-80 bg-[radial-gradient(circle_at_top,rgba(34,211,238,0.12),transparent_55%)]" />
           <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
@@ -50,7 +50,7 @@ export default async function SiteFooter() {
             <div className="flex flex-col gap-2 sm:flex-row">
               <Link
                 href="/learning"
-                className="inline-flex h-11 items-center justify-center rounded-2xl bg-gradient-to-r from-blue-400 to-blue-600 px-4 text-sm font-semibold text-slate-950 transition hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-blue-400/50"
+                className="inline-flex h-11 items-center justify-center rounded-2xl bg-linear-to-r from-cyan-300 to-blue-500 px-4 text-sm font-semibold text-slate-950 transition hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-blue-400/50"
               >
                 {t("startLearning")}
               </Link>
@@ -64,10 +64,10 @@ export default async function SiteFooter() {
           </div>
         </div>
 
-        <div className="mt-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-10 grid gap-8 rounded-[2rem] border border-white/10 bg-white/5 p-6 shadow-[var(--shadow-card)] sm:grid-cols-2 lg:grid-cols-4">
           <div>
             <div className="inline-flex items-center gap-2">
-              <span className="inline-flex h-9 w-9 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-400 to-blue-600 text-slate-950 font-extrabold shadow-sm">
+              <span className="inline-flex h-9 w-9 items-center justify-center rounded-2xl bg-linear-to-br from-cyan-300 to-blue-500 text-slate-950 font-extrabold shadow-sm">
                 V
               </span>
               <div className="leading-tight">
@@ -177,7 +177,7 @@ export default async function SiteFooter() {
           </div>
         </div>
 
-        <div className="mt-10 flex flex-col gap-3 border-t border-white/10 pt-6 sm:flex-row sm:items-center sm:justify-between">
+        <div className="mt-6 flex flex-col gap-3 border-t border-white/10 pt-6 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-xs text-slate-400">
             © {year} {t("brandName")} • {t("copyright")}
           </p>

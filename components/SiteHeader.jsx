@@ -17,9 +17,9 @@ function NavItem({ href, active, children }) {
       href={href}
       aria-current={active ? "page" : undefined}
       className={
-        "rounded-full px-3 py-1.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-blue-400/40 " +
+        "rounded-full px-3 py-1.5 text-sm font-medium transition focus:outline-none focus:ring-2 focus:ring-blue-400/40 " +
         (active
-          ? "bg-white/10 text-white"
+          ? "bg-linear-to-r from-cyan-300/20 to-blue-500/20 text-white shadow-[inset_0_0_0_1px_rgba(125,211,252,0.25)]"
           : "text-slate-200 hover:bg-white/10 hover:text-white")
       }
     >
@@ -40,7 +40,7 @@ function ProgressNavItem({ href, active, label, doneCount, remainingCount, total
       className={
         "inline-flex min-w-40 flex-col rounded-2xl px-3 py-1.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-blue-400/40 " +
         (active
-          ? "bg-white/10 text-white"
+          ? "bg-linear-to-r from-cyan-300/20 to-blue-500/20 text-white shadow-[inset_0_0_0_1px_rgba(125,211,252,0.25)]"
           : "text-slate-200 hover:bg-white/10 hover:text-white")
       }
     >
@@ -93,9 +93,9 @@ function LearningNavMenu({ label, items, isActive }) {
         type="button"
         onClick={() => setOpen((v) => !v)}
         className={
-          "inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-blue-400/40 " +
+          "inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium transition focus:outline-none focus:ring-2 focus:ring-blue-400/40 " +
           (active
-            ? "bg-white/10 text-white"
+            ? "bg-linear-to-r from-cyan-300/20 to-blue-500/20 text-white shadow-[inset_0_0_0_1px_rgba(125,211,252,0.25)]"
             : "text-slate-200 hover:bg-white/10 hover:text-white")
         }
         aria-haspopup="menu"
@@ -214,9 +214,9 @@ export default function SiteHeader() {
   const remainingCount = Math.max(0, totalLessons - doneCount);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-white/10 bg-(--header-bg) backdrop-blur">
+    <header className="sticky top-0 z-50 border-b border-white/10 bg-(--header-bg) backdrop-blur-xl">
       <div className="mx-auto w-full max-w-6xl px-4 py-3">
-        <div className="flex flex-wrap items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3 rounded-3xl border border-white/10 bg-white/5 px-3 py-2 shadow-[var(--shadow-card)]">
           <Link
             href="/"
             className="group inline-flex shrink-0 items-center gap-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400/40"

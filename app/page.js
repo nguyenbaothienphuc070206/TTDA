@@ -291,14 +291,16 @@ function HomeVi() {
 
   return (
     <div className="mx-auto w-full max-w-6xl px-4 py-10 sm:py-16">
-      <section className="relative overflow-hidden rounded-[2.25rem] border border-white/10 bg-white/5 p-7 sm:p-12">
-        <div className="absolute inset-0 opacity-80 bg-[radial-gradient(circle_at_top,rgba(34,211,238,0.12),transparent_55%)]" />
+      <section className="relative overflow-hidden rounded-[2.25rem] border border-white/10 bg-white/5 p-7 shadow-[var(--shadow-card-strong)] sm:p-12">
+        <div className="absolute inset-0 opacity-90 bg-[radial-gradient(circle_at_top,rgba(34,211,238,0.16),transparent_58%)]" />
+        <div className="absolute -right-24 -top-20 h-64 w-64 rounded-full bg-blue-500/20 blur-3xl" />
+        <div className="absolute -left-20 -bottom-24 h-64 w-64 rounded-full bg-amber-300/10 blur-3xl" />
         <div className="relative">
-          <p className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-semibold text-slate-200">
+          <p className="inline-flex items-center gap-2 rounded-full border border-cyan-300/25 bg-cyan-300/10 px-3 py-1 text-xs font-semibold text-cyan-100">
             Lộ trình rõ ràng • Từng bước dễ tập • Lưu tiến độ
           </p>
 
-          <h1 className="mt-5 text-3xl font-semibold tracking-tight text-white sm:text-5xl">
+          <h1 className="mt-5 max-w-4xl text-3xl font-semibold tracking-tight text-white sm:text-5xl sm:leading-[1.05]">
             Học Vovinam theo lộ trình đầy đủ từ Lam đai tự vệ đến Hồng đai tứ
           </h1>
           <p className="mt-4 max-w-2xl text-base leading-7 text-slate-300 sm:text-lg">
@@ -893,14 +895,16 @@ function getGlobalHomeCopy(locale) {
 function HomeGlobal({ copy }) {
   return (
     <div className="mx-auto w-full max-w-6xl px-4 py-10 sm:py-16">
-      <section className="relative overflow-hidden rounded-[2.25rem] border border-white/10 bg-white/5 p-7 sm:p-12">
-        <div className="absolute inset-0 opacity-80 bg-[radial-gradient(circle_at_top,rgba(34,211,238,0.12),transparent_55%)]" />
+      <section className="relative overflow-hidden rounded-[2.25rem] border border-white/10 bg-white/5 p-7 shadow-[var(--shadow-card-strong)] sm:p-12">
+        <div className="absolute inset-0 opacity-90 bg-[radial-gradient(circle_at_top,rgba(34,211,238,0.16),transparent_58%)]" />
+        <div className="absolute -right-24 -top-20 h-64 w-64 rounded-full bg-blue-500/20 blur-3xl" />
+        <div className="absolute -left-20 -bottom-24 h-64 w-64 rounded-full bg-amber-300/10 blur-3xl" />
         <div className="relative">
-          <p className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-semibold text-slate-200">
+          <p className="inline-flex items-center gap-2 rounded-full border border-cyan-300/25 bg-cyan-300/10 px-3 py-1 text-xs font-semibold text-cyan-100">
             {copy.heroPill}
           </p>
 
-          <h1 className="mt-5 text-3xl font-semibold tracking-tight text-white sm:text-5xl">
+          <h1 className="mt-5 max-w-4xl text-3xl font-semibold tracking-tight text-white sm:text-5xl sm:leading-[1.05]">
             {copy.heroTitle}
           </h1>
           <p className="mt-4 max-w-2xl text-base leading-7 text-slate-300 sm:text-lg">
