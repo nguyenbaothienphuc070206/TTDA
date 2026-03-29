@@ -402,7 +402,7 @@ html[data-theme="light"] .ui3d-card:hover {
   animation: gradientFlow 11s ease-in-out infinite;
 }
 
-.motion-gradient-surface > * {
+.motion-gradient-surface > :not(.absolute) {
   position: relative;
   z-index: 1;
 }
