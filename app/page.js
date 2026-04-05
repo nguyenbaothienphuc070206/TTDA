@@ -569,6 +569,15 @@ function HomeVi() {
               Đã thử nghiệm nhỏ với người mới tập để tối ưu bước bắt đầu
             </div>
           </div>
+
+          <div className="mt-4 rounded-2xl border border-cyan-300/20 bg-cyan-300/10 p-3">
+            <p className="text-xs font-semibold uppercase tracking-wide text-cyan-100">Early signal</p>
+            <ul className="mt-2 grid gap-1 text-sm text-slate-100">
+              <li>• Thiết kế dựa trên hành vi người mới: dễ bỏ cuộc khi không có lộ trình.</li>
+              <li>• Tối ưu buổi tập ngắn 15-20 phút để giữ nhịp 3-5 buổi/tuần.</li>
+              <li>• Thử nghiệm nhỏ cho thấy người mới dễ hoàn thành 3-4 bài đầu trong tuần đầu.</li>
+            </ul>
+          </div>
         </div>
       </section>
 

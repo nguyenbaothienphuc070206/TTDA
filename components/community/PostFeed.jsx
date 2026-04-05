@@ -83,6 +83,7 @@ export default function PostFeed({ posts }) {
           <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 font-semibold text-slate-100">Người mới thường bắt đầu với Lam đai tự vệ</span>
           <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 font-semibold text-slate-100">Buổi 15-20 phút là lựa chọn phổ biến</span>
           <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 font-semibold text-slate-100">Check-in ngắn mỗi ngày giúp duy trì nhịp tập</span>
+          <span className="rounded-full border border-cyan-300/30 bg-cyan-300/10 px-3 py-1 font-semibold text-cyan-100">Mini-testing: người mới phản hồi dễ duy trì hơn tự tập rời rạc</span>
         </div>
       </div>
 

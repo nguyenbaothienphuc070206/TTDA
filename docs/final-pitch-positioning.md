@@ -29,6 +29,12 @@ Vovinam Learning is not just content playback. It is a structured, AI-powered tr
 - Use simulated behavioral insight clearly labeled as demo
 - Use mini testing notes (1-3 beginner testers) to show practical validation
 
+Suggested lines for judges:
+
+- Designed around beginner behavior: users quit early when guidance is unclear
+- Optimized for short sessions (15-20 minutes) to reduce early drop-off risk
+- Initial mini testing with beginners shows onboarding is easier than self-guided video hopping
+
 ## Business Realism
 
 1. Freemium

@@ -32,6 +32,7 @@ AI Form Check gives immediate camera-based feedback while users practice.
 - We avoid inflated user metrics at this stage
 - We show early signals: beginner-focused design and short-session adherence logic
 - We include mini-test feedback from beginner users to validate onboarding clarity
+- We can defend every claim as design logic or early validation, not vanity numbers
 
 ## 5) Technical depth (15s)
 
