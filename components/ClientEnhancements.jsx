@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 const PwaRegister = dynamic(() => import("@/components/PwaRegister"), { ssr: false });
 const SifuReminderAgent = dynamic(() => import("@/components/SifuReminderAgent"), { ssr: false });
 const AiCoachBubble = dynamic(() => import("@/components/AiCoachBubble"), { ssr: false });
+const RouteWarmup = dynamic(() => import("@/components/RouteWarmup"), { ssr: false });
 
 function isLitePerformanceDevice() {
   if (typeof window === "undefined") return false;
@@ -26,30 +27,55 @@ function isLitePerformanceDevice() {
 }
 
 export default function ClientEnhancements() {
+  const [baseReady, setBaseReady] = useState(() => {
+    if (typeof document === "undefined") return false;
+    return document.visibilityState === "visible";
+  });
   const [enhancedReady, setEnhancedReady] = useState(false);
   const liteMode = isLitePerformanceDevice();
 
   useEffect(() => {
     const lite = isLitePerformanceDevice();
+    const onVisible = () => {
+      if (document.visibilityState === "visible") {
+        setBaseReady(true);
+      }
+    };
 
-    if (lite) {
-      return undefined;
+    if (document.visibilityState !== "visible") {
+      document.addEventListener("visibilitychange", onVisible);
     }
 
-    const activate = () => setEnhancedReady(true);
+    if (lite) {
+      return () => {
+        document.removeEventListener("visibilitychange", onVisible);
+      };
+    }
+
+    const activate = () => {
+      if (document.visibilityState !== "visible") return;
+      setEnhancedReady(true);
+    };
 
     if (typeof window.requestIdleCallback === "function") {
       const id = window.requestIdleCallback(activate, { timeout: 1500 });
-      return () => window.cancelIdleCallback(id);
+      return () => {
+        document.removeEventListener("visibilitychange", onVisible);
+        window.cancelIdleCallback(id);
+      };
     }
 
-    const timer = window.setTimeout(activate, 500);
-    return () => window.clearTimeout(timer);
+    const timer = window.setTimeout(activate, 650);
+    return () => {
+      document.removeEventListener("visibilitychange", onVisible);
+      window.clearTimeout(timer);
+    };
   }, []);
 
   return (
     <>
-      <PwaRegister />
+      {baseReady ? <PwaRegister /> : null}
+      {baseReady && !liteMode ? <RouteWarmup /> : null}
       {enhancedReady && !liteMode ? <SifuReminderAgent /> : null}
       {enhancedReady && !liteMode ? <AiCoachBubble /> : null}
     </>

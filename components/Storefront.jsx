@@ -48,6 +48,10 @@ function getCopy(locale) {
       learnWeapon: "Learn about weapon",
       loadingAria: "Loading showroom",
       loadingProducts: "Loading product list...",
+      labelMust: "Must-have for beginners",
+      labelShould: "Good to have",
+      labelUpgrade: "When leveling up",
+      beginnerComboBadge: "Top pick for beginners",
     };
   }
 
@@ -91,6 +95,10 @@ function getCopy(locale) {
       learnWeapon: "武器を詳しく見る",
       loadingAria: "ショールームを読み込み中",
       loadingProducts: "商品一覧を読み込み中...",
+      labelMust: "初心者必須",
+      labelShould: "あると便利",
+      labelUpgrade: "昇級時に検討",
+      beginnerComboBadge: "初心者向けおすすめ",
     };
   }
 
@@ -99,11 +107,11 @@ function getCopy(locale) {
     description:
       "Phân loại theo nhóm trang bị và gợi ý combo phù hợp. Đây là mô hình Affiliate: bấm \"Mua tại đối tác\" để mở trang mua bên ngoài.",
     affiliateNote:
-      "Khi bạn mua qua liên kết, ứng dụng có thể nhận hoa hồng (không làm tăng giá). Giá hiển thị chỉ để tham khảo; giá thực tế theo trang đối tác.",
+      "Liên kết đối tác. Không phát sinh phí.",
     comboTitle: "Combo gợi ý",
     combos: [
       {
-        title: "Combo Người Mới",
+        title: "Combo Người Mới (Khuyên dùng)",
         description: "Đủ để bắt đầu tập nền tảng (võ phục + đai + bảo hộ).",
         ids: ["vo-phuc-basic", "dai-lam", "bao-ho-ong-quyen"],
       },
@@ -133,7 +141,22 @@ function getCopy(locale) {
     learnWeapon: "Tìm hiểu võ khí",
     loadingAria: "Đang tải showroom",
     loadingProducts: "Đang tải danh sách sản phẩm...",
+    labelMust: "Bắt buộc cho người mới",
+    labelShould: "Nên có",
+    labelUpgrade: "Khi lên cấp",
+    beginnerComboBadge: "Combo khuyến nghị cho người mới",
   };
+}
+
+function priorityLabelForProduct(productId, copy) {
+  const id = String(productId || "").trim();
+  if (id === "vo-phuc-basic" || id === "dai-lam" || id === "bao-ho-ong-quyen") {
+    return copy.labelMust;
+  }
+  if (id === "con-nhua") {
+    return copy.labelShould;
+  }
+  return copy.labelUpgrade;
 }
 
 function Pill({ children }) {
@@ -144,9 +167,11 @@ function Pill({ children }) {
   );
 }
 
-function ComboCard({ title, description, items, totalVnd }) {
+function ComboCard({ title, description, items, totalVnd, beginnerComboBadge }) {
+  const isBeginner = String(title || "").toLowerCase().includes("nguoi moi") || String(title || "").toLowerCase().includes("beginner");
+
   return (
-    <div className="rounded-3xl border border-white/10 bg-slate-950/35 p-5 shadow-[var(--shadow-card)] transition hover:-translate-y-0.5 hover:border-cyan-300/25">
+    <div className={"rounded-3xl border p-5 shadow-[var(--shadow-card)] transition hover:-translate-y-0.5 " + (isBeginner ? "border-cyan-300/30 bg-cyan-300/10 hover:border-cyan-300/45" : "border-white/10 bg-slate-950/35 hover:border-cyan-300/25")}>
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <div className="text-sm font-semibold text-white">{title}</div>
@@ -154,6 +179,12 @@ function ComboCard({ title, description, items, totalVnd }) {
         </div>
         <div className="text-sm font-semibold text-white">{formatVnd(totalVnd)}</div>
       </div>
+
+      {isBeginner ? (
+        <div className="mt-2">
+          <Pill>{beginnerComboBadge}</Pill>
+        </div>
+      ) : null}
 
       <div className="mt-3 flex flex-wrap gap-2">
         {items.map((p) => {
@@ -276,6 +307,7 @@ export default function Storefront() {
                 description={c.description}
                 items={c.items}
                 totalVnd={c.totalVnd}
+                beginnerComboBadge={copy.beginnerComboBadge}
               />
             ))}
           </div>
@@ -319,6 +351,7 @@ export default function Storefront() {
                           {badges.map((b) => (
                             <Pill key={b}>{b}</Pill>
                           ))}
+                          <Pill>{priorityLabelForProduct(p.id, copy)}</Pill>
                         </div>
                       ) : null}
 

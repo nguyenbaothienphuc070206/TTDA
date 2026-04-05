@@ -29,9 +29,9 @@ function getCopy(locale) {
   }
 
   return {
-    title: "Lịch tập",
+    title: "Lịch tập tuần",
     description:
-      "Tạo lịch tập 7 ngày đơn giản để luyện đều. Lịch sẽ tự lưu trên máy (localStorage).",
+      "Duy trì nhịp. Giữ kỷ luật.",
     thienVo: "Mở Thiền Võ (Box Breathing) →",
   };
 }

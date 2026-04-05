@@ -17,6 +17,12 @@ export default function RouteWarmup() {
   const router = useRouter();
 
   useEffect(() => {
+    if (typeof window === "undefined") return undefined;
+
+    if (window.sessionStorage.getItem("vovinam_prefetch_warmed_v1") === "1") {
+      return undefined;
+    }
+
     const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
     const effectiveType = String(connection?.effectiveType || "").toLowerCase();
     const saveData = Boolean(connection?.saveData);
@@ -28,26 +34,41 @@ export default function RouteWarmup() {
     }
 
     const lowCpu = Number(navigator.hardwareConcurrency || 0) > 0 && Number(navigator.hardwareConcurrency || 0) <= 4;
-    const routes = lowCpu ? CORE_ROUTES.slice(0, 3) : CORE_ROUTES;
+    const lowMem = Number(navigator.deviceMemory || 0) > 0 && Number(navigator.deviceMemory || 0) <= 4;
+    const routes = lowCpu || lowMem ? CORE_ROUTES.slice(0, 3) : CORE_ROUTES;
+    const intervalMs = lowCpu || lowMem ? 650 : 320;
 
     let cancelled = false;
 
     const warmup = () => {
       if (cancelled) return;
-      routes.forEach((route) => {
-        router.prefetch(route);
-      });
+
+      let index = 0;
+      const runNext = () => {
+        if (cancelled || index >= routes.length) {
+          if (!cancelled) {
+            window.sessionStorage.setItem("vovinam_prefetch_warmed_v1", "1");
+          }
+          return;
+        }
+
+        router.prefetch(routes[index]);
+        index += 1;
+        window.setTimeout(runNext, intervalMs);
+      };
+
+      runNext();
     };
 
     if (typeof window.requestIdleCallback === "function") {
-      const id = window.requestIdleCallback(warmup, { timeout: 2000 });
+      const id = window.requestIdleCallback(warmup, { timeout: 2800 });
       return () => {
         cancelled = true;
         window.cancelIdleCallback(id);
       };
     }
 
-    const timer = window.setTimeout(warmup, 450);
+    const timer = window.setTimeout(warmup, 800);
     return () => {
       cancelled = true;
       clearTimeout(timer);

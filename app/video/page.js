@@ -1,4 +1,5 @@
 import VideoLibrary from "@/components/VideoLibrary";
+import VideoTodayPanel from "@/components/VideoTodayPanel";
 import { VIDEOS } from "@/data/videos";
 import { getLocale } from "next-intl/server";
 
@@ -46,6 +47,10 @@ export default async function VideosPage() {
           {copy.description}
         </p>
       </header>
+
+      <div className="mb-6">
+        <VideoTodayPanel />
+      </div>
 
       <VideoLibrary videos={VIDEOS} />
     </div>

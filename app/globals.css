@@ -427,6 +427,25 @@ html[data-theme="light"] .ui3d-card:hover {
   animation: auraDrift 20s ease-in-out infinite;
 }
 
+@media (max-width: 900px) {
+  body::before {
+    opacity: 0.08;
+  }
+
+  .motion-gradient-surface::before,
+  .motion-gradient-title,
+  .motion-gradient-btn,
+  .motion-gradient-orb,
+  .float-fast,
+  .float-slow,
+  .float-slower,
+  .fade-in-up,
+  .stagger-fade > * {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
 @media (max-width: 960px) {
   .ui3d-card:hover {
     transform: none;
@@ -453,6 +472,10 @@ html[data-performance="lite"] .hero-noise::after {
 
 html[data-performance="lite"] .bg-vignette {
   background: none;
+}
+
+html[data-performance="lite"] .bg-grid {
+  display: none;
 }
 
 html[data-performance="lite"] .float-fast,

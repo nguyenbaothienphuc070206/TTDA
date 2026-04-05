@@ -155,14 +155,26 @@ function difficultyLabel(d, copy) {
   return copy.difficultyText.unknown;
 }
 
+function readInitialParams() {
+  if (typeof window === "undefined") {
+    return { focus: "", search: "" };
+  }
+
+  const params = new URLSearchParams(window.location.search);
+  return {
+    focus: String(params.get("focus") || "").trim(),
+    search: String(params.get("q") || "").trim(),
+  };
+}
+
 export default function TechniqueLibrary() {
   const locale = useLocale();
   const copy = useMemo(() => getCopy(locale), [locale]);
-  const [query, setQuery] = useState("");
-  const [debouncedQuery, setDebouncedQuery] = useState("");
+  const [query, setQuery] = useState(() => readInitialParams().search);
+  const [debouncedQuery, setDebouncedQuery] = useState(() => readInitialParams().search);
   const [categoryId, setCategoryId] = useState("all");
   const [difficulty, setDifficulty] = useState("all");
-  const [focusedSlug, setFocusedSlug] = useState("");
+  const [focusedSlug, setFocusedSlug] = useState(() => readInitialParams().focus);
   const [planId, setPlanId] = useState("free");
 
   const [voiceNotice, setVoiceNotice] = useState("");

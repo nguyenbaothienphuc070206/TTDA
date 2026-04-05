@@ -44,7 +44,7 @@ export default async function RootLayout({ children }) {
           // Set theme early to avoid visual flicker while client JS hydrates.
           dangerouslySetInnerHTML={{
             __html:
-              "(function(){try{var d=document.documentElement;var k='vovinam_theme_v1';var t=localStorage.getItem(k);if(t==='light'||t==='dark'||t==='vodo'){d.dataset.theme=t;}var n=window.navigator||{};var c=n.connection||{};var save=!!c.saveData;var slow=/2g/.test(String(c.effectiveType||''));var cpu=Number(n.hardwareConcurrency||0);var mem=Number(n.deviceMemory||0);var lowCpu=cpu>0&&cpu<=4;var lowMem=mem>0&&mem<=4;var reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;if(save||slow||lowCpu||lowMem||reduce){d.dataset.performance='lite';}}catch(_){}})();",
+              "(function(){try{var d=document.documentElement;var k='vovinam_theme_v1';var t=localStorage.getItem(k);if(t==='light'||t==='dark'||t==='vodo'){d.dataset.theme=t;}var pk='vovinam_perf_mode_v1';var pm=localStorage.getItem(pk);if(pm==='lite'||pm==='full'){d.dataset.performance=pm;return;}var n=window.navigator||{};var c=n.connection||{};var save=!!c.saveData;var slow=/2g|3g/.test(String(c.effectiveType||''));var cpu=Number(n.hardwareConcurrency||0);var mem=Number(n.deviceMemory||0);var lowCpu=cpu>0&&cpu<=4;var lowMem=mem>0&&mem<=4;var reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;d.dataset.performance=(save||slow||lowCpu||lowMem||reduce)?'lite':'full';}catch(_){}})();",
           }}
         />
       </head>

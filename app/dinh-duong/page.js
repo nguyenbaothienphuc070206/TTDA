@@ -25,9 +25,9 @@ function getCopy(locale) {
   }
 
   return {
-    title: "Dinh dưỡng & calories",
+    title: "Dinh dưỡng & năng lượng",
     description:
-      "Tính calories/ngày và gợi ý món ăn dựa theo cân nặng, chiều cao, tuổi và mức tập (mới/vừa/lâu). Có kèm chuỗi ăn mẫu 7/14/21/30 ngày để bạn tham khảo.",
+      "Ăn đúng để tập tốt và hồi phục nhanh.",
   };
 }
 

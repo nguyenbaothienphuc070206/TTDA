@@ -46,7 +46,8 @@ export default function CommunityInbox() {
       const data = await fetchCommunityConversations({ limit: 50 });
       setItems(Array.isArray(data?.conversations) ? data.conversations : []);
     } catch (e) {
-      setError(asText(e?.message) || t("genericError"));
+      void e;
+      setError(t("genericError"));
       setItems([]);
     } finally {
       setLoading(false);

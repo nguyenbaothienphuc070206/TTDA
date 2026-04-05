@@ -27,6 +27,9 @@ function getCopy(locale) {
       topVideos: "Most viewed: Videos",
       topTechniques: "Most viewed: Techniques",
       noData: "No data yet.",
+      starterSnapshot: "Starter snapshot",
+      starterVideos: "You watched 3 lessons",
+      starterMinutes: "Training time: 25 minutes",
     };
   }
 
@@ -44,17 +47,20 @@ function getCopy(locale) {
       topVideos: "閲覧数上位: 動画",
       topTechniques: "閲覧数上位: 技術",
       noData: "データがまだありません。",
+      starterSnapshot: "開始時のサンプル",
+      starterVideos: "3レッスンを視聴済み",
+      starterMinutes: "練習時間: 25分",
     };
   }
 
   return {
     overview: "Tổng quan",
-    overviewDesc: (done, total) => `Hoàn thành ${done}/${total} bài`,
+    overviewDesc: (done, total) => `${done} / ${total} bài`,
     continueLearning: "Tiếp tục học",
     watchVideo: "Xem video",
     nutrition: "Dinh dưỡng",
     completedLessons: "Bài đã hoàn thành",
-    noCompletedLessons: "Bạn chưa đánh dấu bài nào.",
+    noCompletedLessons: "Chưa có dữ liệu. Hoàn thành bài đầu tiên để bắt đầu theo dõi.",
     done: "Done",
     topLessons: "Xem nhiều nhất: Bài học",
     topVideos: "Xem nhiều nhất: Video",
@@ -168,6 +174,7 @@ export default function ProgressDashboard() {
             <p className="mt-1 text-sm leading-6 text-slate-300">
               {copy.overviewDesc(doneCount, total)}
             </p>
+            <p className="mt-1 text-sm text-slate-300">Mỗi bước nhỏ đều có giá trị.</p>
           </div>
           <div className="rounded-2xl border border-cyan-300/20 bg-slate-950/35 px-4 py-2 text-sm font-semibold text-cyan-100">
             {percent}%

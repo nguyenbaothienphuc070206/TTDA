@@ -176,6 +176,20 @@ function resolveLessonsForBelt(belt) {
   });
 }
 
+function getTrackIdFromLessonSlug(lessonSlug, beltId) {
+  const slug = String(lessonSlug || "").trim();
+  const prefix = `${String(beltId || "").trim()}-`;
+  if (!slug || !prefix || !slug.startsWith(prefix)) return "";
+  return slug.slice(prefix.length);
+}
+
+function getTechniqueForTrack(trackId) {
+  if (trackId === "phan-don") return "phan-don-can-ban-1";
+  if (trackId === "khoa-go") return "thoat-nam-co-tay";
+  if (trackId === "chien-luoc") return "dam-thang";
+  return "da-tong-truoc";
+}
+
 function BeltCard({ belt, doneSlugs, copy }) {
   const lessons = useMemo(
     () => resolveLessonsForBelt(belt),
@@ -381,6 +395,54 @@ export default function LearningDashboard() {
     return list.map((l) => l.slug);
   }, [doneSlugs]);
 
+  const recommended = useMemo(() => {
+    const doneSet = new Set(doneSlugs);
+
+    for (const belt of BELTS) {
+      const lessons = resolveLessonsForBelt(belt);
+      if (!Array.isArray(lessons) || lessons.length === 0) continue;
+
+      const nextLesson = lessons.find((l) => !doneSet.has(l.slug)) || lessons[0];
+      const trackId = getTrackIdFromLessonSlug(nextLesson.slug, belt.id) || "quyen";
+
+      return {
+        belt,
+        nextLesson,
+        trackId,
+        videoId: `${belt.id}-${trackId}`,
+        techniqueSlug: getTechniqueForTrack(trackId),
+      };
+    }
+
+    return {
+      belt: BELTS[0],
+      nextLesson: LESSONS[0],
+      trackId: "quyen",
+      videoId: "lam-dai-tu-ve-quyen",
+      techniqueSlug: "da-tong-truoc",
+    };
+  }, [doneSlugs]);
+
+  const askNavigator = () => {
+    if (typeof window === "undefined") return;
+
+    const beltTitle = String(recommended?.belt?.title || "Lam đai tự vệ");
+    const lessonTitle = String(recommended?.nextLesson?.title || "Bài học cơ bản");
+
+    try {
+      window.dispatchEvent(
+        new CustomEvent("vovinam-ai-ask", {
+          detail: {
+            query: `Tôi đang ở ${beltTitle}. Hãy tạo buổi tập hôm nay gồm quyền, 1 phản xạ và 1 video hướng dẫn dựa trên bài ${lessonTitle}.`,
+            context: { kind: "roadmap" },
+          },
+        })
+      );
+    } catch {
+      // ignore
+    }
+  };
+
   const toggleOffline = async () => {
     setOfflineNotice("");
     setOfflineNoticeTone("info");
@@ -468,6 +530,48 @@ export default function LearningDashboard() {
           />
         </div>
       </div>
+
+      <section className="rounded-3xl border border-cyan-300/20 bg-linear-to-r from-cyan-300/10 to-blue-500/10 p-6 sm:p-8 shadow-[var(--shadow-card)]">
+        <p className="text-xs font-semibold uppercase tracking-wide text-cyan-100">Recommended for you</p>
+        <h2 className="mt-1 text-xl font-semibold text-white">Nên học tiếp ngay bây giờ</h2>
+        <p className="mt-2 text-sm leading-6 text-slate-200">
+          Bạn đang ở: {recommended.belt.title}. Đi theo flow này để không bị ngợp bởi toàn bộ 14 cấp đai.
+        </p>
+
+        <ul className="mt-3 grid gap-1 text-sm leading-6 text-slate-200">
+          <li>• {recommended.nextLesson.title}</li>
+          <li>• 1 bài phản xạ theo cấp hiện tại</li>
+          <li>• 1 video hướng dẫn đúng cấp đai</li>
+        </ul>
+
+        <div className="mt-4 flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={askNavigator}
+            className="cta-secondary inline-flex h-10 items-center justify-center rounded-2xl px-3 text-xs font-semibold text-white"
+          >
+            AI tạo buổi tập hôm nay
+          </button>
+          <Link
+            href={`/bai-hoc/${recommended.nextLesson.slug}?from=course`}
+            className="cta-primary inline-flex h-10 items-center justify-center rounded-2xl px-3 text-xs font-semibold"
+          >
+            Bắt đầu ngay
+          </Link>
+          <Link
+            href={`/video?from=course&focusVideo=${recommended.videoId}`}
+            className="cta-secondary inline-flex h-10 items-center justify-center rounded-2xl px-3 text-xs font-semibold text-white"
+          >
+            Mở video liên quan
+          </Link>
+          <Link
+            href={`/ky-thuat?focus=${recommended.techniqueSlug}&from=course`}
+            className="cta-secondary inline-flex h-10 items-center justify-center rounded-2xl px-3 text-xs font-semibold text-white"
+          >
+            Mở kỹ thuật liên quan
+          </Link>
+        </div>
+      </section>
 
       <div className="rounded-3xl border border-white/10 bg-white/5 p-6 sm:p-8 shadow-[var(--shadow-card)]">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">

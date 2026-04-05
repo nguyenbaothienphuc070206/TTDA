@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getLocale } from "next-intl/server";
 
+import JourneyStarterPanel from "@/components/JourneyStarterPanel";
 import MotivationPanel from "@/components/MotivationPanel";
 
 export const metadata = {
@@ -116,7 +117,7 @@ function getCopy(locale) {
 
   return {
     title: "Learning",
-    intro: "Gom Course và Video vào một nơi để dễ tìm.",
+    intro: "Đi theo luồng rõ ràng cho người mới: test nhanh, AI gợi ý buổi tập, rồi vào đúng bài cần học.",
     eyebrow: "Training Hub",
     courseTitle: "Course",
     courseDesc: "Dashboard khóa học theo hệ 14 cấp đai và tiến độ bài học.",
@@ -168,6 +169,10 @@ export default async function LearningHubPage() {
           <StatChip value="6+" label={copy.stat3Label} />
         </div>
       </header>
+
+      <div className="mb-6">
+        <JourneyStarterPanel />
+      </div>
 
       <div className="grid gap-3 lg:grid-cols-2">
         <HubCard

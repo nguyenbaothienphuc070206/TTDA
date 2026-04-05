@@ -75,10 +75,11 @@
   },
   "community": {
     "list": {
-      "title": "Community",
-      "description": "Bảng xếp hạng theo từng đai. Bấm vào mỗi đai để xem profile và bắt đầu chat.",
-      "loadError": "Không tải được dữ liệu bảng xếp hạng (Supabase query lỗi).",
-      "envError": "Chưa cấu hình Supabase service key (SUPABASE_SECRET_KEY) nên chưa xem được dữ liệu cộng đồng.",
+      "title": "Cộng đồng",
+      "subtitle": "Luyện cùng nhau. Tiến bộ cùng nhau.",
+      "description": "Khám phá học viên theo từng cấp đai. Xem hồ sơ, theo dõi tiến độ và trao đổi kinh nghiệm.",
+      "loadError": "Cộng đồng đang được cập nhật, quay lại sau nhé!",
+      "envError": "Cộng đồng đang được cập nhật, quay lại sau nhé!",
       "memberFallback": "Học viên",
       "memberLabel": "Học viên",
       "peopleSuffix": "người",
@@ -87,14 +88,13 @@
       "searchLabel": "Tìm học viên",
       "searchPlaceholder": "Nhập tên...",
       "sortLabel": "Sắp xếp",
-      "sortNameAsc": "Tên A-Z",
-      "sortNameDesc": "Tên Z-A",
-      "sortNewest": "Mới nhất trước",
-      "sortOldest": "Cũ nhất trước",
+      "sortNameAsc": "Tên (A-Z)",
+      "sortBelt": "Cấp đai",
       "applyFilters": "Áp dụng",
       "clearFilters": "Xóa lọc",
       "retry": "Thử lại",
-      "resultSummary": "Kết quả phù hợp"
+      "resultSummary": "Kết quả phù hợp",
+      "viewAction": "Xem"
     },
     "chatPage": {
       "backArrow": "← Quay lại Community"

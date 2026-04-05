@@ -116,8 +116,8 @@ export default function CommunityChat({ toUserId, toName }) {
           );
         }
       } catch (e) {
-        const message = asText(e?.message);
-        setError(message || t("genericError"));
+        void e;
+        setError(t("genericError"));
       } finally {
         if (!silent) {
           setLoadingInitial(false);
@@ -254,8 +254,8 @@ export default function CommunityChat({ toUserId, toName }) {
 
       await loadMessages({ append: false, silent: true });
     } catch (e) {
-      const message = asText(e?.message);
-      setError(message || t("genericError"));
+      void e;
+      setError(t("genericError"));
     } finally {
       setSending(false);
     }

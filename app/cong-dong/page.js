@@ -25,19 +25,69 @@ function asText(value) {
   return String(value || "").trim();
 }
 
+const MOCK_NAMES = [
+  "Nguyen Van An",
+  "Tran Minh Khoa",
+  "Le Hoang Nam",
+  "Pham Quoc Bao",
+  "Vo Thi Mai",
+  "Dang Thu Ha",
+  "Bui Tuan Kiet",
+  "Doan Ngoc Han",
+  "Phan Gia Huy",
+  "Hoang Minh Chau",
+  "Truong Bao Nhi",
+  "Ngo Quynh Anh",
+  "Duong Thanh Dat",
+  "Ly Kim Ngan",
+  "Mai Thanh Tung",
+];
+
 function sanitizeSort(value) {
   const v = asText(value).toLowerCase();
-  if (v === "name_desc") return "name_desc";
-  if (v === "newest") return "newest";
-  if (v === "oldest") return "oldest";
+  if (v === "belt") return "belt";
   return "name_asc";
+}
+
+function buildMockMembersByBelt(sortLocale) {
+  const byBelt = createEmptyByBelt();
+  let cursor = 0;
+
+  for (const belt of BELTS) {
+    const count = 6;
+    const list = [];
+
+    for (let i = 0; i < count; i += 1) {
+      const name = MOCK_NAMES[cursor % MOCK_NAMES.length];
+      cursor += 1;
+
+      list.push({
+        userId: `mock-${belt.id}-${i + 1}`,
+        name,
+        avatarUrl: "",
+        createdAt: new Date(Date.now() - i * 86_400_000).toISOString(),
+      });
+    }
+
+    byBelt[belt.id] = sortMembers(list, "name_asc", sortLocale);
+  }
+
+  return byBelt;
+}
+
+function hasAnyMember(byBelt) {
+  return BELTS.some((belt) => {
+    const list = byBelt?.[belt.id];
+    return Array.isArray(list) && list.length > 0;
+  });
 }
 
 async function loadBeltLeaderboard({ memberFallback, loadError, envError, sortLocale }) {
   const emptyByBelt = createEmptyByBelt();
   const empty = {
-    ok: false,
+    ok: true,
     error: "",
+    notice: "",
     byBelt: emptyByBelt,
   };
 
@@ -53,7 +103,8 @@ async function loadBeltLeaderboard({ memberFallback, loadError, envError, sortLo
     if (profilesErr || progressErr) {
       return {
         ...empty,
-        error: loadError,
+        notice: loadError,
+        byBelt: buildMockMembersByBelt(sortLocale),
       };
     }
 
@@ -87,11 +138,21 @@ async function loadBeltLeaderboard({ memberFallback, loadError, envError, sortLo
       byBelt[beltId].sort((a, b) => a.name.localeCompare(b.name, sortLocale));
     }
 
-    return { ok: true, error: "", byBelt };
+    if (!hasAnyMember(byBelt)) {
+      return {
+        ok: true,
+        error: "",
+        notice: envError,
+        byBelt: buildMockMembersByBelt(sortLocale),
+      };
+    }
+
+    return { ok: true, error: "", notice: "", byBelt };
   } catch {
     return {
       ...empty,
-      error: envError,
+      notice: envError,
+      byBelt: buildMockMembersByBelt(sortLocale),
     };
   }
 }
@@ -105,6 +166,11 @@ function sortMembers(members, sort, sortLocale) {
 
   if (sort === "name_desc") {
     list.sort((a, b) => b.name.localeCompare(a.name, sortLocale));
+    return list;
+  }
+
+  if (sort === "belt") {
+    list.sort((a, b) => a.name.localeCompare(b.name, sortLocale));
     return list;
   }
 
@@ -182,6 +248,7 @@ export default async function CommunityPage({ searchParams }) {
   const t = await getTranslations("community.list");
   const queryText = asText(searchParams?.q).slice(0, 80);
   const sort = sanitizeSort(searchParams?.sort);
+  const selectedBeltId = asText(searchParams?.belt);
 
   const data = await loadBeltLeaderboard({
     memberFallback: t("memberFallback"),
@@ -199,12 +266,13 @@ export default async function CommunityPage({ searchParams }) {
     <div className="mx-auto w-full max-w-6xl px-4 py-10">
       <header className="mb-6 rounded-3xl border border-white/10 bg-white/5 p-6 sm:p-8">
         <h1 className="text-2xl font-semibold tracking-tight text-white sm:text-3xl">{t("title")}</h1>
+        <p className="mt-1 text-sm font-medium text-cyan-100">{t("subtitle")}</p>
         <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-300">{t("description")}</p>
       </header>
 
-      {data.ok ? null : (
+      {data.notice ? (
         <div className="mb-4 rounded-3xl border border-amber-300/25 bg-amber-400/10 p-5 text-sm text-amber-100">
-          <div>{data.error}</div>
+          <div>{data.notice}</div>
           <div className="mt-3">
             <Link
               href="/cong-dong"
@@ -214,7 +282,7 @@ export default async function CommunityPage({ searchParams }) {
             </Link>
           </div>
         </div>
-      )}
+      ) : null}
 
       <form className="mb-4 grid gap-3 rounded-3xl border border-white/10 bg-white/5 p-4 sm:grid-cols-[1fr_auto_auto] sm:items-end">
         <div>
@@ -247,9 +315,7 @@ export default async function CommunityPage({ searchParams }) {
             className="h-10 rounded-2xl border border-white/10 bg-slate-950/40 px-3 text-sm text-white outline-none focus:ring-2 focus:ring-cyan-300/30"
           >
             <option value="name_asc">{t("sortNameAsc")}</option>
-            <option value="name_desc">{t("sortNameDesc")}</option>
-            <option value="newest">{t("sortNewest")}</option>
-            <option value="oldest">{t("sortOldest")}</option>
+            <option value="belt">{t("sortBelt")}</option>
           </select>
         </div>
 
@@ -277,48 +343,63 @@ export default async function CommunityPage({ searchParams }) {
       <div className="grid gap-3">
         {BELTS.map((belt) => {
           const members = Array.isArray(byBelt?.[belt.id]) ? byBelt[belt.id] : [];
+          const isSelected = selectedBeltId === belt.id;
+
+          const params = new URLSearchParams();
+          if (queryText) params.set("q", queryText);
+          if (sort) params.set("sort", sort);
+          params.set("belt", belt.id);
+
+          const viewHref = `/cong-dong?${params.toString()}`;
 
           return (
-            <details
+            <div
               key={belt.id}
-              className="group rounded-3xl border border-white/10 bg-white/5 p-5 open:bg-white/10"
+              className={
+                "rounded-3xl border p-5 " +
+                (isSelected ? "border-cyan-300/25 bg-cyan-300/8" : "border-white/10 bg-white/5")
+              }
             >
-              <summary className="cursor-pointer list-none outline-none">
-                <div className="flex items-center justify-between gap-3">
-                  <div className="min-w-0">
-                    <div className="text-sm font-semibold text-white">{belt.title}</div>
-                    <div className="mt-1 text-xs text-slate-300">
-                      {members.length} {t("peopleSuffix")}
-                    </div>
+              <div className="flex items-center justify-between gap-3">
+                <div className="min-w-0">
+                  <div className="text-sm font-semibold text-white">{belt.title}</div>
+                  <div className="mt-1 text-xs text-slate-300">
+                    {members.length} {t("peopleSuffix")}
                   </div>
-
-                  <span className="inline-flex h-9 w-9 items-center justify-center rounded-2xl border border-white/10 bg-white/5 text-slate-200 transition group-open:rotate-45">
-                    +
-                  </span>
                 </div>
-              </summary>
 
-              <div className="mt-4 grid gap-2">
-                {members.length ? (
-                  members.map((m) => (
-                    <MemberRow
-                      key={m.userId}
-                      member={m}
-                      memberFallback={t("memberFallback")}
-                      memberLabel={t("memberLabel")}
-                      chatCta={t("chatCta")}
-                    />
-                  ))
-                ) : (
-                  <div className="rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-slate-300">
-                    {t("emptyBelt")}
-                  </div>
-                )}
+                <Link
+                  href={viewHref}
+                  className="inline-flex h-9 items-center justify-center rounded-2xl border border-white/10 bg-white/5 px-3 text-sm font-semibold text-white transition hover:bg-white/10"
+                >
+                  {t("viewAction")} →
+                </Link>
               </div>
-            </details>
+
+              {isSelected ? (
+                <div className="mt-4 grid gap-2">
+                  {members.length ? (
+                    members.map((m) => (
+                      <MemberRow
+                        key={m.userId}
+                        member={m}
+                        memberFallback={t("memberFallback")}
+                        memberLabel={t("memberLabel")}
+                        chatCta={t("chatCta")}
+                      />
+                    ))
+                  ) : (
+                    <div className="rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-slate-300">
+                      {t("emptyBelt")}
+                    </div>
+                  )}
+                </div>
+              ) : null}
+            </div>
           );
         })}
       </div>
+
     </div>
   );
 }

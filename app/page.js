@@ -22,7 +22,6 @@ import { LEVELS, LESSONS, getLessonsByLevel } from "@/data/lessons";
 import { NEWS } from "@/data/news";
 import JsonLd from "@/components/JsonLd";
 import HomeDemoActions from "@/components/HomeDemoActions";
-import RouteWarmup from "@/components/RouteWarmup";
 
 export const metadata = {
   title: "Vovinam Learning - Học Vovinam Theo Lộ Trình",
@@ -408,7 +407,6 @@ function HomeVi() {
 
   return (
     <div className="ui3d-stage mobile-safe-bottom mx-auto w-full max-w-6xl px-4 py-6 sm:py-10">
-      <RouteWarmup />
       <JsonLd data={buildHomeJsonLd("vi")} />
       <ProblemStatement
         title="90% người tập bỏ cuộc vì không có lộ trình rõ ràng"
@@ -425,11 +423,10 @@ function HomeVi() {
           </p>
 
           <h1 className="headline-gradient motion-gradient-title hero-title-enterprise mt-3 max-w-3xl font-semibold">
-            Học Vovinam theo lộ trình đầy đủ từ Lam đai tự vệ đến Hồng đai tứ
+            Tập Vovinam mà không có lộ trình = bỏ cuộc trong 2 tuần
           </h1>
           <p className="hero-subtitle-enterprise mt-2 max-w-2xl text-slate-300">
-            Mỗi bài có mục tiêu, hướng dẫn từng bước, lỗi thường gặp và gợi ý tự
-            luyện. Bạn có thể đánh dấu hoàn thành để theo dõi tiến độ.
+            Chúng tôi biến bạn từ người mới đến Hồng đai với AI Coach cá nhân.
           </p>
 
           <div className="mt-5 flex flex-col gap-2.5 sm:flex-row">
@@ -446,20 +443,24 @@ function HomeVi() {
               Test trình độ trong 30s
             </Link>
           </div>
-
-          <HomeDemoActions
-            primaryLabel="Demo AI Coach gợi ý bài tập"
-            secondaryLabel="1 click tạo buổi tập hôm nay"
-            aiPrompt="Tôi mới tập Vovinam, gợi ý 1 buổi tập 20 phút hôm nay theo cấp Lam đai."
-          />
+          <p className="mt-3 text-sm font-medium text-cyan-100">
+            Một huấn luyện viên Vovinam cá nhân, trong túi của bạn.
+          </p>
 
         </div>
       </section>
 
+      <HomeDemoActions
+        title="Thử ngay AI Coach"
+        primaryLabel="Tạo buổi tập cho tôi"
+        aiPrompt="Tôi mới tập Vovinam, gợi ý 1 buổi tập 20 phút hôm nay theo cấp Lam đai."
+        resultLatencyMs={800}
+      />
+
       <section className="mt-8">
         <SectionHeading
           id="how-it-works"
-          title="How it works trong 3 bước"
+          title="Cách hoạt động trong 3 bước"
           description="Từ mơ hồ đến rõ ràng: test nhanh, tạo lộ trình, và theo dõi tiến bộ mỗi ngày."
         />
         <div className="mt-4 grid gap-3 md:grid-cols-3">
@@ -482,195 +483,139 @@ function HomeVi() {
             bullets={["Track tiến độ", "Thống kê ngày/tuần", "Gợi ý bước tiếp"]}
           />
         </div>
+
+        <div className="surface-card enterprise-shell ui3d-card mt-4 rounded-3xl p-4 sm:p-5">
+          <p className="text-sm leading-6 text-slate-300">
+            Chỉ cần 3 thao tác mỗi ngày: mở app, tập theo buổi được gợi ý, bấm hoàn thành.
+            Khi mọi thứ đủ rõ, bạn không còn phải suy nghĩ “hôm nay tập gì” nữa.
+          </p>
+        </div>
       </section>
 
-      <MotivationStrip
-        title="Bạn không cần hoàn hảo, bạn cần đều đặn"
-        message="Nếu hôm nay chỉ tập được 15-20 phút cũng rất tốt. Một buổi gọn gàng, đúng kỹ thuật luôn có giá trị hơn tập nhiều mà rối form."
-        chips={[
-          "Hoàn thành 1 bài là đã thắng",
-          "Giữ form trước khi tăng tốc",
-          "Mệt thì giảm nhịp, không bỏ hẳn",
-        ]}
-      />
+      <section className="mt-8">
+        <SectionHeading
+          id="before-after"
+          title="Trước và sau khi có AI Coach"
+          description="Không chỉ là tính năng, đây là khác biệt về cảm giác tập mỗi ngày."
+        />
+
+        <div className="mt-4 grid gap-3 md:grid-cols-2">
+          <div className="surface-card enterprise-shell ui3d-card rounded-3xl p-5">
+            <p className="text-xs font-semibold uppercase tracking-wide text-rose-200">Trước</p>
+            <ul className="mt-3 grid gap-2 text-sm leading-6 text-slate-300">
+              <li className="flex gap-2"><span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-rose-300/80" /><span>Tập random, không rõ hôm nay cần làm gì.</span></li>
+              <li className="flex gap-2"><span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-rose-300/80" /><span>Không biết mình sai chỗ nào để sửa.</span></li>
+              <li className="flex gap-2"><span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-rose-300/80" /><span>Dễ bỏ cuộc vì thiếu cảm giác tiến bộ.</span></li>
+            </ul>
+          </div>
+
+          <div className="surface-card enterprise-shell ui3d-card rounded-3xl p-5">
+            <p className="text-xs font-semibold uppercase tracking-wide text-emerald-200">Sau</p>
+            <ul className="mt-3 grid gap-2 text-sm leading-6 text-slate-300">
+              <li className="flex gap-2"><span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-300/80" /><span>Có lộ trình rõ ràng theo từng cấp đai.</span></li>
+              <li className="flex gap-2"><span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-300/80" /><span>AI tự chỉnh bài tập mỗi ngày theo thời gian bạn có.</span></li>
+              <li className="flex gap-2"><span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-300/80" /><span>Track tiến độ để luôn biết mình đang đi tới đâu.</span></li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section className="mt-6">
+        <div className="surface-card enterprise-shell ui3d-card rounded-3xl p-5">
+          <h2 className="text-lg font-semibold text-white">Vì sao có thể tin lộ trình này</h2>
+          <div className="mt-3 grid gap-2 sm:grid-cols-3">
+            <div className="rounded-2xl border border-white/10 bg-slate-950/30 px-3 py-2 text-xs font-semibold text-slate-200">
+              Dựa trên 14 cấp đai Vovinam chuẩn
+            </div>
+            <div className="rounded-2xl border border-white/10 bg-slate-950/30 px-3 py-2 text-xs font-semibold text-slate-200">
+              Thiết kế theo giáo trình thực tế
+            </div>
+            <div className="rounded-2xl border border-white/10 bg-slate-950/30 px-3 py-2 text-xs font-semibold text-slate-200">
+              Phù hợp người mới bắt đầu
+            </div>
+          </div>
+        </div>
+      </section>
 
       <section className="mt-10">
         <SectionHeading
-          id="vo-dao"
-          title="Tinh thần võ đạo"
-          description="Tập để khỏe - tự tin - kỷ luật. Tập đúng kỹ thuật và giữ tâm thế bình tĩnh." 
+          id="recommended"
+          title="Học đúng cách (Recommended)"
+          description="Toàn bộ phần tips, safety và kế hoạch được gom gọn trong 1 block để bạn mở khi cần."
         />
 
-        <div className="mt-5 grid gap-3 md:grid-cols-2 lg:grid-cols-3">
-          <FeatureCard
-            title="Kỷ luật & đều đặn"
-            description="Tập đều quan trọng hơn tập nặng. Tăng dần nhẹ mỗi tuần để bền." 
-            icon={<FontAwesomeIcon icon={faCalendarCheck} className="h-5 w-5" />}
-          />
-          <FeatureCard
-            title="Tôn trọng & tự vệ"
-            description="Mục tiêu là tự bảo vệ và kiểm soát bản thân, không phô trương hay gây hấn." 
-            icon={<FontAwesomeIcon icon={faShieldHalved} className="h-5 w-5" />}
-          />
-          <FeatureCard
-            title="An toàn là ưu tiên"
-            description="Khởi động kỹ, tập chậm, dừng khi đau nhói. Kỹ thuật khó nên có HLV." 
-            icon={<FontAwesomeIcon icon={faHeartPulse} className="h-5 w-5" />}
-          />
+        <div className="mt-4 grid gap-3">
+          <details className="surface-card enterprise-shell ui3d-card group rounded-3xl p-5 open:bg-white/10">
+            <summary className="cursor-pointer list-none text-sm font-semibold text-white">
+              <div className="flex items-center justify-between gap-3">
+                <span>Tips tập hiệu quả</span>
+                <span className="inline-flex h-9 w-9 items-center justify-center rounded-2xl border border-white/10 bg-white/5 text-slate-200 transition group-open:rotate-45">+</span>
+              </div>
+            </summary>
+            <ul className="mt-3 grid gap-2 text-sm leading-6 text-slate-300">
+              <li>• Tập tấn và di chuyển trước khi vào bài đòn phức tạp.</li>
+              <li>• Chia buổi tập thành 3-4 hiệp ngắn để giữ chất lượng động tác.</li>
+              <li>• Quay video ngắn 10-20 giây để tự sửa form mỗi ngày.</li>
+            </ul>
+          </details>
+
+          <details className="surface-card enterprise-shell ui3d-card group rounded-3xl p-5 open:bg-white/10">
+            <summary className="cursor-pointer list-none text-sm font-semibold text-white">
+              <div className="flex items-center justify-between gap-3">
+                <span>Safety checklist</span>
+                <span className="inline-flex h-9 w-9 items-center justify-center rounded-2xl border border-white/10 bg-white/5 text-slate-200 transition group-open:rotate-45">+</span>
+              </div>
+            </summary>
+            <ul className="mt-3 grid gap-2 text-sm leading-6 text-slate-300">
+              <li>• Khởi động 5-10 phút cho cổ chân, gối, hông, vai.</li>
+              <li>• Đau nhói hoặc choáng: dừng ngay, không cố thêm hiệp.</li>
+              <li>• Ưu tiên tập đúng kỹ thuật trước khi tăng tốc hoặc tăng lực.</li>
+            </ul>
+          </details>
+
+          <details className="surface-card enterprise-shell ui3d-card group rounded-3xl p-5 open:bg-white/10">
+            <summary className="cursor-pointer list-none text-sm font-semibold text-white">
+              <div className="flex items-center justify-between gap-3">
+                <span>Kế hoạch 4 tuần mẫu</span>
+                <span className="inline-flex h-9 w-9 items-center justify-center rounded-2xl border border-white/10 bg-white/5 text-slate-200 transition group-open:rotate-45">+</span>
+              </div>
+            </summary>
+            <div className="mt-3 grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
+              <div className="rounded-2xl border border-white/10 bg-slate-950/30 p-3 text-sm text-slate-200"><strong>Tuần 1:</strong> Nền tảng</div>
+              <div className="rounded-2xl border border-white/10 bg-slate-950/30 p-3 text-sm text-slate-200"><strong>Tuần 2:</strong> Đòn chân</div>
+              <div className="rounded-2xl border border-white/10 bg-slate-950/30 p-3 text-sm text-slate-200"><strong>Tuần 3:</strong> Kết hợp</div>
+              <div className="rounded-2xl border border-white/10 bg-slate-950/30 p-3 text-sm text-slate-200"><strong>Tuần 4:</strong> Ứng dụng</div>
+            </div>
+            <p className="mt-3 text-sm leading-6 text-slate-300">
+              Mẹo tăng cấp bền: mỗi tuần chỉ tăng một yếu tố (thời lượng hoặc số buổi hoặc độ khó).
+            </p>
+          </details>
         </div>
       </section>
 
       <section className="mt-12">
         <SectionHeading
-          id="khoa-hoc"
-          title="Khóa học theo cấp đai"
-          description="Chia theo đầy đủ hệ đai để bạn biết đang ở giai đoạn nào và học gì tiếp theo." 
+          id="product-depth"
+          title="Product depth"
+          description="Giữ đầy đủ chiều sâu sản phẩm, nhưng homepage chỉ hiển thị preview để không quá tải."
           right={
             <Link
-              href="/hoc-tap"
+              href="/lo-trinh"
               className="text-sm font-semibold text-cyan-200 hover:text-white transition"
             >
-              Vào dashboard →
+              Xem toàn bộ lộ trình →
             </Link>
           }
         />
 
-        <div className="mt-5 grid gap-3 md:grid-cols-2 lg:grid-cols-3">
-          {BELTS.map((b) => (
+        <div className="mt-5 grid gap-3 md:grid-cols-2 lg:grid-cols-4">
+          {BELTS.slice(0, 4).map((b) => (
             <BeltPreview key={b.id} belt={b} />
           ))}
         </div>
-      </section>
-
-      <section className="mt-12">
-        <SectionHeading
-          id="tin-tuc"
-          title="Lịch thi đấu & sự kiện"
-          description="Feed nhỏ cập nhật lịch thi đấu, đăng ký và nhắc lịch quan trọng." 
-          right={
-            <Link
-              href="/lich-tap"
-              className="text-sm font-semibold text-cyan-200 hover:text-white transition"
-            >
-              Tạo lịch tập →
-            </Link>
-          }
-        />
 
         <div className="mt-5 grid gap-3 md:grid-cols-2 lg:grid-cols-3">
-          {NEWS.slice(0, 3).map((n) => (
-            <NewsCard key={n.id} item={n} />
-          ))}
-        </div>
-      </section>
-
-      <section className="mt-10">
-        <SectionHeading
-          id="tinh-nang"
-          title="Tính năng nổi bật"
-          description="Tập trung vào thứ bạn cần khi tự luyện: rõ ràng, dễ theo dõi và an toàn."
-          right={
-            <Link
-              href="/lo-trinh"
-              className="text-sm font-semibold text-cyan-200 hover:text-white transition"
-            >
-              Vào lộ trình →
-            </Link>
-          }
-        />
-
-        <div className="mt-5 grid gap-3 md:grid-cols-2 lg:grid-cols-3">
-          <FeatureCard
-            title="Bài học từng bước"
-            description="Mỗi bài có mục tiêu, bước tập, lỗi thường gặp và gợi ý để bạn tập đúng." 
-            icon={<FontAwesomeIcon icon={faBookOpen} className="h-5 w-5" />}
-          />
-          <FeatureCard
-            title="Lưu tiến độ tự động"
-            description="Bấm “Đánh dấu hoàn thành” để theo dõi bạn đã học tới đâu (lưu ngay trên máy)."
-            icon={<FontAwesomeIcon icon={faChartLine} className="h-5 w-5" />}
-          />
-          <FeatureCard
-            title="Lịch tập 7 ngày"
-            description="Tạo lịch theo cấp đai + số buổi/tuần + thời lượng. Dễ duy trì thói quen." 
-            icon={<FontAwesomeIcon icon={faCalendarDays} className="h-5 w-5" />}
-          />
-          <FeatureCard
-            title="Thiết kế sáng rõ"
-            description="UI sáng, chữ rõ, nút lớn dễ bấm. Nhìn lâu không mỏi và không rối mắt."
-            icon={<FontAwesomeIcon icon={faGaugeHigh} className="h-5 w-5" />}
-          />
-          <FeatureCard
-            title="Tối ưu bảo mật"
-            description="Bật security headers, tắt X-Powered-By, có robots/sitemap và trang chính sách." 
-            icon={<FontAwesomeIcon icon={faLock} className="h-5 w-5" />}
-          />
-          <FeatureCard
-            title="Nhẹ và nhanh"
-            description="Trang chủ chủ yếu render tĩnh; nội dung bài học nằm trong data nên tải nhanh." 
-            icon={<FontAwesomeIcon icon={faBolt} className="h-5 w-5" />}
-          />
-        </div>
-      </section>
-
-      <section className="mt-12">
-        <SectionHeading
-          id="cach-hoc"
-          title="Cách học hiệu quả (gợi ý)"
-          description="Cách học này giúp bạn tiến bộ ổn, ít chấn thương, và không bị “tập cho có”."
-        />
-
-        <div className="mt-5 grid gap-3 md:grid-cols-2 lg:grid-cols-3">
-          <StepCard
-            step="1"
-            title="Bắt đầu từ nền tảng"
-            description="Đừng vội đá cao/nhanh. Nền tảng tốt giúp bạn lên cấp cao an toàn."
-            bullets={[
-              "Tập tấn + di chuyển trước",
-              "Tập tay thủ và thở đều",
-              "Quay video 10-20 giây để tự sửa",
-            ]}
-          />
-          <StepCard
-            step="2"
-            title="Tập theo nhịp nhỏ"
-            description="Chia nhỏ thời gian giúp bạn giữ kỹ thuật tốt và dễ duy trì." 
-            bullets={[
-              "3-4 hiệp ngắn mỗi buổi",
-              "Nghỉ 30-60 giây giữa hiệp",
-              "Ưu tiên đúng động tác hơn số lần",
-            ]}
-          />
-          <StepCard
-            step="3"
-            title="Đều đặn + tăng dần"
-            description="Tăng dần theo tuần: thời lượng, số buổi hoặc độ khó (mỗi lần tăng 1 thứ)."
-            bullets={[
-              "Tạo lịch tập 7 ngày",
-              "Đánh dấu hoàn thành sau mỗi buổi",
-              "Nếu đau: giảm cường độ, không cố",
-            ]}
-          />
-        </div>
-      </section>
-
-      <section className="mt-12">
-        <SectionHeading
-          id="bai-noi-bat"
-          title="Bài học nổi bật"
-          description="Một vài bài nên học sớm để nắm kỹ thuật và tự tin tập tiếp."
-          right={
-            <Link
-              href="/lo-trinh"
-              className="text-sm font-semibold text-cyan-200 hover:text-white transition"
-            >
-              Xem tất cả bài →
-            </Link>
-          }
-        />
-
-        <div className="mt-5 grid gap-3 md:grid-cols-2 lg:grid-cols-3">
-          {featured.map((lesson) => (
+          {featured.slice(0, 3).map((lesson) => (
             <LessonPreviewCard
               key={lesson.slug}
               lesson={lesson}
@@ -678,177 +623,11 @@ function HomeVi() {
             />
           ))}
         </div>
-      </section>
-
-      <section className="mt-10">
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <h2 className="text-xl font-semibold text-white">Lộ trình theo cấp đai</h2>
-            <p className="mt-1 text-sm text-slate-300">
-              Bắt đầu từ Lam đai tự vệ, tiến dần theo từng cấp đến Hồng đai tứ.
-            </p>
-          </div>
-          <Link
-            href="/lo-trinh"
-            className="text-sm font-semibold text-cyan-200 hover:text-white transition"
-          >
-            Xem toàn bộ lộ trình →
-          </Link>
-        </div>
 
         <div className="mt-5 grid gap-3 lg:grid-cols-3">
-          {LEVELS.map((level) => (
+          {LEVELS.slice(0, 3).map((level) => (
             <LevelPreview key={level.id} level={level} />
           ))}
-        </div>
-      </section>
-
-      <section className="mt-12">
-        <SectionHeading
-          id="ke-hoach"
-          title="Kế hoạch 4 tuần (mẫu)"
-          description="Nếu bạn chưa biết tập gì mỗi tuần, đây là gợi ý đơn giản để bám theo."
-          right={
-            <Link
-              href="/lich-tap"
-              className="text-sm font-semibold text-cyan-200 hover:text-white transition"
-            >
-              Tạo lịch 7 ngày →
-            </Link>
-          }
-        />
-
-        <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-          {[
-            {
-              w: "Tuần 1",
-              title: "Nền tảng",
-              desc: "Tấn + di chuyển + đấm thẳng. Tập chậm, chuẩn trục cơ thể.",
-              icon: faRoute,
-            },
-            {
-              w: "Tuần 2",
-              title: "Đòn chân",
-              desc: "Đá tống trước + đỡ cơ bản. Thêm thăng bằng và nhịp thở.",
-              icon: faPersonRunning,
-            },
-            {
-              w: "Tuần 3",
-              title: "Kết hợp",
-              desc: "Phối hợp tay-chân, tăng độ bền. Nếu ổn có thể thử Hoàng đai.",
-              icon: faDumbbell,
-            },
-            {
-              w: "Tuần 4",
-              title: "Ứng dụng",
-              desc: "Tập chuỗi kỹ thuật, phản đòn nguyên tắc. Ưu tiên an toàn khi tập đôi.",
-              icon: faUsers,
-            },
-          ].map((item) => (
-            <div
-              key={item.w}
-              className="rounded-3xl border border-white/10 bg-white/5 p-6 ui3d-card"
-            >
-              <div className="flex items-center justify-between gap-2">
-                <Pill>{item.w}</Pill>
-                <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-white/10 bg-linear-to-br from-cyan-300/15 to-blue-500/10 text-cyan-200">
-                  <FontAwesomeIcon icon={item.icon} className="h-5 w-5" />
-                </span>
-              </div>
-              <h3 className="mt-4 text-base font-semibold text-white">
-                {item.title}
-              </h3>
-              <p className="mt-1 text-sm leading-6 text-slate-300">{item.desc}</p>
-            </div>
-          ))}
-        </div>
-
-        <div className="mt-4 rounded-3xl border border-white/10 bg-white/5 p-5 ui3d-card">
-          <p className="text-sm leading-6 text-slate-300">
-            Mẹo: Khi bạn cảm thấy “động tác đã sạch” (đúng và kiểm soát được),
-            hãy tăng <strong>một</strong> yếu tố: thời lượng <em>hoặc</em> số
-            buổi <em>hoặc</em> độ khó. Tránh tăng cùng lúc nhiều thứ.
-          </p>
-        </div>
-      </section>
-
-      <section className="mt-12">
-        <SectionHeading
-          id="chuan-bi"
-          title="Chuẩn bị & an toàn"
-          description="Tập đúng là tốt, tập an toàn là quan trọng. Đây là checklist ngắn để bạn không bị chấn thương vặt."
-          right={
-            <Link
-              href="/chinh-sach-bao-mat"
-              className="text-sm font-semibold text-cyan-200 hover:text-white transition"
-            >
-              Xem chính sách →
-            </Link>
-          }
-        />
-
-        <div className="mt-5 grid gap-3 md:grid-cols-2 lg:grid-cols-3">
-          <FeatureCard
-            title="Khởi động đúng"
-            description="Ưu tiên cổ chân, gối, hông và vai. Khởi động nhẹ rồi tăng dần."
-            icon={<FontAwesomeIcon icon={faHeartPulse} className="h-5 w-5" />}
-          />
-          <FeatureCard
-            title="Không gian & dụng cụ"
-            description="Sàn không trơn, đủ rộng; có nước; có thảm/nệm mỏng nếu tập ngã."
-            icon={<FontAwesomeIcon icon={faDumbbell} className="h-5 w-5" />}
-          />
-          <FeatureCard
-            title="Tập đôi an toàn"
-            description="Thống nhất tốc độ & tín hiệu dừng. Không dùng lực mạnh khi không có bảo hộ."
-            icon={<FontAwesomeIcon icon={faShieldHalved} className="h-5 w-5" />}
-          />
-        </div>
-
-        <div className="mt-4 grid gap-3 lg:grid-cols-2">
-          <div className="rounded-3xl border border-white/10 bg-white/5 p-6 sm:p-8 ui3d-card">
-            <h3 className="text-base font-semibold text-white">Checklist trước buổi tập</h3>
-            <ul className="mt-3 grid gap-2 text-sm leading-6 text-slate-300">
-              <li className="flex gap-2">
-                <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-cyan-300/80" />
-                <span>Khởi động 5-10 phút (cổ chân, gối, hông, vai).</span>
-              </li>
-              <li className="flex gap-2">
-                <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-cyan-300/80" />
-                <span>Tập chậm - đúng kỹ thuật trước khi tăng tốc.</span>
-              </li>
-              <li className="flex gap-2">
-                <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-cyan-300/80" />
-                <span>Đau nhói/choáng: dừng lại và nghỉ, không cố.</span>
-              </li>
-              <li className="flex gap-2">
-                <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-cyan-300/80" />
-                <span>Giãn cơ 3-5 phút sau buổi tập để đỡ đau nhức.</span>
-              </li>
-            </ul>
-          </div>
-
-          <div className="rounded-3xl border border-white/10 bg-white/5 p-6 sm:p-8 ui3d-card">
-            <h3 className="text-base font-semibold text-white">Dụng cụ gợi ý</h3>
-            <ul className="mt-3 grid gap-2 text-sm leading-6 text-slate-300">
-              <li className="flex gap-2">
-                <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-cyan-300/80" />
-                <span>Nước + khăn nhỏ (giữ nhịp thở và tránh mất nước).</span>
-              </li>
-              <li className="flex gap-2">
-                <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-cyan-300/80" />
-                <span>Thảm/nệm mỏng nếu tập ngã an toàn.</span>
-              </li>
-              <li className="flex gap-2">
-                <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-cyan-300/80" />
-                <span>Bảo hộ (nếu tập đôi): găng, ống quyển…</span>
-              </li>
-              <li className="flex gap-2">
-                <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-cyan-300/80" />
-                <span>Gương hoặc camera để tự sửa tư thế.</span>
-              </li>
-            </ul>
-          </div>
         </div>
       </section>
 
@@ -893,6 +672,20 @@ function HomeVi() {
             a="Tiến độ và lịch tập lưu trong localStorage trên trình duyệt. Nếu bạn xóa dữ liệu trình duyệt hoặc đổi máy, dữ liệu sẽ mất."
           />
         </div>
+
+        <details className="surface-card enterprise-shell ui3d-card group mt-4 rounded-3xl p-5 open:bg-white/10">
+          <summary className="cursor-pointer list-none text-sm font-semibold text-white">
+            <div className="flex items-center justify-between gap-3">
+              <span>Thông tin sự kiện và giải đấu (mở rộng)</span>
+              <span className="inline-flex h-9 w-9 items-center justify-center rounded-2xl border border-white/10 bg-white/5 text-slate-200 transition group-open:rotate-45">+</span>
+            </div>
+          </summary>
+          <div className="mt-3 grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+            {NEWS.slice(0, 3).map((n) => (
+              <NewsCard key={n.id} item={n} />
+            ))}
+          </div>
+        </details>
       </section>
 
       <section className="mt-12">
@@ -1065,7 +858,6 @@ function getGlobalHomeCopy(locale) {
 function HomeGlobal({ copy, locale }) {
   return (
     <div className="ui3d-stage mobile-safe-bottom mx-auto w-full max-w-6xl px-4 py-6 sm:py-10">
-      <RouteWarmup />
       <JsonLd data={buildHomeJsonLd(locale)} />
       <ProblemStatement title={copy.problemTitle} description={copy.problemDescription} />
       <section className="surface-card-strong enterprise-shell motion-gradient-surface ui3d-card hero-noise hero-compact relative overflow-hidden rounded-[2rem] p-5 sm:p-8">

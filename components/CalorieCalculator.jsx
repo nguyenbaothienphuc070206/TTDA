@@ -627,6 +627,7 @@ export default function CalorieCalculator() {
   }, [form.sex, form.stageId, safeAge, safeHeightCm, safeWeightKg]);
 
   const leftResult = result || previewResult;
+  const tldrWaterMl = Math.round(Math.max(1200, Math.min(4500, safeWeightKg * 35)));
 
   const suggestions = useMemo(() => {
     if (!result) return null;
@@ -767,6 +768,16 @@ export default function CalorieCalculator() {
           <p className="mt-2 text-sm leading-6 text-slate-300">
             Tóm tắt nhanh Macro, nước và lời nhắc dinh dưỡng phù hợp võ sinh.
           </p>
+
+          <div className="mt-4 rounded-3xl border border-cyan-300/20 bg-cyan-300/10 p-5">
+            <div className="text-xs font-semibold uppercase tracking-wide text-cyan-100">Hôm nay bạn cần</div>
+            <ul className="mt-2 grid gap-1 text-sm leading-6 text-slate-200">
+              <li>• {leftResult.targets.maintain} kcal</li>
+              <li>• ~{leftResult.macros.proteinG}g protein</li>
+              <li>• Uống khoảng {formatLitersFromMl(tldrWaterMl)} nước</li>
+              <li>• Ưu tiên đạm nạc và uống đủ nước</li>
+            </ul>
+          </div>
 
           <div className="mt-4 grid gap-4">
             <TodayMenuWidget calories={leftResult.targets.maintain} macros={leftResult.macros} />

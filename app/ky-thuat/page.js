@@ -1,4 +1,5 @@
 import TechniqueLibrary from "@/components/TechniqueLibrary";
+import Link from "next/link";
 import { getLocale } from "next-intl/server";
 
 export const metadata = {
@@ -44,6 +45,18 @@ export default async function TechniqueLibraryPage() {
         <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-300">
           {copy.description}
         </p>
+
+        <div className="mt-4 flex flex-wrap gap-2">
+          <Link href="/hoc-tap?from=technique" className="cta-secondary inline-flex h-10 items-center justify-center rounded-2xl px-3 text-xs font-semibold text-white">
+            Quay lại Course
+          </Link>
+          <Link href="/video?from=technique&focusVideo=lam-dai-tu-ve-quyen" className="cta-secondary inline-flex h-10 items-center justify-center rounded-2xl px-3 text-xs font-semibold text-white">
+            Mở video liên quan
+          </Link>
+          <Link href="/bai-hoc/lam-dai-tu-ve-quyen?from=technique" className="cta-primary inline-flex h-10 items-center justify-center rounded-2xl px-3 text-xs font-semibold">
+            Bắt đầu bài học liên quan
+          </Link>
+        </div>
       </header>
 
       <TechniqueLibrary />

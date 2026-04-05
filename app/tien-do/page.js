@@ -4,7 +4,7 @@ import Link from "next/link";
 import { getLocale } from "next-intl/server";
 
 export const metadata = {
-  title: "Tiến độ học tập",
+  title: "Tiến độ luyện tập",
 };
 
 function getCopy(locale) {
@@ -51,9 +51,9 @@ function getCopy(locale) {
   }
 
   return {
-    title: "Tiến độ học tập",
+    title: "Tiến độ luyện tập",
     description:
-      "Theo dõi số bài đã hoàn thành và thống kê xem bạn hay xem nội dung nào nhất. (Thống kê theo thiết bị vì bản demo chưa có DB.)",
+      "Theo dõi sự đều đặn và cải thiện theo thời gian.",
     chip: "Progress Intelligence",
     actionCourse: "Mở khóa học",
     actionSchedule: "Mở lịch tập",

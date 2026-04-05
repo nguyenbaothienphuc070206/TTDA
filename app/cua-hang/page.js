@@ -51,12 +51,12 @@ function getCopy(locale) {
   }
 
   return {
-    title: "Cửa hàng",
+    title: "Trang bị luyện tập",
     description:
-      "Cửa hàng theo mô hình Affiliate: bấm “Mua tại đối tác” để mở trang mua hàng bên ngoài. Ứng dụng có thể nhận hoa hồng khi bạn mua qua liên kết.",
+      "Chọn đúng để tập hiệu quả và an toàn.",
     chip: "Affiliate Store",
-    trust1: "Liên kết minh bạch",
-    trust2: "Không phí ẩn",
+    trust1: "Liên kết đối tác",
+    trust2: "Không phát sinh phí",
     trust3: "Thanh toán tại đối tác",
     motivationTitle: "Mua thứ hỗ trợ việc tập, không mua theo hứng",
     motivationMessage:

@@ -373,7 +373,7 @@ function getCopy(locale) {
     diaryAiResponding: "AI đang phản hồi...",
     diaryReplyLabel: "AI phản hồi",
     diarySessionFallback: "Buổi tập",
-    noDiary: "Chưa có nhật ký nào.",
+    noDiary: "Chưa có nhật ký. Bắt đầu buổi tập đầu tiên để theo dõi tiến độ.",
   };
 }
 

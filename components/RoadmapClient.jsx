@@ -4,240 +4,212 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { useLocale } from "next-intl";
 
-import LessonCard from "@/components/LessonCard";
-import { LESSONS } from "@/data/lessons";
-import { readDoneSlugs } from "@/lib/progress";
+import { BELTS } from "@/data/belts";
+import { getLessonsByBeltId } from "@/data/lessons";
+import { readDoneSlugs, toggleLessonDone } from "@/lib/progress";
+import { readProfile } from "@/lib/profile";
 
 function getCopy(locale) {
   const id = String(locale || "vi").toLowerCase();
 
   if (id === "en") {
     return {
-      statusStart:
-        "Start simple: pick 1 Blue Self-Defense lesson, practice slowly for clean technique, then mark complete.",
-      statusDone:
-        "Excellent - you completed the whole roadmap. Now review and gradually increase speed/endurance.",
-      statusNext: (title, minutes) =>
-        `Suggested next: ${title} • ${minutes} minutes. (This card is highlighted)`,
-      heading: "Vovinam Training Roadmap",
-      description:
-        "Pick lessons across the full belt path from Blue Self-Defense to Red Level 4. Mark complete to save progress locally. You can also tap \"Ask AI about this lesson\" for common mistakes.",
-      createSchedule: "Create 7-day schedule",
-      progress: "Progress",
-      pathMap: "Roadmap path",
-      pathMapDesc: "The path lights up as you complete lessons in order.",
-      litSegments: (a, b) => `${a}/${b} lit segments`,
+      heading: "Training Roadmap",
+      description: "Progress step by step, from fundamentals to advanced.",
+      progressLabel: "completed",
+      progressHint: "Start small. Stay consistent.",
+      todayTitle: "Suggested today",
+      duration: "Duration",
+      note: "Train slowly. Keep alignment and rhythm before speed.",
+      start: "Start",
+      markDone: "Mark complete",
+      askAi: "Ask AI",
+      nextLevel: "Next level",
+      lockNote: "Unlock after finishing your current level.",
     };
   }
 
   if (id === "ja") {
     return {
-      statusStart:
-        "まずは軽く始めましょう。青帯護身のレッスンを1つ選び、ゆっくり正確に練習してから完了を記録します。",
-      statusDone:
-        "素晴らしいです。ロードマップをすべて完了しました。復習しながら、速度と持久力を段階的に上げましょう。",
-      statusNext: (title, minutes) =>
-        `次のおすすめ: ${title} • ${minutes}分（このカードをハイライト中）`,
-      heading: "Vovinam 練習ロードマップ",
-      description:
-        "青帯護身から紅帯四級まで、全帯システムでレッスンを選べます。完了を記録すると進捗は端末に保存されます。\"このレッスンをAIに質問\" でよくあるミスも確認できます。",
-      createSchedule: "7日間スケジュールを作成",
-      progress: "進捗",
-      pathMap: "ロードマップ",
-      pathMapDesc: "順番どおりに完了するとルートが点灯していきます。",
-      litSegments: (a, b) => `${a}/${b} 点灯セグメント`,
+      heading: "トレーニングロードマップ",
+      description: "基礎から上級まで、段階的に進みます。",
+      progressLabel: "完了",
+      progressHint: "小さく始めて、継続しましょう。",
+      todayTitle: "今日の提案",
+      duration: "時間",
+      note: "ゆっくり練習し、速度より軸とリズムを優先。",
+      start: "開始",
+      markDone: "完了を記録",
+      askAi: "AIに相談",
+      nextLevel: "次のレベル",
+      lockNote: "現在レベル完了後に解放されます。",
     };
   }
 
   return {
-    statusStart:
-      "Bắt đầu nhẹ thôi: chọn 1 bài Lam đai tự vệ, tập chậm cho sạch động tác rồi đánh dấu.",
-    statusDone:
-      "Quá chất - bạn đã hoàn thành toàn bộ lộ trình. Giờ ôn lại + tăng dần tốc độ/độ bền là đẹp.",
-    statusNext: (title, minutes) =>
-      `Gợi ý tiếp theo: ${title} • ${minutes} phút. (Card đang được highlight)`,
-    heading: "Lộ trình luyện Vovinam",
-    description:
-      "Chọn bài theo đầy đủ hệ đai từ Lam đai tự vệ đến Hồng đai tứ. Đánh dấu hoàn thành để lưu tiến độ (tự lưu trên máy). Bạn cũng có thể bấm “Hỏi AI về bài này” để xem lỗi thường gặp.",
-    createSchedule: "Tạo lịch tập 7 ngày",
-    progress: "Tiến độ",
-    pathMap: "Bản đồ lộ trình",
-    pathMapDesc: "Con đường sẽ sáng dần khi bạn hoàn thành bài theo thứ tự.",
-    litSegments: (a, b) => `${a}/${b} đoạn sáng`,
+    heading: "Lộ trình luyện tập",
+    description: "Tiến bộ theo từng bước, từ nền tảng đến nâng cao.",
+    progressLabel: "bài đã hoàn thành",
+    progressHint: "Bắt đầu nhỏ. Duy trì đều.",
+    todayTitle: "Gợi ý hôm nay",
+    duration: "Thời lượng",
+    note: "Tập chậm, giữ trục và nhịp trước khi tăng tốc.",
+    start: "Bắt đầu",
+    markDone: "Đánh dấu hoàn thành",
+    askAi: "Hỏi AI",
+    nextLevel: "Level tiếp theo",
+    lockNote: "Mở khóa sau khi hoàn thành cấp hiện tại.",
   };
 }
 
-function ProgressBar({ percent }) {
-  const p = Math.max(0, Math.min(100, Number(percent) || 0));
-  return (
-    <div className="h-2.5 w-full overflow-hidden rounded-full bg-white/10">
-      <div
-        className="h-full bg-gradient-to-r from-blue-400 to-blue-600 progress-bar"
-        style={{ width: `${p}%` }}
-      />
-    </div>
-  );
+function getLessonDisplayTitle(lesson) {
+  const slug = String(lesson?.slug || "");
+  if (slug.endsWith("-quyen")) return "Quyền cơ bản";
+  return String(lesson?.title || "Bài cơ bản");
 }
 
 export default function RoadmapClient() {
   const locale = useLocale();
   const copy = getCopy(locale);
-  const totalLessons = useMemo(() => LESSONS.length, []);
+
   const [doneSlugs, setDoneSlugs] = useState([]);
+  const [beltId, setBeltId] = useState(BELTS[0]?.id || "");
 
   useEffect(() => {
     const sync = () => {
       const done = readDoneSlugs();
       setDoneSlugs(Array.isArray(done) ? done : []);
+
+      const profile = readProfile();
+      const profileBeltId = String(profile?.beltId || "").trim();
+      if (profileBeltId && BELTS.some((b) => b.id === profileBeltId)) {
+        setBeltId(profileBeltId);
+      }
     };
 
     sync();
     window.addEventListener("vovinam-progress", sync);
+    window.addEventListener("vovinam-profile", sync);
     window.addEventListener("storage", sync);
+
     return () => {
       window.removeEventListener("vovinam-progress", sync);
+      window.removeEventListener("vovinam-profile", sync);
       window.removeEventListener("storage", sync);
     };
   }, []);
 
-  const doneCount = doneSlugs.length;
-  const percent =
-    totalLessons === 0 ? 0 : Math.round((doneCount / totalLessons) * 100);
+  const doneSet = useMemo(() => new Set(doneSlugs), [doneSlugs]);
 
-  const nextLesson = useMemo(() => {
-    const done = new Set(doneSlugs);
-    return LESSONS.find((l) => !done.has(l.slug)) || null;
-  }, [doneSlugs]);
+  const blocks = useMemo(() => {
+    return BELTS.map((belt) => {
+      const lessons = getLessonsByBeltId(belt.id);
+      const done = lessons.filter((l) => doneSet.has(l.slug)).length;
+      const next = lessons.find((l) => !doneSet.has(l.slug)) || lessons[0] || null;
+      return {
+        belt,
+        lessons,
+        done,
+        total: lessons.length,
+        next,
+      };
+    });
+  }, [doneSet]);
 
-  const contiguousDoneCount = useMemo(() => {
-    const done = new Set(doneSlugs);
-    let count = 0;
+  const currentIndex = useMemo(() => {
+    const idxByProfile = BELTS.findIndex((b) => b.id === beltId);
+    if (idxByProfile >= 0) return idxByProfile;
+    const firstUnfinished = blocks.findIndex((x) => x.done < x.total);
+    return firstUnfinished >= 0 ? firstUnfinished : 0;
+  }, [blocks, beltId]);
 
-    for (const lesson of LESSONS) {
-      if (done.has(lesson.slug)) count += 1;
-      else break;
+  const current = blocks[currentIndex] || blocks[0] || null;
+  const nextLevel = blocks[currentIndex + 1] || null;
+
+  const totalLessons = useMemo(() => blocks.reduce((sum, b) => sum + b.total, 0), [blocks]);
+  const totalDone = useMemo(() => blocks.reduce((sum, b) => sum + b.done, 0), [blocks]);
+
+  const onToggleDone = () => {
+    const slug = String(current?.next?.slug || "");
+    if (!slug) return;
+    const next = toggleLessonDone(slug);
+    setDoneSlugs(Array.isArray(next) ? next : []);
+  };
+
+  const onAskAi = () => {
+    if (typeof window === "undefined") return;
+
+    const beltTitle = String(current?.belt?.title || "Lam đai tự vệ");
+    const lessonTitle = String(current?.next?.title || "Quyền cơ bản");
+
+    try {
+      window.dispatchEvent(
+        new CustomEvent("vovinam-ai-ask", {
+          detail: {
+            query: `Tôi đang ở ${beltTitle}. Hãy hướng dẫn buổi tập hôm nay theo bài ${lessonTitle}, tập trung kỹ thuật đúng và an toàn.`,
+            context: { kind: "roadmap" },
+          },
+        })
+      );
+    } catch {
+      // ignore
     }
-
-    return count;
-  }, [doneSlugs]);
-
-  const activeSlug = nextLesson?.slug || "";
-
-  const statusLine = useMemo(() => {
-    if (totalLessons === 0) return "";
-
-    if (doneCount === 0) {
-      return copy.statusStart;
-    }
-
-    if (doneCount >= totalLessons) {
-      return copy.statusDone;
-    }
-
-    if (nextLesson) {
-      return copy.statusNext(nextLesson.title, nextLesson.minutes);
-    }
-
-    return "";
-  }, [copy, doneCount, nextLesson, totalLessons]);
+  };
 
   return (
     <div className="mx-auto w-full max-w-6xl px-4 py-10">
-      <header className="rounded-3xl border border-white/10 bg-white/5 p-6 sm:p-8 shadow-[var(--shadow-card)] fade-in-up">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <h1 className="text-2xl font-semibold tracking-tight text-white sm:text-3xl">
-              {copy.heading}
-            </h1>
-            <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-300">
-              {copy.description}
-            </p>
-          </div>
-          <Link
-            href="/lich-tap"
-            className="inline-flex h-11 items-center justify-center rounded-2xl border border-white/10 bg-white/5 px-4 text-sm font-semibold text-white transition hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-blue-400/30"
-          >
-            {copy.createSchedule}
-          </Link>
-        </div>
+      <header className="rounded-3xl border border-white/10 bg-white/5 p-6 sm:p-8 shadow-[var(--shadow-card)]">
+        <h1 className="text-2xl font-semibold tracking-tight text-white sm:text-3xl">{copy.heading}</h1>
+        <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-300">{copy.description}</p>
 
-        <div className="mt-5 rounded-3xl border border-white/10 bg-slate-950/20 p-4">
-          <div className="flex items-center justify-between gap-3">
-            <div className="text-sm font-semibold text-white">{copy.progress}</div>
-            <div className="rounded-2xl border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-semibold text-slate-200">
-              {doneCount}/{totalLessons} • {percent}%
-            </div>
+        <div className="mt-4 rounded-2xl border border-white/10 bg-slate-950/30 p-4">
+          <div className="text-sm font-semibold text-white">
+            {totalDone} / {totalLessons} {copy.progressLabel}
           </div>
-          <div className="mt-2">
-            <ProgressBar percent={percent} />
-          </div>
-          {statusLine ? (
-            <p className="mt-2 text-xs leading-5 text-slate-300">{statusLine}</p>
-          ) : null}
+          <p className="mt-1 text-sm text-slate-300">{copy.progressHint}</p>
         </div>
       </header>
 
-      <section className="mt-8 rounded-3xl border border-white/10 bg-white/5 p-6 sm:p-8 shadow-[var(--shadow-card)] stagger-fade">
-        <div className="flex flex-wrap items-end justify-between gap-3">
-          <div>
-            <h2 className="text-xl font-semibold text-white">{copy.pathMap}</h2>
-            <p className="mt-1 text-sm leading-6 text-slate-300">
-              {copy.pathMapDesc}
-            </p>
+      {current ? (
+        <section className="mt-6 rounded-3xl border border-cyan-300/25 bg-cyan-300/10 p-6 shadow-[var(--shadow-card)]">
+          <div className="text-xs font-semibold uppercase tracking-wide text-cyan-100">{copy.todayTitle}</div>
+          <h2 className="mt-1 text-xl font-semibold text-white">{current.belt.title}</h2>
+          <p className="mt-1 text-sm text-slate-200">Bài: {getLessonDisplayTitle(current.next)}</p>
+          <p className="mt-1 text-sm text-slate-200">{copy.duration}: {current.next?.minutes || 18} phút</p>
+          <p className="mt-2 text-sm leading-6 text-slate-200">{copy.note}</p>
+
+          <div className="mt-4 flex flex-wrap gap-2">
+            <Link
+              href={`/bai-hoc/${current.next?.slug || "lam-dai-tu-ve-quyen"}`}
+              className="cta-primary inline-flex h-10 items-center justify-center rounded-2xl px-4 text-sm font-semibold"
+            >
+              {copy.start}
+            </Link>
+            <button
+              type="button"
+              onClick={onToggleDone}
+              className="cta-secondary inline-flex h-10 items-center justify-center rounded-2xl px-4 text-sm font-semibold text-white"
+            >
+              {copy.markDone}
+            </button>
+            <button
+              type="button"
+              onClick={onAskAi}
+              className="cta-secondary inline-flex h-10 items-center justify-center rounded-2xl px-4 text-sm font-semibold text-white"
+            >
+              {copy.askAi}
+            </button>
           </div>
-          <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-semibold text-slate-200">
-            {copy.litSegments(contiguousDoneCount, totalLessons)}
-          </span>
-        </div>
+        </section>
+      ) : null}
 
-        <div className="mt-6">
-          {LESSONS.map((lesson, idx) => {
-            const done = doneSlugs.includes(lesson.slug);
-            const isNext = Boolean(activeSlug && lesson.slug === activeSlug);
-            const isAllDone = doneCount >= totalLessons && totalLessons > 0;
-            const nodeState = isAllDone
-              ? "done"
-              : done
-                ? "done"
-                : isNext
-                  ? "next"
-                  : "todo";
-
-            const segmentLit = idx < contiguousDoneCount;
-            const showConnector = idx < LESSONS.length - 1;
-
-            return (
-              <div key={lesson.slug} className="relative pb-10 pl-12 last:pb-0">
-                {showConnector ? (
-                  <div
-                    aria-hidden
-                    className={
-                      "absolute left-5 top-7 bottom-0 w-px " +
-                      (segmentLit
-                        ? "bg-gradient-to-b from-blue-400/70 to-blue-600/50"
-                        : "bg-white/10")
-                    }
-                  />
-                ) : null}
-
-                <div
-                  aria-hidden
-                  className={
-                    "absolute left-[1.12rem] top-7 h-4 w-4 rounded-full border " +
-                    (nodeState === "done"
-                      ? "border-blue-300/30 bg-gradient-to-r from-blue-400 to-blue-600 shadow-[0_0_0_6px_rgba(59,130,246,0.12)]"
-                      : nodeState === "next"
-                        ? "border-blue-400/45 bg-slate-950/40 shadow-[0_0_0_6px_rgba(59,130,246,0.10)]"
-                        : "border-white/10 bg-white/10")
-                  }
-                />
-
-                <LessonCard lesson={lesson} isActive={isNext} />
-              </div>
-            );
-          })}
-        </div>
-      </section>
+      {nextLevel ? (
+        <section className="mt-4 rounded-3xl border border-white/10 bg-slate-950/30 p-5 opacity-75">
+          <div className="text-xs font-semibold uppercase tracking-wide text-slate-300">{copy.nextLevel}</div>
+          <h3 className="mt-1 text-lg font-semibold text-white">{nextLevel.belt.title}</h3>
+          <p className="mt-1 text-sm text-slate-300">{copy.lockNote}</p>
+        </section>
+      ) : null}
     </div>
   );
 }

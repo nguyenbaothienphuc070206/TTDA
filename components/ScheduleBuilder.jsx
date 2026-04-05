@@ -31,6 +31,9 @@ function getCopy(locale) {
       restBadge: "Rest",
       restText: "Light stretching, walking, and steady breathing",
       tip: "Tip: If you are too tired on a day, switch \"Train\" to \"Rest\" and make up on another day.",
+      coachPlanTitle: "Coach-generated plan",
+      coachPlanDesc: "Today, you should train the following sessions:",
+      noPlanYet: "Press Generate to create your plan.",
     };
   }
 
@@ -52,14 +55,17 @@ function getCopy(locale) {
       restBadge: "休み",
       restText: "軽いストレッチ、散歩、呼吸を整える",
       tip: "ヒント: 疲れが強い日は\"練習\"を\"休み\"に切り替え、別日に調整しましょう。",
+      coachPlanTitle: "コーチ自動プラン",
+      coachPlanDesc: "今日からこの順番で進めましょう:",
+      noPlanYet: "計画を作成を押して開始してください。",
     };
   }
 
   return {
     days: ["Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6", "Thứ 7", "Chủ nhật"],
-    title: "Tạo lịch tập 7 ngày",
+    title: "Tạo lịch 7 ngày",
     description:
-      "Chọn mục tiêu, số buổi/tuần và thời lượng. App sẽ gợi ý bài học phù hợp để bạn luyện đều.",
+      "Tạo lịch 7 ngày dựa trên mục tiêu và số buổi mỗi tuần.",
     generate: "Tạo lịch",
     clear: "Xóa",
     goal: "Mục tiêu",
@@ -73,6 +79,9 @@ function getCopy(locale) {
     restBadge: "Nghỉ",
     restText: "Giãn cơ nhẹ, đi bộ, thở đều",
     tip: "Mẹo: Nếu hôm nào quá mệt, hãy đổi \"Tập\" thành \"Nghỉ\", rồi bù vào ngày khác.",
+    coachPlanTitle: "Lịch của bạn",
+    coachPlanDesc: "App đã quyết định sẵn bài tập cho từng buổi:",
+    noPlanYet: "Bấm Tạo lịch để nhận lịch tập cụ thể theo bài học.",
   };
 }
 
@@ -123,6 +132,10 @@ export default function ScheduleBuilder() {
     () => LEVELS.find((l) => l.id === levelId) || LEVELS[0],
     [levelId]
   );
+
+  const trainingItems = useMemo(() => {
+    return (Array.isArray(schedule) ? schedule : []).filter((x) => x?.type === "tap");
+  }, [schedule]);
 
   useEffect(() => {
     const sync = () => {
@@ -283,6 +296,26 @@ export default function ScheduleBuilder() {
             );
           })}
         </div>
+      </div>
+
+      <div className="mt-4 rounded-2xl border border-cyan-300/20 bg-cyan-300/10 p-4">
+        <div className="text-sm font-semibold text-white">{copy.coachPlanTitle}</div>
+        <p className="mt-1 text-xs text-slate-200">{copy.coachPlanDesc}</p>
+
+        {trainingItems.length ? (
+          <ul className="mt-3 grid gap-2 text-sm leading-6 text-slate-200">
+            {trainingItems.map((item) => (
+              <li key={`${item.day}-${item.slug}`} className="rounded-xl border border-cyan-300/20 bg-slate-950/30 px-3 py-2">
+                <span className="font-semibold text-cyan-100">{item.day}:</span>{" "}
+                <Link href={`/bai-hoc/${item.slug}`} className="underline decoration-white/20 underline-offset-4 hover:text-white">
+                  {item.title}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <div className="mt-3 text-sm text-slate-300">{copy.noPlanYet}</div>
+        )}
       </div>
 
       <div className="mt-4 text-xs leading-5 text-slate-300">
