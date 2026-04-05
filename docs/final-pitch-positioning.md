@@ -22,6 +22,13 @@ Vovinam Learning is not just content playback. It is a structured, AI-powered tr
 - AI layer: memory-aware coach and personalized plans
 - Business layer: subscription + affiliate + coach/B2B expansion
 
+## Social Proof Strategy (Honest)
+
+- Do not claim inflated user numbers without audited data
+- Use early-signal framing: designed around beginner drop-off behavior
+- Use simulated behavioral insight clearly labeled as demo
+- Use mini testing notes (1-3 beginner testers) to show practical validation
+
 ## Business Realism
 
 1. Freemium

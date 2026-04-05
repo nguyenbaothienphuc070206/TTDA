@@ -409,8 +409,8 @@ function HomeVi() {
     <div className="ui3d-stage mobile-safe-bottom mx-auto w-full max-w-6xl px-4 py-6 sm:py-10">
       <JsonLd data={buildHomeJsonLd("vi")} />
       <ProblemStatement
-        title="90% người tập bỏ cuộc vì không có lộ trình rõ ràng"
-        description="Vovinam Learning giải quyết bằng 14 cấp đai, bài học theo bước, video map theo cấp và AI Coach gợi ý buổi tập trong vài giây."
+        title="Người mới thường bỏ cuộc khi không có lộ trình rõ ràng"
+        description="Vovinam Learning giải quyết bằng 14 cấp đai, bài học theo bước, video map theo cấp và AI Coach gợi ý buổi tập ngắn để dễ duy trì."
       />
       <section className="surface-card-strong enterprise-shell motion-gradient-surface ui3d-card hero-noise hero-compact relative overflow-hidden rounded-[2rem] p-5 sm:p-8">
         <div className="absolute inset-0 opacity-90 bg-[radial-gradient(circle_at_top,rgba(34,211,238,0.16),transparent_58%)]" />
@@ -566,7 +566,7 @@ function HomeVi() {
               Thiết kế theo giáo trình thực tế
             </div>
             <div className="rounded-2xl border border-white/10 bg-slate-950/30 px-3 py-2 text-xs font-semibold text-slate-200">
-              Phù hợp người mới bắt đầu
+              Đã thử nghiệm nhỏ với người mới tập để tối ưu bước bắt đầu
             </div>
           </div>
         </div>
@@ -771,7 +771,7 @@ function getGlobalHomeCopy(locale) {
       createSchedule: "30s level assessment",
       problemTitle: "Most beginners quit because training lacks structure",
       problemDescription:
-        "Vovinam Learning combines 14 belt levels, mapped videos, and AI-guided sessions so users always know what to train next.",
+        "Vovinam Learning combines 14 belt levels, mapped videos, and AI-guided short sessions so beginners always know what to train next.",
       demoPrimary: "Demo AI coach workout",
       demoSecondary: "One-click session generator",
       statLessons: "Total lessons",
@@ -834,7 +834,7 @@ function getGlobalHomeCopy(locale) {
       createSchedule: "30秒レベル診断",
       problemTitle: "継続できない最大要因は、明確な練習導線がないこと",
       problemDescription:
-        "Vovinam Learning は14段階の帯、対応動画、AI提案を統合し、次に何を練習すべきかを常に示します。",
+        "Vovinam Learning は14段階の帯、対応動画、短時間AI提案を統合し、初心者でも次に何を練習すべきかを明確にします。",
       demoPrimary: "AIコーチ提案をデモ",
       demoSecondary: "1クリックで本日の練習",
       statLessons: "総レッスン数",

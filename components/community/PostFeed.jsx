@@ -75,11 +75,14 @@ export default function PostFeed({ posts }) {
   return (
     <div className="grid gap-3">
       <div className="rounded-2xl border border-cyan-300/20 bg-cyan-300/10 p-4">
-        <div className="text-sm font-semibold text-white">Community đang hoạt động</div>
+        <div className="text-sm font-semibold text-white">Community Insight (mô phỏng)</div>
+        <p className="mt-1 text-xs text-slate-300">
+          Dùng để minh họa hành vi học tập phổ biến của người mới, không phải số liệu realtime.
+        </p>
         <div className="mt-2 flex flex-wrap gap-2 text-xs">
-          <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 font-semibold text-slate-100">84 users online tuần này</span>
-          <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 font-semibold text-slate-100">56 check-in hôm nay</span>
-          <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 font-semibold text-slate-100">19 bài chia sẻ mới</span>
+          <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 font-semibold text-slate-100">Người mới thường bắt đầu với Lam đai tự vệ</span>
+          <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 font-semibold text-slate-100">Buổi 15-20 phút là lựa chọn phổ biến</span>
+          <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 font-semibold text-slate-100">Check-in ngắn mỗi ngày giúp duy trì nhịp tập</span>
         </div>
       </div>
 

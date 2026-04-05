@@ -27,6 +27,12 @@ AI Form Check gives immediate camera-based feedback while users practice.
 - Premium: AI Coach Pro, advanced belts, form check, advanced videos
 - B2B: dashboard for clubs and coaches
 
+## 4.1) Credibility without fake numbers (10s)
+
+- We avoid inflated user metrics at this stage
+- We show early signals: beginner-focused design and short-session adherence logic
+- We include mini-test feedback from beginner users to validate onboarding clarity
+
 ## 5) Technical depth (15s)
 
 - Next.js App Router + API routes
