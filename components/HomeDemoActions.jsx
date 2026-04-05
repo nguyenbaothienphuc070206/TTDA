@@ -32,7 +32,7 @@ export default function HomeDemoActions({
         onClick={askAiCoach}
         className="inline-flex h-10 items-center justify-center rounded-2xl border border-cyan-300/30 bg-cyan-300/12 px-4 text-xs font-semibold text-cyan-100 transition hover:bg-cyan-300/18 focus:outline-none focus:ring-2 focus:ring-cyan-300/40"
       >
-        {sending ? "Dang mo AI Coach..." : primaryLabel}
+        {sending ? "Đang mở AI Coach..." : primaryLabel}
       </button>
 
       <button

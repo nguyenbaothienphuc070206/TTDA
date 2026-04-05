@@ -411,8 +411,8 @@ function HomeVi() {
       <RouteWarmup />
       <JsonLd data={buildHomeJsonLd("vi")} />
       <ProblemStatement
-        title="90% nguoi tap bo cuoc vi khong co lo trinh ro rang"
-        description="Vovinam Learning giai quyet bang 14 cap dai, bai hoc theo buoc, video map theo cap va AI Coach goi y buoi tap trong vai giay."
+        title="90% người tập bỏ cuộc vì không có lộ trình rõ ràng"
+        description="Vovinam Learning giải quyết bằng 14 cấp đai, bài học theo bước, video map theo cấp và AI Coach gợi ý buổi tập trong vài giây."
       />
       <section className="surface-card-strong enterprise-shell motion-gradient-surface ui3d-card hero-noise hero-compact relative overflow-hidden rounded-[2rem] p-5 sm:p-8">
         <div className="absolute inset-0 opacity-90 bg-[radial-gradient(circle_at_top,rgba(34,211,238,0.16),transparent_58%)]" />
@@ -437,20 +437,20 @@ function HomeVi() {
               href="/lo-trinh"
               className="cta-primary motion-gradient-btn inline-flex h-11 items-center justify-center rounded-2xl px-5 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-cyan-300/50"
             >
-              Tao lo trinh ca nhan ngay
+              Tạo lộ trình cá nhân ngay
             </Link>
             <Link
               href="/lich-tap"
               className="cta-secondary motion-gradient-btn inline-flex h-11 items-center justify-center rounded-2xl px-5 text-sm font-semibold text-white transition focus:outline-none focus:ring-2 focus:ring-cyan-300/30"
             >
-              Test trinh do trong 30s
+              Test trình độ trong 30s
             </Link>
           </div>
 
           <HomeDemoActions
-            primaryLabel="Demo AI Coach goi y bai tap"
-            secondaryLabel="1 click tao buoi tap hom nay"
-            aiPrompt="Toi moi tap Vovinam, goi y 1 buoi tap 20 phut hom nay theo cap Lam dai."
+            primaryLabel="Demo AI Coach gợi ý bài tập"
+            secondaryLabel="1 click tạo buổi tập hôm nay"
+            aiPrompt="Tôi mới tập Vovinam, gợi ý 1 buổi tập 20 phút hôm nay theo cấp Lam đai."
           />
 
         </div>
@@ -459,27 +459,27 @@ function HomeVi() {
       <section className="mt-8">
         <SectionHeading
           id="how-it-works"
-          title="How it works trong 3 buoc"
-          description="Tu mo ho den ro rang: test nhanh, tao lo trinh, va theo doi tien bo moi ngay."
+          title="How it works trong 3 bước"
+          description="Từ mơ hồ đến rõ ràng: test nhanh, tạo lộ trình, và theo dõi tiến bộ mỗi ngày."
         />
         <div className="mt-4 grid gap-3 md:grid-cols-3">
           <StepCard
             step="1"
-            title="Test nhanh 30 giay"
-            description="Tra loi vai cau hoi co ban de xac dinh cap hien tai va muc tieu tap."
-            bullets={["Khong can dung cu", "Co goi y an toan", "Bat dau ngay"]}
+            title="Test nhanh 30 giây"
+            description="Trả lời vài câu hỏi cơ bản để xác định cấp hiện tại và mục tiêu tập."
+            bullets={["Không cần dụng cụ", "Có gợi ý an toàn", "Bắt đầu ngay"]}
           />
           <StepCard
             step="2"
-            title="Sinh buoi tap ca nhan"
-            description="AI Coach de xuat bai tap theo cap dai, thoi luong va lich ban trong ngay."
-            bullets={["15-30 phut", "Theo cap dai", "Co phuong an thay the"]}
+            title="Sinh buổi tập cá nhân"
+            description="AI Coach đề xuất bài tập theo cấp đai, thời lượng và lịch bạn trong ngày."
+            bullets={["15-30 phút", "Theo cấp đai", "Có phương án thay thế"]}
           />
           <StepCard
             step="3"
-            title="Danh dau va tang cap"
-            description="Hoan thanh bai, luu tien do, va biet chinh xac khi nao nen len cap tiep theo."
-            bullets={["Track tien do", "Thong ke ngay/tuan", "Goi y buoc tiep"]}
+            title="Đánh dấu và tăng cấp"
+            description="Hoàn thành bài, lưu tiến độ, và biết chính xác khi nào nên lên cấp tiếp theo."
+            bullets={["Track tiến độ", "Thống kê ngày/tuần", "Gợi ý bước tiếp"]}
           />
         </div>
       </section>
