@@ -21,6 +21,7 @@ import { BELTS } from "@/data/belts";
 import { LEVELS, LESSONS, getLessonsByLevel } from "@/data/lessons";
 import { NEWS } from "@/data/news";
 import JsonLd from "@/components/JsonLd";
+import HomeDemoActions from "@/components/HomeDemoActions";
 import RouteWarmup from "@/components/RouteWarmup";
 
 export const metadata = {
@@ -204,6 +205,16 @@ function MotivationStrip({ title, message, chips }) {
           ))}
         </div>
       ) : null}
+    </section>
+  );
+}
+
+function ProblemStatement({ title, description }) {
+  return (
+    <section className="surface-card enterprise-shell mb-4 rounded-3xl p-4 sm:p-5">
+      <p className="text-xs font-semibold uppercase tracking-wide text-cyan-200">Problem</p>
+      <h2 className="mt-1 text-lg font-semibold text-white">{title}</h2>
+      <p className="mt-1 text-sm leading-6 text-slate-300">{description}</p>
     </section>
   );
 }
@@ -399,6 +410,10 @@ function HomeVi() {
     <div className="ui3d-stage mobile-safe-bottom mx-auto w-full max-w-6xl px-4 py-6 sm:py-10">
       <RouteWarmup />
       <JsonLd data={buildHomeJsonLd("vi")} />
+      <ProblemStatement
+        title="90% nguoi tap bo cuoc vi khong co lo trinh ro rang"
+        description="Vovinam Learning giai quyet bang 14 cap dai, bai hoc theo buoc, video map theo cap va AI Coach goi y buoi tap trong vai giay."
+      />
       <section className="surface-card-strong enterprise-shell motion-gradient-surface ui3d-card hero-noise hero-compact relative overflow-hidden rounded-[2rem] p-5 sm:p-8">
         <div className="absolute inset-0 opacity-90 bg-[radial-gradient(circle_at_top,rgba(34,211,238,0.16),transparent_58%)]" />
         <div className="absolute -right-24 -top-20 h-64 w-64 rounded-full bg-blue-500/20 blur-3xl float-fast motion-gradient-orb" />
@@ -422,16 +437,50 @@ function HomeVi() {
               href="/lo-trinh"
               className="cta-primary motion-gradient-btn inline-flex h-11 items-center justify-center rounded-2xl px-5 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-cyan-300/50"
             >
-              Bắt đầu học
+              Tao lo trinh ca nhan ngay
             </Link>
             <Link
               href="/lich-tap"
               className="cta-secondary motion-gradient-btn inline-flex h-11 items-center justify-center rounded-2xl px-5 text-sm font-semibold text-white transition focus:outline-none focus:ring-2 focus:ring-cyan-300/30"
             >
-              Tạo lịch tập 7 ngày
+              Test trinh do trong 30s
             </Link>
           </div>
 
+          <HomeDemoActions
+            primaryLabel="Demo AI Coach goi y bai tap"
+            secondaryLabel="1 click tao buoi tap hom nay"
+            aiPrompt="Toi moi tap Vovinam, goi y 1 buoi tap 20 phut hom nay theo cap Lam dai."
+          />
+
+        </div>
+      </section>
+
+      <section className="mt-8">
+        <SectionHeading
+          id="how-it-works"
+          title="How it works trong 3 buoc"
+          description="Tu mo ho den ro rang: test nhanh, tao lo trinh, va theo doi tien bo moi ngay."
+        />
+        <div className="mt-4 grid gap-3 md:grid-cols-3">
+          <StepCard
+            step="1"
+            title="Test nhanh 30 giay"
+            description="Tra loi vai cau hoi co ban de xac dinh cap hien tai va muc tieu tap."
+            bullets={["Khong can dung cu", "Co goi y an toan", "Bat dau ngay"]}
+          />
+          <StepCard
+            step="2"
+            title="Sinh buoi tap ca nhan"
+            description="AI Coach de xuat bai tap theo cap dai, thoi luong va lich ban trong ngay."
+            bullets={["15-30 phut", "Theo cap dai", "Co phuong an thay the"]}
+          />
+          <StepCard
+            step="3"
+            title="Danh dau va tang cap"
+            description="Hoan thanh bai, luu tien do, va biet chinh xac khi nao nen len cap tiep theo."
+            bullets={["Track tien do", "Thong ke ngay/tuan", "Goi y buoc tiep"]}
+          />
         </div>
       </section>
 
@@ -890,8 +939,13 @@ function getGlobalHomeCopy(locale) {
       heroTitle: "Train Vovinam with a clear step-by-step path",
       heroDescription:
         "Follow a structured flow from fundamentals to advanced levels. Learn safely, track progress, and build consistency each week.",
-      startLearning: "Start roadmap",
-      createSchedule: "Create 7-day schedule",
+      startLearning: "Build my personal roadmap",
+      createSchedule: "30s level assessment",
+      problemTitle: "Most beginners quit because training lacks structure",
+      problemDescription:
+        "Vovinam Learning combines 14 belt levels, mapped videos, and AI-guided sessions so users always know what to train next.",
+      demoPrimary: "Demo AI coach workout",
+      demoSecondary: "One-click session generator",
       statLessons: "Total lessons",
       statBelts: "Belt levels",
       statGoal: "Goal",
@@ -928,6 +982,14 @@ function getGlobalHomeCopy(locale) {
       motivationChip1: "One completed lesson is a win",
       motivationChip2: "Protect form before speed",
       motivationChip3: "Scale down intensity, not commitment",
+      howTitle: "How it works in 3 steps",
+      howDescription: "Assess quickly, get a tailored session, then track progress daily.",
+      howStep1Title: "30s quick assessment",
+      howStep1Desc: "Answer a few questions to map your current belt and target.",
+      howStep2Title: "Generate today plan",
+      howStep2Desc: "AI Coach suggests a focused session based on level and available time.",
+      howStep3Title: "Track and level up",
+      howStep3Desc: "Mark complete, monitor consistency, and move to next belt with confidence.",
       ctaTitle: "Ready for your first focused session?",
       ctaDescription:
         "Open the roadmap, pick one suitable lesson, and train with clean form. Keep the pace controlled and safety-first.",
@@ -940,8 +1002,13 @@ function getGlobalHomeCopy(locale) {
       heroTitle: "段階的な流れで Vovinam を練習する",
       heroDescription:
         "基礎から上位レベルまで、構造化された順序で学べます。安全を重視し、進捗を記録しながら毎週の習慣を作ります。",
-      startLearning: "ロードマップ開始",
-      createSchedule: "7日間スケジュール作成",
+      startLearning: "個別ロードマップを作成",
+      createSchedule: "30秒レベル診断",
+      problemTitle: "継続できない最大要因は、明確な練習導線がないこと",
+      problemDescription:
+        "Vovinam Learning は14段階の帯、対応動画、AI提案を統合し、次に何を練習すべきかを常に示します。",
+      demoPrimary: "AIコーチ提案をデモ",
+      demoSecondary: "1クリックで本日の練習",
       statLessons: "総レッスン数",
       statBelts: "帯レベル",
       statGoal: "目標",
@@ -978,6 +1045,14 @@ function getGlobalHomeCopy(locale) {
       motivationChip1: "1レッスン完了は勝ち",
       motivationChip2: "速度よりフォームを守る",
       motivationChip3: "やめるより強度を調整する",
+      howTitle: "3ステップで習慣化",
+      howDescription: "短時間で把握し、今日の計画を作り、毎日進捗を積み上げます。",
+      howStep1Title: "30秒クイック診断",
+      howStep1Desc: "現在レベルと目的を簡単に把握します。",
+      howStep2Title: "今日の練習を生成",
+      howStep2Desc: "AIコーチがレベルと時間に合わせて提案します。",
+      howStep3Title: "記録して次へ",
+      howStep3Desc: "完了を記録し、安定して次の帯へ進みます。",
       ctaTitle: "最初の集中トレーニングを始めましょう",
       ctaDescription:
         "ロードマップから自分に合うレッスンを1つ選び、正確なフォームで練習しましょう。ペース管理と安全を最優先に。",
@@ -992,6 +1067,7 @@ function HomeGlobal({ copy, locale }) {
     <div className="ui3d-stage mobile-safe-bottom mx-auto w-full max-w-6xl px-4 py-6 sm:py-10">
       <RouteWarmup />
       <JsonLd data={buildHomeJsonLd(locale)} />
+      <ProblemStatement title={copy.problemTitle} description={copy.problemDescription} />
       <section className="surface-card-strong enterprise-shell motion-gradient-surface ui3d-card hero-noise hero-compact relative overflow-hidden rounded-[2rem] p-5 sm:p-8">
         <div className="absolute inset-0 opacity-90 bg-[radial-gradient(circle_at_top,rgba(34,211,238,0.16),transparent_58%)]" />
         <div className="absolute -right-24 -top-20 h-64 w-64 rounded-full bg-blue-500/20 blur-3xl float-fast motion-gradient-orb" />
@@ -1024,6 +1100,40 @@ function HomeGlobal({ copy, locale }) {
             </Link>
           </div>
 
+          <HomeDemoActions
+            primaryLabel={copy.demoPrimary}
+            secondaryLabel={copy.demoSecondary}
+            aiPrompt="Generate a focused 20-minute Vovinam session for today based on beginner level."
+          />
+
+        </div>
+      </section>
+
+      <section className="mt-8">
+        <SectionHeading
+          id="how-it-works"
+          title={copy.howTitle}
+          description={copy.howDescription}
+        />
+        <div className="mt-4 grid gap-3 md:grid-cols-3">
+          <StepCard
+            step="1"
+            title={copy.howStep1Title}
+            description={copy.howStep1Desc}
+            bullets={["Fast", "Simple", "Actionable"]}
+          />
+          <StepCard
+            step="2"
+            title={copy.howStep2Title}
+            description={copy.howStep2Desc}
+            bullets={["AI guided", "Level aware", "Time aware"]}
+          />
+          <StepCard
+            step="3"
+            title={copy.howStep3Title}
+            description={copy.howStep3Desc}
+            bullets={["Track", "Improve", "Level up"]}
+          />
         </div>
       </section>
 
