@@ -75,6 +75,7 @@ export default async function StorePage() {
 
   return (
     <div className="mx-auto w-full max-w-6xl px-4 py-10">
+      <div className="stagger-fade grid gap-6">
       <header className="mb-6 rounded-3xl border border-white/10 bg-white/5 p-6 shadow-[var(--shadow-card)] sm:p-8">
         <div className="inline-flex rounded-full border border-cyan-300/25 bg-cyan-300/10 px-3 py-1 text-xs font-semibold text-cyan-100">
           {copy.chip}
@@ -93,7 +94,7 @@ export default async function StorePage() {
         </div>
       </header>
 
-      <div className="mb-6">
+      <div>
         <MotivationPanel
           title={copy.motivationTitle}
           message={copy.motivationMessage}
@@ -106,6 +107,7 @@ export default async function StorePage() {
       </div>
 
       <Storefront />
+      </div>
     </div>
   );
 }

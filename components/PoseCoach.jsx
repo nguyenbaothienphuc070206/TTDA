@@ -3,6 +3,8 @@
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 
+import { popConfettiFromElement } from "@/lib/confetti";
+
 function dist(a, b) {
   if (!a || !b) return 0;
   const dx = Number(a.x) - Number(b.x);
@@ -82,6 +84,31 @@ function pickFeedback(landmarks) {
   return tips.join(" ");
 }
 
+function buildDemoResult({ hasVideoSource, uploadKind }) {
+  const baseScore = hasVideoSource ? 78 : 74;
+
+  if (uploadKind === "image") {
+    return {
+      score: baseScore - 2,
+      mistakes: ["Lech hong", "Tay ha thap"],
+      suggestions: [
+        "Xoay hong thang huong tan cong de truyen luc tot hon.",
+        "Nang tay truoc cao ngang cam de giu guard.",
+      ],
+    };
+  }
+
+  return {
+    score: baseScore,
+    mistakes: ["Lech hong", "Tay ha thap"],
+    suggestions: [
+      "Can tam co bung, giu hong on dinh khi chuyen tru.",
+      "Khoa vai va giu khuuyu tay truoc cao hon trong pha don.",
+      "Tap cham 3 nhiep dau de chuan hoa bien do dong tac.",
+    ],
+  };
+}
+
 export default function PoseCoach() {
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
@@ -94,6 +121,7 @@ export default function PoseCoach() {
   const lastDetectRef = useRef(0);
   const lastPoseRef = useRef(null);
   const uploadUrlRef = useRef("");
+  const checkButtonRef = useRef(null);
 
   const [enabled, setEnabled] = useState(false);
   const [status, setStatus] = useState("Chưa bật camera.");
@@ -103,6 +131,8 @@ export default function PoseCoach() {
   const [error, setError] = useState("");
   const [uploadKind, setUploadKind] = useState("");
   const [uploadUrl, setUploadUrl] = useState("");
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [analysisResult, setAnalysisResult] = useState(null);
 
   const stop = async ({ statusText } = {}) => {
     const wasCamera = Boolean(streamRef.current);
@@ -163,6 +193,8 @@ export default function PoseCoach() {
 
   const clearUpload = async () => {
     setError("");
+    setAnalysisResult(null);
+    setIsAnalyzing(false);
     await stop({ statusText: "Chưa bật camera." });
 
     const prev = uploadUrlRef.current;
@@ -440,6 +472,8 @@ export default function PoseCoach() {
     if (!file) return;
 
     setError("");
+    setAnalysisResult(null);
+    setIsAnalyzing(false);
 
     if (file.size > 25 * 1024 * 1024) {
       setError("File quá lớn. Hãy chọn ảnh/video ngắn (≤ 25MB).");
@@ -481,6 +515,7 @@ export default function PoseCoach() {
 
   const start = async () => {
     setError("");
+    setAnalysisResult(null);
 
     if (enabled) return;
 
@@ -674,6 +709,40 @@ export default function PoseCoach() {
     }
   };
 
+  const runDemoCheck = async () => {
+    setError("");
+
+    const hasSource = enabled || Boolean(uploadUrlRef.current);
+    if (!hasSource) {
+      setError("Hãy bật camera hoặc tải video trước khi check form.");
+      return;
+    }
+
+    if (isAnalyzing) return;
+
+    setIsAnalyzing(true);
+    setAnalysisResult(null);
+    setStatus("AI analyzing...");
+
+    await new Promise((resolve) => {
+      window.setTimeout(resolve, 2000);
+    });
+
+    const nextResult = buildDemoResult({
+      hasVideoSource: enabled || uploadKind === "video",
+      uploadKind,
+    });
+
+    setIsAnalyzing(false);
+    setAnalysisResult(nextResult);
+    setStatus("Da co ket qua phan tich.");
+    setFeedback(nextResult.suggestions.join(" "));
+
+    if (nextResult.score >= 75) {
+      popConfettiFromElement(checkButtonRef.current);
+    }
+  };
+
   useEffect(() => {
     return () => {
       stop();
@@ -700,17 +769,29 @@ export default function PoseCoach() {
           </p>
         </div>
 
-        <button
-          type="button"
-          onClick={enabled ? stop : start}
-          className={
-            enabled
-              ? "inline-flex h-11 items-center justify-center rounded-2xl border border-white/10 bg-white/5 px-4 text-sm font-semibold text-white transition hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-blue-400/30"
-              : "inline-flex h-11 items-center justify-center rounded-2xl bg-gradient-to-r from-blue-400 to-blue-600 px-4 text-sm font-semibold text-slate-950 transition hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-blue-400/50"
-          }
-        >
-          {enabled ? (streamRef.current ? "Tắt camera" : "Dừng phân tích") : "Bật camera"}
-        </button>
+        <div className="flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={enabled ? stop : start}
+            className={
+              enabled
+                ? "inline-flex h-11 items-center justify-center rounded-2xl border border-white/10 bg-white/5 px-4 text-sm font-semibold text-white transition hover:bg-white/10 active:scale-[0.99] focus:outline-none focus:ring-2 focus:ring-blue-400/30"
+                : "inline-flex h-11 items-center justify-center rounded-2xl bg-gradient-to-r from-blue-400 to-blue-600 px-4 text-sm font-semibold text-slate-950 transition hover:brightness-110 active:scale-[0.99] focus:outline-none focus:ring-2 focus:ring-blue-400/50"
+            }
+          >
+            {enabled ? (streamRef.current ? "Tắt camera" : "Dừng phân tích") : "Bật camera"}
+          </button>
+
+          <button
+            ref={checkButtonRef}
+            type="button"
+            onClick={runDemoCheck}
+            disabled={isAnalyzing}
+            className="inline-flex h-11 items-center justify-center rounded-2xl bg-gradient-to-r from-cyan-300 to-blue-500 px-4 text-sm font-semibold text-slate-950 transition hover:brightness-110 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-70 focus:outline-none focus:ring-2 focus:ring-cyan-300/50"
+          >
+            {isAnalyzing ? "AI analyzing..." : "Check form"}
+          </button>
+        </div>
       </div>
 
       <div className="mt-4 grid gap-2 sm:grid-cols-[1fr_auto] sm:items-end">
@@ -771,6 +852,42 @@ export default function PoseCoach() {
           <div className="text-xs font-semibold text-slate-300">Trạng thái</div>
           <div className="mt-1 text-sm font-semibold text-white">{status}</div>
         </div>
+
+        {analysisResult ? (
+          <div className="rounded-2xl border border-cyan-300/25 bg-cyan-300/10 p-4">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div className="text-xs font-semibold uppercase tracking-wide text-cyan-100">Kết quả Form Check</div>
+              <div className="text-sm font-semibold text-white">Điểm: {analysisResult.score}/100</div>
+            </div>
+
+            <div className="mt-2 h-2 overflow-hidden rounded-full bg-white/10">
+              <div
+                className="progress-bar h-full rounded-full bg-gradient-to-r from-cyan-300 to-blue-500"
+                style={{ width: `${analysisResult.score}%` }}
+              />
+            </div>
+
+            <div className="mt-3 grid gap-3 sm:grid-cols-2">
+              <div>
+                <div className="text-xs font-semibold text-slate-200">Lỗi chính</div>
+                <ul className="mt-1 grid gap-1 text-sm text-slate-100">
+                  {analysisResult.mistakes.map((item) => (
+                    <li key={item}>- {item}</li>
+                  ))}
+                </ul>
+              </div>
+
+              <div>
+                <div className="text-xs font-semibold text-slate-200">Gợi ý sửa</div>
+                <ul className="mt-1 grid gap-1 text-sm text-slate-100">
+                  {analysisResult.suggestions.map((item) => (
+                    <li key={item}>- {item}</li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </div>
+        ) : null}
 
         <div className="rounded-2xl border border-white/10 bg-slate-950/30 p-4">
           <div className="text-xs font-semibold text-slate-300">Gợi ý</div>

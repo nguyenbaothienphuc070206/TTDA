@@ -96,6 +96,11 @@ function Message({ tone, children }) {
   return <div className={`rounded-2xl border p-4 text-sm ${styles}`}>{children}</div>;
 }
 
+function initialsFromEmail(email) {
+  const prefix = String(email || "VO").split("@")[0] || "VO";
+  return prefix.slice(0, 2).toUpperCase();
+}
+
 export default function UserAuthPanel() {
   const locale = useLocale();
   const copy = getCopy(locale);
@@ -107,6 +112,8 @@ export default function UserAuthPanel() {
   const [passkeyBusy, setPasskeyBusy] = useState(false);
   const [passkeyMessage, setPasskeyMessage] = useState("");
   const [passkeySigned, setPasskeySigned] = useState(false);
+  const [localStreak, setLocalStreak] = useState(0);
+  const [deviceSync, setDeviceSync] = useState("local");
 
   const refresh = async () => {
     setError("");
@@ -139,6 +146,24 @@ export default function UserAuthPanel() {
 
   useEffect(() => {
     refresh();
+  }, []);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      try {
+        const raw = window.localStorage.getItem("vovinam-progress-meta-v2");
+        if (!raw) return;
+        const parsed = JSON.parse(raw);
+        setLocalStreak(Number(parsed?.streakDays || 0));
+        setDeviceSync("cloud+local");
+      } catch {
+        setLocalStreak(0);
+      }
+    }, 0);
+
+    return () => {
+      window.clearTimeout(timer);
+    };
   }, []);
 
   const onGoogle = async () => {
@@ -273,6 +298,15 @@ export default function UserAuthPanel() {
       {status === "signed_in" ? (
         <div className="mt-4">
           <Message tone="info">
+            <div className="mb-3 flex items-center gap-3">
+              <div className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-cyan-300/25 bg-cyan-300/10 text-xs font-semibold text-cyan-100">
+                {initialsFromEmail(email)}
+              </div>
+              <div>
+                <div className="text-xs text-slate-300">Account</div>
+                <div className="text-sm font-semibold text-white">Training profile active</div>
+              </div>
+            </div>
             <div>
               <span className="text-slate-300">{copy.email}</span>{" "}
               <span className="font-semibold text-white">{email || "-"}</span>
@@ -280,6 +314,14 @@ export default function UserAuthPanel() {
             <div className="mt-1">
               <span className="text-slate-300">{copy.role}</span>{" "}
               <span className="font-semibold text-white">{role || copy.defaultRole}</span>
+            </div>
+            <div className="mt-2 flex flex-wrap gap-2 text-xs">
+              <span className="rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-slate-100">
+                Sync mode: {deviceSync}
+              </span>
+              <span className="rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-slate-100">
+                Local streak: {localStreak} ngày
+              </span>
             </div>
           </Message>
         </div>

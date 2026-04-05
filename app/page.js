@@ -442,6 +442,12 @@ function HomeVi() {
             >
               Test trình độ trong 30s
             </Link>
+            <Link
+              href="/form-check"
+              className="inline-flex h-11 items-center justify-center rounded-2xl border border-emerald-300/30 bg-emerald-400/10 px-5 text-sm font-semibold text-emerald-100 transition hover:bg-emerald-400/15 focus:outline-none focus:ring-2 focus:ring-emerald-300/40"
+            >
+              Thử AI Form Check (WOW)
+            </Link>
           </div>
           <p className="mt-3 text-sm font-medium text-cyan-100">
             Một huấn luyện viên Vovinam cá nhân, trong túi của bạn.
@@ -456,6 +462,35 @@ function HomeVi() {
         aiPrompt="Tôi mới tập Vovinam, gợi ý 1 buổi tập 20 phút hôm nay theo cấp Lam đai."
         resultLatencyMs={800}
       />
+
+      <section className="mt-6 rounded-3xl border border-emerald-300/20 bg-emerald-400/10 p-5">
+        <p className="text-xs font-semibold uppercase tracking-wide text-emerald-100">Signature Feature</p>
+        <h2 className="mt-1 text-xl font-semibold text-white">AI Form Check: điểm khác biệt mà YouTube không có</h2>
+        <p className="mt-2 text-sm leading-6 text-slate-200">
+          Dùng camera để nhận feedback form theo thời gian thực: lệch trục, guard, nhịp tấn. Đây là điểm &quot;wow&quot;
+          giúp người tập thấy giá trị ngay trong 30 giây đầu.
+        </p>
+        <div className="mt-3">
+          <Link
+            href="/form-check"
+            className="inline-flex h-10 items-center justify-center rounded-2xl border border-emerald-300/30 bg-emerald-400/10 px-4 text-sm font-semibold text-emerald-100 transition hover:bg-emerald-400/15"
+          >
+            Mở AI Form Check →
+          </Link>
+        </div>
+      </section>
+
+      <section className="mt-4 rounded-3xl border border-cyan-300/20 bg-cyan-300/10 p-5">
+        <p className="text-xs font-semibold uppercase tracking-wide text-cyan-100">Judge Q&amp;A</p>
+        <h2 className="mt-1 text-lg font-semibold text-white">Tại sao dùng app này thay vì YouTube?</h2>
+        <p className="mt-2 text-sm leading-6 text-slate-200">
+          Vì đây không chỉ là xem nội dung. App cho bạn vòng lặp luyện tập hoàn chỉnh: AI Form Check, tiến độ có dữ liệu,
+          streak giữ nhịp, leaderboard tạo động lực, và AI Coach cá nhân hóa theo điểm yếu thực tế.
+        </p>
+        <p className="mt-2 text-sm font-semibold text-cyan-100">
+          Vovinam Learning is not just an app. It is a structured, AI-powered training system that transforms traditional martial arts into a scalable, data-driven experience.
+        </p>
+      </section>
 
       <section className="mt-8">
         <SectionHeading

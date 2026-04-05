@@ -79,6 +79,7 @@ function getCopy(locale) {
       nutrition: "Nutrition",
       progress: "Progress",
       aiCoach: "AI Coach",
+      formCheck: "AI Form Check",
     };
   }
 
@@ -112,6 +113,7 @@ function getCopy(locale) {
       nutrition: "栄養",
       progress: "進捗",
       aiCoach: "AIコーチ",
+      formCheck: "AIフォームチェック",
     };
   }
 
@@ -144,6 +146,7 @@ function getCopy(locale) {
     nutrition: "Nutrition",
     progress: "Progress",
     aiCoach: "AI Coach",
+    formCheck: "AI Form Check",
   };
 }
 
@@ -201,6 +204,7 @@ export default async function LearningHubPage() {
           <QuickLink href="/dinh-duong">{copy.nutrition}</QuickLink>
           <QuickLink href="/tien-do">{copy.progress}</QuickLink>
           <QuickLink href="/ai-coach">{copy.aiCoach}</QuickLink>
+          <QuickLink href="/form-check">{copy.formCheck}</QuickLink>
         </div>
       </section>
 

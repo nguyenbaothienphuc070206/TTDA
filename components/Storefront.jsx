@@ -52,6 +52,7 @@ function getCopy(locale) {
       labelShould: "Good to have",
       labelUpgrade: "When leveling up",
       beginnerComboBadge: "Top pick for beginners",
+      reviewLabel: "reviews",
     };
   }
 
@@ -99,6 +100,7 @@ function getCopy(locale) {
       labelShould: "あると便利",
       labelUpgrade: "昇級時に検討",
       beginnerComboBadge: "初心者向けおすすめ",
+      reviewLabel: "件のレビュー",
     };
   }
 
@@ -145,6 +147,7 @@ function getCopy(locale) {
     labelShould: "Nên có",
     labelUpgrade: "Khi lên cấp",
     beginnerComboBadge: "Combo khuyến nghị cho người mới",
+    reviewLabel: "đánh giá",
   };
 }
 
@@ -157,6 +160,12 @@ function priorityLabelForProduct(productId, copy) {
     return copy.labelShould;
   }
   return copy.labelUpgrade;
+}
+
+function renderStars(rating) {
+  const value = Math.max(0, Math.min(5, Number(rating) || 0));
+  const full = Math.round(value);
+  return Array.from({ length: 5 }, (_, idx) => (idx < full ? "★" : "☆")).join("");
 }
 
 function Pill({ children }) {
@@ -341,6 +350,12 @@ export default function Storefront() {
                         <div>
                           <div className="text-sm font-semibold text-white">{p.name}</div>
                           <div className="mt-1 text-xs text-slate-300">{p.summary}</div>
+                          <div className="mt-2 text-xs font-semibold text-amber-200">
+                            {renderStars(p.rating)}
+                            <span className="ml-2 text-slate-300">
+                              {Number(p.rating || 0).toFixed(1)} ({Number(p.reviewCount || 0)} {copy.reviewLabel})
+                            </span>
+                          </div>
                         </div>
 
                         <div className="text-sm font-semibold text-white">{formatVnd(p.priceVnd)}</div>
@@ -361,7 +376,7 @@ export default function Storefront() {
                             href={href}
                             target="_blank"
                             rel="noreferrer"
-                            className="inline-flex h-11 w-full items-center justify-center rounded-2xl bg-linear-to-r from-cyan-300 to-blue-500 px-4 text-sm font-semibold text-slate-950 transition hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-cyan-300/50"
+                            className="inline-flex h-11 w-full items-center justify-center rounded-2xl bg-linear-to-r from-cyan-300 to-blue-500 px-4 text-sm font-semibold text-slate-950 transition hover:brightness-110 active:scale-[0.99] focus:outline-none focus:ring-2 focus:ring-cyan-300/50"
                           >
                             {copy.buyAt(partnerName)}
                           </a>
