@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 
 import { BELT_FAMILIES, getBeltsByFamilyId } from "@/data/belts";
+import { isPitchModeEnabled } from "@/lib/pitchMode";
 
 function FooterLink({ href, children }) {
   return (
@@ -24,6 +25,7 @@ function FooterTitle({ children }) {
 
 export default async function SiteFooter() {
   const t = await getTranslations("footer");
+  const pitchMode = isPitchModeEnabled();
   const year = new Date().getFullYear();
   const emergencySupportUrl = String(process.env.NEXT_PUBLIC_EMERGENCY_SUPPORT_URL || "").trim();
   const levelFamilies = BELT_FAMILIES.map((family) => ({
@@ -99,7 +101,7 @@ export default async function SiteFooter() {
                 </div>
               </details>
 
-              <FooterLink href="/cong-dong">{t("links.community")}</FooterLink>
+              {!pitchMode ? <FooterLink href="/cong-dong">{t("links.community")}</FooterLink> : null}
               <FooterLink href="/lo-trinh">{t("links.roadmap")}</FooterLink>
               <FooterLink href="/lich-tap">{t("links.schedule")}</FooterLink>
               <FooterLink href="/dinh-duong">{t("links.nutrition")}</FooterLink>

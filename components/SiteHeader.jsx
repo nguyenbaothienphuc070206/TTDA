@@ -9,6 +9,7 @@ import LanguageToggle from "@/components/LanguageToggle";
 import ThemeToggle from "@/components/ThemeToggle";
 import { LESSONS } from "@/data/lessons";
 import { fetchCommunityConversations } from "@/lib/community/messagesApi";
+import { isPitchModeEnabled } from "@/lib/pitchMode";
 import { readDoneSlugs } from "@/lib/progress";
 
 function NavItem({ href, active, children }) {
@@ -139,6 +140,7 @@ function LearningNavMenu({ label, items, isActive }) {
 export default function SiteHeader() {
   const t = useTranslations("nav");
   const pathname = usePathname() || "/";
+  const pitchMode = isPitchModeEnabled();
   const totalLessons = LESSONS.length;
   const [doneCount, setDoneCount] = useState(0);
   const [communityUnread, setCommunityUnread] = useState(0);
@@ -163,7 +165,7 @@ export default function SiteHeader() {
     { href: "/dinh-duong", label: t("nutrition") },
     { href: "/cua-hang", label: t("store") },
     { href: "/ho-so", label: t("profile") },
-  ];
+  ].filter((item) => !(pitchMode && item.href === "/cong-dong"));
 
   useEffect(() => {
     const lessonSlugSet = new Set(LESSONS.map((lesson) => lesson.slug));
@@ -186,6 +188,10 @@ export default function SiteHeader() {
   }, []);
 
   useEffect(() => {
+    if (pitchMode) {
+      return;
+    }
+
     let mounted = true;
 
     const syncUnread = async () => {
@@ -209,7 +215,7 @@ export default function SiteHeader() {
       clearInterval(timer);
       window.removeEventListener("focus", syncUnread);
     };
-  }, []);
+  }, [pitchMode]);
 
   const remainingCount = Math.max(0, totalLessons - doneCount);
 

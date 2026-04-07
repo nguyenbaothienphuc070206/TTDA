@@ -69,6 +69,15 @@ Nếu bạn deploy thật và muốn `sitemap.xml`/`robots.txt` dùng đúng dom
 1. Copy `.env.example` → `.env.local`
 2. Điền `NEXT_PUBLIC_SITE_URL=https://your-domain.com`
 
+### Pitch Mode (demo/pitching)
+
+Để bật giao diện pitch (ẩn bớt phần phụ, giữ AI Coach + Form Check + flow chính):
+
+1. Mở `.env.local`
+2. Thêm `NEXT_PUBLIC_PITCH_MODE=1`
+
+Để quay lại giao diện đầy đủ, đặt `NEXT_PUBLIC_PITCH_MODE=0` (hoặc xóa biến).
+
 ## Hardening cho tải lớn (100M+ users)
 
 Để chạy an toàn ở quy mô lớn, app đã có thêm lớp chặn quá tải ở edge cho toàn bộ `/api/*` và tăng cường security headers.

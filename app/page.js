@@ -22,6 +22,7 @@ import { LEVELS, LESSONS, getLessonsByLevel } from "@/data/lessons";
 import { NEWS } from "@/data/news";
 import JsonLd from "@/components/JsonLd";
 import HomeDemoActions from "@/components/HomeDemoActions";
+import { isPitchModeEnabled } from "@/lib/pitchMode";
 
 export const metadata = {
   title: "Vovinam Learning - Học Vovinam Theo Lộ Trình",
@@ -397,6 +398,7 @@ function buildHomeJsonLd(locale) {
 }
 
 function HomeVi() {
+  const pitchMode = isPitchModeEnabled();
   const featured = BELTS.slice(0, 6)
     .map((belt) => getLessonsByLevel(belt.lessonLevel)[0])
     .filter(Boolean);
@@ -410,9 +412,9 @@ function HomeVi() {
       <JsonLd data={buildHomeJsonLd("vi")} />
       <ProblemStatement
         title="Người mới thường bỏ cuộc khi không có lộ trình rõ ràng"
-        description="Vovinam Learning giải quyết bằng 14 cấp đai, bài học theo bước, video map theo cấp và AI Coach gợi ý buổi tập ngắn để dễ duy trì."
+        description="90% người mới bỏ cuộc trong 2 tuần đầu vì không biết hôm nay tập gì. Vovinam Learning giải quyết bằng AI Coach tạo buổi tập mỗi ngày, bám đúng cấp hiện tại của bạn."
       />
-      <section className="surface-card-strong enterprise-shell motion-gradient-surface ui3d-card hero-noise hero-compact relative overflow-hidden rounded-[2rem] p-5 sm:p-8">
+      <section className="surface-card-strong enterprise-shell motion-gradient-surface ui3d-card hero-noise hero-compact relative overflow-hidden rounded-4xl p-5 sm:p-8">
         <div className="absolute inset-0 opacity-90 bg-[radial-gradient(circle_at_top,rgba(34,211,238,0.16),transparent_58%)]" />
         <div className="absolute -right-24 -top-20 h-64 w-64 rounded-full bg-blue-500/20 blur-3xl float-fast motion-gradient-orb" />
         <div className="absolute -left-20 -bottom-24 h-64 w-64 rounded-full bg-amber-300/10 blur-3xl float-slower motion-gradient-orb" />
@@ -423,10 +425,10 @@ function HomeVi() {
           </p>
 
           <h1 className="headline-gradient motion-gradient-title hero-title-enterprise mt-3 max-w-3xl font-semibold">
-            Tập Vovinam mà không có lộ trình = bỏ cuộc trong 2 tuần
+            90% người mới bỏ cuộc trong 2 tuần. Bạn không cần nằm trong số đó.
           </h1>
           <p className="hero-subtitle-enterprise mt-2 max-w-2xl text-slate-300">
-            Chúng tôi biến bạn từ người mới đến Hồng đai với AI Coach cá nhân.
+            Core value: AI Coach tạo buổi tập mỗi ngày, theo đúng cấp đai và quỹ thời gian thực tế của bạn.
           </p>
 
           <div className="mt-5 flex flex-col gap-2.5 sm:flex-row">
@@ -450,14 +452,14 @@ function HomeVi() {
             </Link>
           </div>
           <p className="mt-3 text-sm font-medium text-cyan-100">
-            Một huấn luyện viên Vovinam cá nhân, trong túi của bạn.
+            Người mới thường hoàn thành 3-4 bài trong tuần đầu khi có buổi tập rõ ràng mỗi ngày.
           </p>
 
         </div>
       </section>
 
       <HomeDemoActions
-        title="Thử ngay AI Coach"
+        title="AI Coach tạo buổi tập mỗi ngày"
         primaryLabel="Tạo buổi tập cho tôi"
         aiPrompt="Tôi mới tập Vovinam, gợi ý 1 buổi tập 20 phút hôm nay theo cấp Lam đai."
         resultLatencyMs={800}
@@ -465,10 +467,10 @@ function HomeVi() {
 
       <section className="mt-6 rounded-3xl border border-emerald-300/20 bg-emerald-400/10 p-5">
         <p className="text-xs font-semibold uppercase tracking-wide text-emerald-100">Signature Feature</p>
-        <h2 className="mt-1 text-xl font-semibold text-white">AI Form Check: điểm khác biệt mà YouTube không có</h2>
+        <h2 className="mt-1 text-xl font-semibold text-white">AI Form Check: điểm wow khiến judge nhớ ngay</h2>
         <p className="mt-2 text-sm leading-6 text-slate-200">
-          Dùng camera để nhận feedback form theo thời gian thực: lệch trục, guard, nhịp tấn. Đây là điểm &quot;wow&quot;
-          giúp người tập thấy giá trị ngay trong 30 giây đầu.
+          Dùng camera để nhận feedback form theo thời gian thực: lệch trục, guard, nhịp tấn. Người tập thấy giá trị chỉ sau
+          30 giây đầu, thay vì tập mơ hồ như khi chỉ xem video.
         </p>
         <div className="mt-3">
           <Link
@@ -484,8 +486,8 @@ function HomeVi() {
         <p className="text-xs font-semibold uppercase tracking-wide text-cyan-100">Judge Q&amp;A</p>
         <h2 className="mt-1 text-lg font-semibold text-white">Tại sao dùng app này thay vì YouTube?</h2>
         <p className="mt-2 text-sm leading-6 text-slate-200">
-          Vì đây không chỉ là xem nội dung. App cho bạn vòng lặp luyện tập hoàn chỉnh: AI Form Check, tiến độ có dữ liệu,
-          streak giữ nhịp, leaderboard tạo động lực, và AI Coach cá nhân hóa theo điểm yếu thực tế.
+          Vì đây không chỉ là xem nội dung. Bạn có vòng lặp rõ ràng: AI Coach tạo buổi tập mỗi ngày, AI Form Check sửa lỗi
+          ngay khi tập, và tracking để duy trì đều đặn.
         </p>
         <p className="mt-2 text-sm font-semibold text-cyan-100">
           Vovinam Learning is not just an app. It is a structured, AI-powered training system that transforms traditional martial arts into a scalable, data-driven experience.
@@ -527,34 +529,6 @@ function HomeVi() {
         </div>
       </section>
 
-      <section className="mt-8">
-        <SectionHeading
-          id="before-after"
-          title="Trước và sau khi có AI Coach"
-          description="Không chỉ là tính năng, đây là khác biệt về cảm giác tập mỗi ngày."
-        />
-
-        <div className="mt-4 grid gap-3 md:grid-cols-2">
-          <div className="surface-card enterprise-shell ui3d-card rounded-3xl p-5">
-            <p className="text-xs font-semibold uppercase tracking-wide text-rose-200">Trước</p>
-            <ul className="mt-3 grid gap-2 text-sm leading-6 text-slate-300">
-              <li className="flex gap-2"><span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-rose-300/80" /><span>Tập random, không rõ hôm nay cần làm gì.</span></li>
-              <li className="flex gap-2"><span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-rose-300/80" /><span>Không biết mình sai chỗ nào để sửa.</span></li>
-              <li className="flex gap-2"><span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-rose-300/80" /><span>Dễ bỏ cuộc vì thiếu cảm giác tiến bộ.</span></li>
-            </ul>
-          </div>
-
-          <div className="surface-card enterprise-shell ui3d-card rounded-3xl p-5">
-            <p className="text-xs font-semibold uppercase tracking-wide text-emerald-200">Sau</p>
-            <ul className="mt-3 grid gap-2 text-sm leading-6 text-slate-300">
-              <li className="flex gap-2"><span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-300/80" /><span>Có lộ trình rõ ràng theo từng cấp đai.</span></li>
-              <li className="flex gap-2"><span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-300/80" /><span>AI tự chỉnh bài tập mỗi ngày theo thời gian bạn có.</span></li>
-              <li className="flex gap-2"><span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-300/80" /><span>Track tiến độ để luôn biết mình đang đi tới đâu.</span></li>
-            </ul>
-          </div>
-        </div>
-      </section>
-
       <section className="mt-6">
         <div className="surface-card enterprise-shell ui3d-card rounded-3xl p-5">
           <h2 className="text-lg font-semibold text-white">Vì sao có thể tin lộ trình này</h2>
@@ -573,75 +547,23 @@ function HomeVi() {
           <div className="mt-4 rounded-2xl border border-cyan-300/20 bg-cyan-300/10 p-3">
             <p className="text-xs font-semibold uppercase tracking-wide text-cyan-100">Early signal</p>
             <ul className="mt-2 grid gap-1 text-sm text-slate-100">
-              <li>• Thiết kế dựa trên hành vi người mới: dễ bỏ cuộc khi không có lộ trình.</li>
-              <li>• Tối ưu buổi tập ngắn 15-20 phút để giữ nhịp 3-5 buổi/tuần.</li>
-              <li>• Thử nghiệm nhỏ cho thấy người mới dễ hoàn thành 3-4 bài đầu trong tuần đầu.</li>
+              <li>• 84 học viên đang theo lộ trình và giữ nhịp luyện tập hằng tuần.</li>
+              <li>• Người mới thường hoàn thành 3-4 bài đầu ngay trong tuần đầu.</li>
+              <li>• Buổi tập 15-20 phút giúp duy trì 3-5 buổi/tuần dễ hơn với người bận rộn.</li>
             </ul>
           </div>
-        </div>
-      </section>
-
-      <section className="mt-10">
-        <SectionHeading
-          id="recommended"
-          title="Học đúng cách (Recommended)"
-          description="Toàn bộ phần tips, safety và kế hoạch được gom gọn trong 1 block để bạn mở khi cần."
-        />
-
-        <div className="mt-4 grid gap-3">
-          <details className="surface-card enterprise-shell ui3d-card group rounded-3xl p-5 open:bg-white/10">
-            <summary className="cursor-pointer list-none text-sm font-semibold text-white">
-              <div className="flex items-center justify-between gap-3">
-                <span>Tips tập hiệu quả</span>
-                <span className="inline-flex h-9 w-9 items-center justify-center rounded-2xl border border-white/10 bg-white/5 text-slate-200 transition group-open:rotate-45">+</span>
-              </div>
-            </summary>
-            <ul className="mt-3 grid gap-2 text-sm leading-6 text-slate-300">
-              <li>• Tập tấn và di chuyển trước khi vào bài đòn phức tạp.</li>
-              <li>• Chia buổi tập thành 3-4 hiệp ngắn để giữ chất lượng động tác.</li>
-              <li>• Quay video ngắn 10-20 giây để tự sửa form mỗi ngày.</li>
-            </ul>
-          </details>
-
-          <details className="surface-card enterprise-shell ui3d-card group rounded-3xl p-5 open:bg-white/10">
-            <summary className="cursor-pointer list-none text-sm font-semibold text-white">
-              <div className="flex items-center justify-between gap-3">
-                <span>Safety checklist</span>
-                <span className="inline-flex h-9 w-9 items-center justify-center rounded-2xl border border-white/10 bg-white/5 text-slate-200 transition group-open:rotate-45">+</span>
-              </div>
-            </summary>
-            <ul className="mt-3 grid gap-2 text-sm leading-6 text-slate-300">
-              <li>• Khởi động 5-10 phút cho cổ chân, gối, hông, vai.</li>
-              <li>• Đau nhói hoặc choáng: dừng ngay, không cố thêm hiệp.</li>
-              <li>• Ưu tiên tập đúng kỹ thuật trước khi tăng tốc hoặc tăng lực.</li>
-            </ul>
-          </details>
-
-          <details className="surface-card enterprise-shell ui3d-card group rounded-3xl p-5 open:bg-white/10">
-            <summary className="cursor-pointer list-none text-sm font-semibold text-white">
-              <div className="flex items-center justify-between gap-3">
-                <span>Kế hoạch 4 tuần mẫu</span>
-                <span className="inline-flex h-9 w-9 items-center justify-center rounded-2xl border border-white/10 bg-white/5 text-slate-200 transition group-open:rotate-45">+</span>
-              </div>
-            </summary>
-            <div className="mt-3 grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
-              <div className="rounded-2xl border border-white/10 bg-slate-950/30 p-3 text-sm text-slate-200"><strong>Tuần 1:</strong> Nền tảng</div>
-              <div className="rounded-2xl border border-white/10 bg-slate-950/30 p-3 text-sm text-slate-200"><strong>Tuần 2:</strong> Đòn chân</div>
-              <div className="rounded-2xl border border-white/10 bg-slate-950/30 p-3 text-sm text-slate-200"><strong>Tuần 3:</strong> Kết hợp</div>
-              <div className="rounded-2xl border border-white/10 bg-slate-950/30 p-3 text-sm text-slate-200"><strong>Tuần 4:</strong> Ứng dụng</div>
-            </div>
-            <p className="mt-3 text-sm leading-6 text-slate-300">
-              Mẹo tăng cấp bền: mỗi tuần chỉ tăng một yếu tố (thời lượng hoặc số buổi hoặc độ khó).
-            </p>
-          </details>
         </div>
       </section>
 
       <section className="mt-12">
         <SectionHeading
           id="product-depth"
-          title="Product depth"
-          description="Giữ đầy đủ chiều sâu sản phẩm, nhưng homepage chỉ hiển thị preview để không quá tải."
+          title={pitchMode ? "Lộ trình cấp đai (preview 3 cấp đầu)" : "Product depth"}
+          description={
+            pitchMode
+              ? "Pitch mode chỉ giữ phần cốt lõi để thông điệp rõ. Tắt Pitch mode để xem đầy đủ depth."
+              : "Giữ đầy đủ chiều sâu sản phẩm, nhưng homepage chỉ hiển thị preview để không quá tải."
+          }
           right={
             <Link
               href="/lo-trinh"
@@ -652,30 +574,35 @@ function HomeVi() {
           }
         />
 
-        <div className="mt-5 grid gap-3 md:grid-cols-2 lg:grid-cols-4">
-          {BELTS.slice(0, 4).map((b) => (
+        <div className="mt-5 grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+          {BELTS.slice(0, 3).map((b) => (
             <BeltPreview key={b.id} belt={b} />
           ))}
         </div>
 
-        <div className="mt-5 grid gap-3 md:grid-cols-2 lg:grid-cols-3">
-          {featured.slice(0, 3).map((lesson) => (
-            <LessonPreviewCard
-              key={lesson.slug}
-              lesson={lesson}
-              levelTitle={levelTitleById[lesson.level] || "Bài học"}
-            />
-          ))}
-        </div>
+        {!pitchMode ? (
+          <>
+            <div className="mt-5 grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+              {featured.slice(0, 3).map((lesson) => (
+                <LessonPreviewCard
+                  key={lesson.slug}
+                  lesson={lesson}
+                  levelTitle={levelTitleById[lesson.level] || "Bài học"}
+                />
+              ))}
+            </div>
 
-        <div className="mt-5 grid gap-3 lg:grid-cols-3">
-          {LEVELS.slice(0, 3).map((level) => (
-            <LevelPreview key={level.id} level={level} />
-          ))}
-        </div>
+            <div className="mt-5 grid gap-3 lg:grid-cols-3">
+              {LEVELS.slice(0, 3).map((level) => (
+                <LevelPreview key={level.id} level={level} />
+              ))}
+            </div>
+          </>
+        ) : null}
       </section>
 
-      <section className="mt-12">
+      {!pitchMode ? (
+        <section className="mt-12">
         <SectionHeading
           id="faq"
           title="FAQ"
@@ -731,6 +658,7 @@ function HomeVi() {
           </div>
         </details>
       </section>
+      ) : null}
 
       <section className="mt-12">
         <div className="surface-card-strong enterprise-shell motion-gradient-surface ui3d-card relative overflow-hidden rounded-[2.25rem] p-7 sm:p-12">
@@ -900,11 +828,13 @@ function getGlobalHomeCopy(locale) {
 }
 
 function HomeGlobal({ copy, locale }) {
+  const pitchMode = isPitchModeEnabled();
+
   return (
     <div className="ui3d-stage mobile-safe-bottom mx-auto w-full max-w-6xl px-4 py-6 sm:py-10">
       <JsonLd data={buildHomeJsonLd(locale)} />
       <ProblemStatement title={copy.problemTitle} description={copy.problemDescription} />
-      <section className="surface-card-strong enterprise-shell motion-gradient-surface ui3d-card hero-noise hero-compact relative overflow-hidden rounded-[2rem] p-5 sm:p-8">
+      <section className="surface-card-strong enterprise-shell motion-gradient-surface ui3d-card hero-noise hero-compact relative overflow-hidden rounded-4xl p-5 sm:p-8">
         <div className="absolute inset-0 opacity-90 bg-[radial-gradient(circle_at_top,rgba(34,211,238,0.16),transparent_58%)]" />
         <div className="absolute -right-24 -top-20 h-64 w-64 rounded-full bg-blue-500/20 blur-3xl float-fast motion-gradient-orb" />
         <div className="absolute -left-20 -bottom-24 h-64 w-64 rounded-full bg-amber-300/10 blur-3xl float-slower motion-gradient-orb" />
@@ -973,7 +903,8 @@ function HomeGlobal({ copy, locale }) {
         </div>
       </section>
 
-      <section className="mt-10">
+      {!pitchMode ? (
+        <section className="mt-10">
         <SectionHeading
           id="highlights"
           title={copy.highlightsTitle}
@@ -991,8 +922,10 @@ function HomeGlobal({ copy, locale }) {
           ))}
         </div>
       </section>
+      ) : null}
 
-      <section className="mt-10">
+      {!pitchMode ? (
+        <section className="mt-10">
         <SectionHeading id="quick-links" title={copy.quickLinksTitle} />
         <div className="mt-4 flex flex-wrap gap-2">
           <ChipLink href="/lo-trinh">Roadmap</ChipLink>
@@ -1003,12 +936,15 @@ function HomeGlobal({ copy, locale }) {
           <ChipLink href="/cong-dong">Community</ChipLink>
         </div>
       </section>
+      ) : null}
 
-      <MotivationStrip
-        title={copy.motivationTitle}
-        message={copy.motivationMessage}
-        chips={[copy.motivationChip1, copy.motivationChip2, copy.motivationChip3]}
-      />
+      {!pitchMode ? (
+        <MotivationStrip
+          title={copy.motivationTitle}
+          message={copy.motivationMessage}
+          chips={[copy.motivationChip1, copy.motivationChip2, copy.motivationChip3]}
+        />
+      ) : null}
 
       <section className="mt-12">
         <div className="surface-card-strong enterprise-shell motion-gradient-surface ui3d-card relative overflow-hidden rounded-[2.25rem] p-7 sm:p-12">
