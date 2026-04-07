@@ -5,6 +5,12 @@ import { useEffect, useRef, useState } from "react";
 
 import { popConfettiFromElement } from "@/lib/confetti";
 
+const TECHNIQUE_OPTIONS = [
+  { value: "tan-co-ban", label: "Tấn cơ bản" },
+  { value: "dam-thang", label: "Đấm thẳng" },
+  { value: "da-tong-ngang", label: "Đá tống ngang" },
+];
+
 function dist(a, b) {
   if (!a || !b) return 0;
   const dx = Number(a.x) - Number(b.x);
@@ -94,8 +100,13 @@ function avg(arr) {
 function collectPoseMetrics(landmarks) {
   if (!Array.isArray(landmarks) || landmarks.length < 29) return null;
 
+  const nose = landmarks[0];
   const ls = landmarks[11];
   const rs = landmarks[12];
+  const le = landmarks[13];
+  const re = landmarks[14];
+  const lw = landmarks[15];
+  const rw = landmarks[16];
   const lh = landmarks[23];
   const rh = landmarks[24];
   const lk = landmarks[25];
@@ -114,15 +125,39 @@ function collectPoseMetrics(landmarks) {
   const shoulderTilt = Math.abs(Number(ls?.y) - Number(rs?.y));
   const hipTilt = Math.abs(Number(lh?.y) - Number(rh?.y));
 
+  const leftElbow = angleDeg(ls, le, lw);
+  const rightElbow = angleDeg(rs, re, rw);
+  const elbowAvg = avg([leftElbow, rightElbow]);
+
+  const leftGuardDrop = Number(lw?.y) - Number(ls?.y);
+  const rightGuardDrop = Number(rw?.y) - Number(rs?.y);
+  const guardDropAvg = avg([leftGuardDrop, rightGuardDrop]);
+
+  const shoulderCenter = {
+    x: avg([Number(ls?.x), Number(rs?.x)]),
+    y: avg([Number(ls?.y), Number(rs?.y)]),
+  };
+  const hipCenter = {
+    x: avg([Number(lh?.x), Number(rh?.x)]),
+    y: avg([Number(lh?.y), Number(rh?.y)]),
+  };
+  const trunkLeanX = Math.abs(Number(shoulderCenter.x) - Number(hipCenter.x));
+
+  const headDrop = Number(hipCenter.y) - Number(nose?.y);
+
   return {
     stanceRatio,
     kneeAvg,
     shoulderTilt: Number.isFinite(shoulderTilt) ? shoulderTilt : 0,
     hipTilt: Number.isFinite(hipTilt) ? hipTilt : 0,
+    elbowAvg,
+    guardDropAvg: Number.isFinite(guardDropAvg) ? guardDropAvg : 0,
+    trunkLeanX: Number.isFinite(trunkLeanX) ? trunkLeanX : 0,
+    headDrop: Number.isFinite(headDrop) ? headDrop : 0,
   };
 }
 
-function buildFormCheckReport({ metrics, poseHitRate, uploadKind }) {
+function buildFormCheckReport({ metrics, poseHitRate, uploadKind, technique }) {
   const mistakes = [];
   const suggestions = [];
   const detailNotes = [];
@@ -175,6 +210,56 @@ function buildFormCheckReport({ metrics, poseHitRate, uploadKind }) {
     detailNotes.push("Trục hông chưa cân bằng, ảnh hưởng truyền lực toàn thân.");
   }
 
+  if (metrics.trunkLeanX > 0.06) {
+    score -= 6;
+    mistakes.push("Thân người nghiêng khỏi trục");
+    suggestions.push("Giữ trục đầu-vai-hông thẳng hàng để truyền lực chắc hơn.");
+    detailNotes.push("Trục thân lệch dễ làm mất cân bằng ở nhịp chuyển động kế tiếp.");
+  }
+
+  if (technique === "dam-thang") {
+    if (metrics.guardDropAvg > 0.045) {
+      score -= 8;
+      mistakes.push("Tay guard hạ thấp khi đấm");
+      suggestions.push("Giữ tay còn lại ngang cằm khi tay kia phát đấm.");
+      detailNotes.push("Guard chưa ổn định khiến vùng mặt/ngực hở khi ra đòn.");
+    }
+
+    if (metrics.elbowAvg < 120) {
+      score -= 5;
+      mistakes.push("Đòn đấm chưa duỗi hết biên độ");
+      suggestions.push("Tăng biên độ duỗi tay cuối đòn nhưng vẫn khóa vai nhẹ.");
+      detailNotes.push("Elbow angle còn thấp, lực cuối đòn chưa tối ưu.");
+    } else {
+      detailNotes.push("Biên độ tay đấm khá tốt cho bài đấm thẳng.");
+    }
+  }
+
+  if (technique === "da-tong-ngang") {
+    if (metrics.kneeAvg > 150) {
+      score -= 7;
+      mistakes.push("Chân trụ còn thẳng khi đá");
+      suggestions.push("Gập nhẹ gối chân trụ để giữ cân bằng lúc vung đá.");
+      detailNotes.push("Chân trụ cứng làm thân dễ lắc khi kết thúc cú đá.");
+    }
+
+    if (metrics.hipTilt > 0.045) {
+      score -= 6;
+      mistakes.push("Hông chưa khóa khi kết thúc cú đá");
+      suggestions.push("Khóa hông ở điểm chạm rồi mới thu chân về guard.");
+      detailNotes.push("Hông còn trôi làm giảm độ chắc và tốc độ thu chân.");
+    }
+  }
+
+  if (technique === "tan-co-ban") {
+    if (metrics.headDrop < 0.18) {
+      score -= 4;
+      mistakes.push("Tư thế thân trên hơi co");
+      suggestions.push("Mở ngực nhẹ, kéo đỉnh đầu lên để thân trên thoáng hơn.");
+      detailNotes.push("Thân trên hơi co khiến nhịp thở và giữ tấn kém ổn định.");
+    }
+  }
+
   if (poseHitRate < 0.6) {
     score -= 8;
     mistakes.push("Pose nhận diện chưa ổn định");
@@ -188,6 +273,14 @@ function buildFormCheckReport({ metrics, poseHitRate, uploadKind }) {
     detailNotes.push("Nguồn là ảnh tĩnh, nhận xét thiên về tư thế tại một thời điểm.");
   } else {
     detailNotes.push("Nguồn là video/camera, nhận xét phản ánh cả nhịp chuyển động.");
+  }
+
+  if (technique === "dam-thang") {
+    detailNotes.push("Mục tiêu kỹ thuật hiện tại: đấm thẳng (ưu tiên guard + trục vai-hông). ");
+  } else if (technique === "da-tong-ngang") {
+    detailNotes.push("Mục tiêu kỹ thuật hiện tại: đá tống ngang (ưu tiên chân trụ + khóa hông).");
+  } else {
+    detailNotes.push("Mục tiêu kỹ thuật hiện tại: tấn cơ bản (ưu tiên độ vững và cân bằng trục).");
   }
 
   if (mistakes.length === 0) {
@@ -221,6 +314,10 @@ export default function PoseCoach() {
     kneeAngles: [],
     shoulderTilts: [],
     hipTilts: [],
+    elbowAngles: [],
+    guardDrops: [],
+    trunkLeans: [],
+    headDrops: [],
   });
   const uploadUrlRef = useRef("");
   const checkButtonRef = useRef(null);
@@ -233,6 +330,7 @@ export default function PoseCoach() {
   const [error, setError] = useState("");
   const [uploadKind, setUploadKind] = useState("");
   const [uploadUrl, setUploadUrl] = useState("");
+  const [selectedTechnique, setSelectedTechnique] = useState("tan-co-ban");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisResult, setAnalysisResult] = useState(null);
 
@@ -244,6 +342,10 @@ export default function PoseCoach() {
       kneeAngles: [],
       shoulderTilts: [],
       hipTilts: [],
+      elbowAngles: [],
+      guardDrops: [],
+      trunkLeans: [],
+      headDrops: [],
     };
   };
 
@@ -267,6 +369,10 @@ export default function PoseCoach() {
     if (metrics.kneeAvg > 0) stats.kneeAngles.push(metrics.kneeAvg);
     if (metrics.shoulderTilt > 0) stats.shoulderTilts.push(metrics.shoulderTilt);
     if (metrics.hipTilt > 0) stats.hipTilts.push(metrics.hipTilt);
+    if (metrics.elbowAvg > 0) stats.elbowAngles.push(metrics.elbowAvg);
+    if (Number.isFinite(metrics.guardDropAvg)) stats.guardDrops.push(metrics.guardDropAvg);
+    if (Number.isFinite(metrics.trunkLeanX)) stats.trunkLeans.push(metrics.trunkLeanX);
+    if (Number.isFinite(metrics.headDrop)) stats.headDrops.push(metrics.headDrop);
   };
 
   const stop = async ({ statusText } = {}) => {
@@ -885,12 +991,17 @@ export default function PoseCoach() {
       kneeAvg: avg([avg(stats?.kneeAngles), latestMetrics?.kneeAvg]),
       shoulderTilt: avg([avg(stats?.shoulderTilts), latestMetrics?.shoulderTilt]),
       hipTilt: avg([avg(stats?.hipTilts), latestMetrics?.hipTilt]),
+      elbowAvg: avg([avg(stats?.elbowAngles), latestMetrics?.elbowAvg]),
+      guardDropAvg: avg([avg(stats?.guardDrops), latestMetrics?.guardDropAvg]),
+      trunkLeanX: avg([avg(stats?.trunkLeans), latestMetrics?.trunkLeanX]),
+      headDrop: avg([avg(stats?.headDrops), latestMetrics?.headDrop]),
     };
 
     const nextResult = buildFormCheckReport({
       metrics: mergedMetrics,
       poseHitRate,
       uploadKind,
+      technique: selectedTechnique,
     });
 
     setIsAnalyzing(false);
@@ -965,15 +1076,32 @@ export default function PoseCoach() {
           />
         </label>
 
-        {uploadUrl ? (
-          <button
-            type="button"
-            onClick={clearUpload}
-            className="inline-flex h-11 items-center justify-center rounded-2xl border border-white/10 bg-white/5 px-4 text-sm font-semibold text-white transition hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-blue-400/30"
-          >
-            Xoá file
-          </button>
-        ) : null}
+        <div className="grid gap-2">
+          <label className="block">
+            <div className="text-xs font-semibold text-slate-200">Kỹ thuật cần check</div>
+            <select
+              value={selectedTechnique}
+              onChange={(e) => setSelectedTechnique(e.target.value)}
+              className="mt-2 h-11 min-w-44 rounded-2xl border border-white/10 bg-slate-950/60 px-3 text-sm text-slate-200 outline-none focus:ring-2 focus:ring-blue-400/30"
+            >
+              {TECHNIQUE_OPTIONS.map((opt) => (
+                <option key={opt.value} value={opt.value}>
+                  {opt.label}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          {uploadUrl ? (
+            <button
+              type="button"
+              onClick={clearUpload}
+              className="inline-flex h-11 items-center justify-center rounded-2xl border border-white/10 bg-white/5 px-4 text-sm font-semibold text-white transition hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-blue-400/30"
+            >
+              Xoá file
+            </button>
+          ) : null}
+        </div>
       </div>
 
       <div className="mt-4 overflow-hidden rounded-2xl border border-white/10 bg-slate-950/40">
