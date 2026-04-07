@@ -84,28 +84,122 @@ function pickFeedback(landmarks) {
   return tips.join(" ");
 }
 
-function buildDemoResult({ hasVideoSource, uploadKind }) {
-  const baseScore = hasVideoSource ? 78 : 74;
+function avg(arr) {
+  if (!Array.isArray(arr) || arr.length === 0) return 0;
+  const safe = arr.filter((x) => Number.isFinite(x));
+  if (safe.length === 0) return 0;
+  return safe.reduce((s, x) => s + x, 0) / safe.length;
+}
+
+function collectPoseMetrics(landmarks) {
+  if (!Array.isArray(landmarks) || landmarks.length < 29) return null;
+
+  const ls = landmarks[11];
+  const rs = landmarks[12];
+  const lh = landmarks[23];
+  const rh = landmarks[24];
+  const lk = landmarks[25];
+  const rk = landmarks[26];
+  const la = landmarks[27];
+  const ra = landmarks[28];
+
+  const shoulders = dist(ls, rs);
+  const stance = dist(la, ra);
+  const stanceRatio = shoulders > 0 ? stance / shoulders : 0;
+
+  const leftKnee = angleDeg(lh, lk, la);
+  const rightKnee = angleDeg(rh, rk, ra);
+  const kneeAvg = avg([leftKnee, rightKnee]);
+
+  const shoulderTilt = Math.abs(Number(ls?.y) - Number(rs?.y));
+  const hipTilt = Math.abs(Number(lh?.y) - Number(rh?.y));
+
+  return {
+    stanceRatio,
+    kneeAvg,
+    shoulderTilt: Number.isFinite(shoulderTilt) ? shoulderTilt : 0,
+    hipTilt: Number.isFinite(hipTilt) ? hipTilt : 0,
+  };
+}
+
+function buildFormCheckReport({ metrics, poseHitRate, uploadKind }) {
+  const mistakes = [];
+  const suggestions = [];
+  const detailNotes = [];
+
+  let score = 84;
+
+  if (metrics.stanceRatio > 0) {
+    if (metrics.stanceRatio < 0.85) {
+      score -= 12;
+      mistakes.push("Tấn hẹp, chân đứng gần nhau");
+      suggestions.push("Mở rộng chân thêm 10-20% để tăng độ ổn định khi ra đòn.");
+      detailNotes.push("Khoảng chân hiện tại thấp hơn khuyến nghị cho thế tấn cơ bản.");
+    } else if (metrics.stanceRatio > 1.9) {
+      score -= 8;
+      mistakes.push("Tấn quá rộng, khó chuyển trụ");
+      suggestions.push("Thu tấn nhẹ để chuyển trọng tâm linh hoạt hơn.");
+      detailNotes.push("Biên độ chân rộng làm giảm tốc độ chuyển động tiếp theo.");
+    } else {
+      detailNotes.push("Độ rộng tấn ổn định, phù hợp để giữ thăng bằng.");
+    }
+  }
+
+  if (metrics.kneeAvg > 0) {
+    if (metrics.kneeAvg > 165) {
+      score -= 10;
+      mistakes.push("Gối còn thẳng, chưa hạ tấn đủ");
+      suggestions.push("Hạ tâm nhẹ, gập gối thêm để tăng lực bám và độ chắc tấn.");
+      detailNotes.push("Góc gối lớn cho thấy lực dồn xuống tấn chưa đủ.");
+    } else if (metrics.kneeAvg < 75) {
+      score -= 8;
+      mistakes.push("Gập gối quá sâu");
+      suggestions.push("Nâng nhẹ trọng tâm để giảm tải đầu gối, giữ tấn an toàn hơn.");
+      detailNotes.push("Góc gối thấp có nguy cơ gây quá tải khớp khi tập lâu.");
+    } else {
+      detailNotes.push("Góc gối nằm trong vùng tập an toàn và hiệu quả.");
+    }
+  }
+
+  if (metrics.shoulderTilt > 0.045) {
+    score -= 6;
+    mistakes.push("Vai lệch khi giữ thế");
+    suggestions.push("Giữ trục vai ngang, siết core nhẹ để thân trên ổn định.");
+    detailNotes.push("Độ lệch vai hơi cao, có thể do dồn lực không đều 2 bên.");
+  }
+
+  if (metrics.hipTilt > 0.05) {
+    score -= 6;
+    mistakes.push("Hông lệch trục");
+    suggestions.push("Căn lại hông về giữa trước khi tăng tốc độ ra đòn.");
+    detailNotes.push("Trục hông chưa cân bằng, ảnh hưởng truyền lực toàn thân.");
+  }
+
+  if (poseHitRate < 0.6) {
+    score -= 8;
+    mistakes.push("Pose nhận diện chưa ổn định");
+    suggestions.push("Đứng xa camera hơn một chút, đủ sáng và lấy toàn thân vào khung hình.");
+    detailNotes.push("Nhiều frame mất pose khiến đánh giá kỹ thuật thiếu liên tục.");
+  } else {
+    detailNotes.push("Tín hiệu video ổn, AI theo dõi pose khá liên tục.");
+  }
 
   if (uploadKind === "image") {
-    return {
-      score: baseScore - 2,
-      mistakes: ["Lech hong", "Tay ha thap"],
-      suggestions: [
-        "Xoay hong thang huong tan cong de truyen luc tot hon.",
-        "Nang tay truoc cao ngang cam de giu guard.",
-      ],
-    };
+    detailNotes.push("Nguồn là ảnh tĩnh, nhận xét thiên về tư thế tại một thời điểm.");
+  } else {
+    detailNotes.push("Nguồn là video/camera, nhận xét phản ánh cả nhịp chuyển động.");
+  }
+
+  if (mistakes.length === 0) {
+    mistakes.push("Không phát hiện lỗi lớn");
+    suggestions.push("Giữ nhịp thở đều và tiếp tục tập chậm 2-3 nhịp đầu để ổn định form.");
   }
 
   return {
-    score: baseScore,
-    mistakes: ["Lech hong", "Tay ha thap"],
-    suggestions: [
-      "Can tam co bung, giu hong on dinh khi chuyen tru.",
-      "Khoa vai va giu khuuyu tay truoc cao hon trong pha don.",
-      "Tap cham 3 nhiep dau de chuan hoa bien do dong tac.",
-    ],
+    score: Math.max(35, Math.min(98, Math.round(score))),
+    mistakes,
+    suggestions,
+    detailNotes,
   };
 }
 
@@ -120,6 +214,14 @@ export default function PoseCoach() {
   const lastUiUpdateRef = useRef(0);
   const lastDetectRef = useRef(0);
   const lastPoseRef = useRef(null);
+  const poseStatsRef = useRef({
+    seenFrames: 0,
+    noPoseFrames: 0,
+    stanceRatios: [],
+    kneeAngles: [],
+    shoulderTilts: [],
+    hipTilts: [],
+  });
   const uploadUrlRef = useRef("");
   const checkButtonRef = useRef(null);
 
@@ -134,6 +236,39 @@ export default function PoseCoach() {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisResult, setAnalysisResult] = useState(null);
 
+  const resetPoseStats = () => {
+    poseStatsRef.current = {
+      seenFrames: 0,
+      noPoseFrames: 0,
+      stanceRatios: [],
+      kneeAngles: [],
+      shoulderTilts: [],
+      hipTilts: [],
+    };
+  };
+
+  const pushPoseStats = (pose) => {
+    const stats = poseStatsRef.current;
+    if (!stats) return;
+
+    if (!pose) {
+      stats.noPoseFrames += 1;
+      return;
+    }
+
+    const metrics = collectPoseMetrics(pose);
+    if (!metrics) {
+      stats.noPoseFrames += 1;
+      return;
+    }
+
+    stats.seenFrames += 1;
+    if (metrics.stanceRatio > 0) stats.stanceRatios.push(metrics.stanceRatio);
+    if (metrics.kneeAvg > 0) stats.kneeAngles.push(metrics.kneeAvg);
+    if (metrics.shoulderTilt > 0) stats.shoulderTilts.push(metrics.shoulderTilt);
+    if (metrics.hipTilt > 0) stats.hipTilts.push(metrics.hipTilt);
+  };
+
   const stop = async ({ statusText } = {}) => {
     const wasCamera = Boolean(streamRef.current);
     const hadUpload = Boolean(uploadUrlRef.current);
@@ -146,6 +281,7 @@ export default function PoseCoach() {
 
     lastDetectRef.current = 0;
     lastPoseRef.current = null;
+    resetPoseStats();
 
     if (rafRef.current) {
       cancelAnimationFrame(rafRef.current);
@@ -195,6 +331,7 @@ export default function PoseCoach() {
     setError("");
     setAnalysisResult(null);
     setIsAnalyzing(false);
+    resetPoseStats();
     await stop({ statusText: "Chưa bật camera." });
 
     const prev = uploadUrlRef.current;
@@ -292,6 +429,10 @@ export default function PoseCoach() {
         pose = null;
       }
 
+      lastPoseRef.current = pose;
+      resetPoseStats();
+      pushPoseStats(pose);
+
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       if (pose) {
         draw.drawConnectors(pose, PoseLandmarker.POSE_CONNECTIONS, {
@@ -331,6 +472,7 @@ export default function PoseCoach() {
     }
 
     setStatus("Đang tải video…");
+    resetPoseStats();
 
     try {
       video.pause();
@@ -430,6 +572,7 @@ export default function PoseCoach() {
           }
 
           lastPoseRef.current = pose;
+          pushPoseStats(pose);
 
           if (pose) {
             if (t - lastUiUpdateRef.current > 450) {
@@ -542,6 +685,7 @@ export default function PoseCoach() {
     }
 
     setStatus("Đang xin quyền camera…");
+    resetPoseStats();
 
     let stream;
     try {
@@ -673,6 +817,7 @@ export default function PoseCoach() {
           }
 
           lastPoseRef.current = pose;
+          pushPoseStats(pose);
 
           if (pose) {
             if (t - lastUiUpdateRef.current > 450) {
@@ -728,8 +873,23 @@ export default function PoseCoach() {
       window.setTimeout(resolve, 2000);
     });
 
-    const nextResult = buildDemoResult({
-      hasVideoSource: enabled || uploadKind === "video",
+    const stats = poseStatsRef.current;
+    const poseFrames = Number(stats?.seenFrames) || 0;
+    const missingFrames = Number(stats?.noPoseFrames) || 0;
+    const totalFrames = poseFrames + missingFrames;
+    const poseHitRate = totalFrames > 0 ? poseFrames / totalFrames : 0;
+
+    const latestMetrics = collectPoseMetrics(lastPoseRef.current);
+    const mergedMetrics = {
+      stanceRatio: avg([avg(stats?.stanceRatios), latestMetrics?.stanceRatio]),
+      kneeAvg: avg([avg(stats?.kneeAngles), latestMetrics?.kneeAvg]),
+      shoulderTilt: avg([avg(stats?.shoulderTilts), latestMetrics?.shoulderTilt]),
+      hipTilt: avg([avg(stats?.hipTilts), latestMetrics?.hipTilt]),
+    };
+
+    const nextResult = buildFormCheckReport({
+      metrics: mergedMetrics,
+      poseHitRate,
       uploadKind,
     });
 
@@ -760,7 +920,7 @@ export default function PoseCoach() {
   }, []);
 
   return (
-    <section className="rounded-3xl border border-white/10 bg-white/5 p-6 sm:p-8 shadow-[var(--shadow-card)]">
+    <section className="rounded-3xl border border-white/10 bg-white/5 p-6 sm:p-8 shadow-(--shadow-card)">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
           <h2 className="text-lg font-semibold text-white">AI Pose Coach</h2>
@@ -776,7 +936,7 @@ export default function PoseCoach() {
             className={
               enabled
                 ? "inline-flex h-11 items-center justify-center rounded-2xl border border-white/10 bg-white/5 px-4 text-sm font-semibold text-white transition hover:bg-white/10 active:scale-[0.99] focus:outline-none focus:ring-2 focus:ring-blue-400/30"
-                : "inline-flex h-11 items-center justify-center rounded-2xl bg-gradient-to-r from-blue-400 to-blue-600 px-4 text-sm font-semibold text-slate-950 transition hover:brightness-110 active:scale-[0.99] focus:outline-none focus:ring-2 focus:ring-blue-400/50"
+                : "inline-flex h-11 items-center justify-center rounded-2xl bg-linear-to-r from-blue-400 to-blue-600 px-4 text-sm font-semibold text-slate-950 transition hover:brightness-110 active:scale-[0.99] focus:outline-none focus:ring-2 focus:ring-blue-400/50"
             }
           >
             {enabled ? (streamRef.current ? "Tắt camera" : "Dừng phân tích") : "Bật camera"}
@@ -787,7 +947,7 @@ export default function PoseCoach() {
             type="button"
             onClick={runDemoCheck}
             disabled={isAnalyzing}
-            className="inline-flex h-11 items-center justify-center rounded-2xl bg-gradient-to-r from-cyan-300 to-blue-500 px-4 text-sm font-semibold text-slate-950 transition hover:brightness-110 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-70 focus:outline-none focus:ring-2 focus:ring-cyan-300/50"
+            className="inline-flex h-11 items-center justify-center rounded-2xl bg-linear-to-r from-cyan-300 to-blue-500 px-4 text-sm font-semibold text-slate-950 transition hover:brightness-110 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-70 focus:outline-none focus:ring-2 focus:ring-cyan-300/50"
           >
             {isAnalyzing ? "AI analyzing..." : "Check form"}
           </button>
@@ -862,7 +1022,7 @@ export default function PoseCoach() {
 
             <div className="mt-2 h-2 overflow-hidden rounded-full bg-white/10">
               <div
-                className="progress-bar h-full rounded-full bg-gradient-to-r from-cyan-300 to-blue-500"
+                className="progress-bar h-full rounded-full bg-linear-to-r from-cyan-300 to-blue-500"
                 style={{ width: `${analysisResult.score}%` }}
               />
             </div>
@@ -885,6 +1045,15 @@ export default function PoseCoach() {
                   ))}
                 </ul>
               </div>
+            </div>
+
+            <div className="mt-3 rounded-xl border border-cyan-200/20 bg-slate-950/30 p-3">
+              <div className="text-xs font-semibold text-cyan-100">Nhận xét chi tiết</div>
+              <ul className="mt-1 grid gap-1 text-sm text-slate-100">
+                {analysisResult.detailNotes.map((item) => (
+                  <li key={item}>- {item}</li>
+                ))}
+              </ul>
             </div>
           </div>
         ) : null}
