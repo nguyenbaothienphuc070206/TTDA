@@ -1,7 +1,6 @@
 import LearningDashboard from "@/components/LearningDashboard";
 import MotivationPanel from "@/components/MotivationPanel";
 import OfflineMeshPanel from "@/components/OfflineMeshPanel";
-import TechniqueFeedbackSection from "@/components/TechniqueFeedbackSection";
 import Link from "next/link";
 import { getLocale } from "next-intl/server";
 
@@ -16,7 +15,7 @@ function getCopy(locale) {
     return {
       title: "Course (Learning Dashboard)",
       description:
-        "Organized by all belt levels from Blue Self-Defense to Red Level 4, with progress tracking and a built-in technique feedback section.",
+        "Organized by all belt levels from Blue Self-Defense to Red Level 4, with automatic progress tracking based on completed lessons.",
       chip: "14 Belt Levels",
       quickTechniqueFeedback: "Technique Feedback",
       quickProgress: "Progress",
@@ -36,7 +35,7 @@ function getCopy(locale) {
     return {
       title: "コース（Learning Dashboard）",
       description:
-        "青帯護身から紅帯四級まで、全帯レベルで学習を整理。進捗管理に加えて技術フィードバック機能を提供します。",
+        "青帯護身から紅帯四級まで、全帯レベルで学習を整理。完了したレッスンに基づいて進捗を自動計算します。",
       chip: "14段階の帯",
       quickTechniqueFeedback: "技術フィードバック",
       quickProgress: "進捗",
@@ -55,7 +54,7 @@ function getCopy(locale) {
   return {
     title: "Khóa học (Learning Dashboard)",
     description:
-      "Phân chia đầy đủ theo cấp đai từ Lam đai tự vệ đến Hồng đai tứ, kèm theo chấm chữa kỹ thuật để bạn biết sai ở đâu và sửa thế nào.",
+      "Phân chia đầy đủ theo cấp đai từ Lam đai tự vệ đến Hồng đai tứ, và tự động tính tiến độ dựa trên bài học bạn đã đánh dấu hoàn thành.",
     chip: "14 cấp đai",
     quickTechniqueFeedback: "Chấm chữa kỹ thuật",
     quickProgress: "Tiến độ",
@@ -89,7 +88,7 @@ export default async function LearningDashboardPage() {
         </p>
 
         <div className="mt-4 flex flex-wrap gap-2">
-          <Link href="#cham-chua-ky-thuat" className="cta-secondary inline-flex h-9 items-center justify-center rounded-2xl px-3 text-xs font-semibold text-white">
+          <Link href="/cham-chua" className="cta-secondary inline-flex h-9 items-center justify-center rounded-2xl px-3 text-xs font-semibold text-white">
             {copy.quickTechniqueFeedback}
           </Link>
           <Link href="/tien-do" className="cta-secondary inline-flex h-9 items-center justify-center rounded-2xl px-3 text-xs font-semibold text-white">
@@ -106,7 +105,7 @@ export default async function LearningDashboardPage() {
           title={copy.motivationTitle}
           message={copy.motivationMessage}
           points={[copy.motivationPoint1, copy.motivationPoint2, copy.motivationPoint3]}
-          primaryHref="#cham-chua-ky-thuat"
+          primaryHref="/cham-chua"
           primaryLabel={copy.motivationPrimary}
           secondaryHref="/tien-do"
           secondaryLabel={copy.motivationSecondary}
@@ -114,8 +113,6 @@ export default async function LearningDashboardPage() {
       </div>
 
       <LearningDashboard />
-
-      <TechniqueFeedbackSection />
 
       <div className="mt-6">
         <OfflineMeshPanel />

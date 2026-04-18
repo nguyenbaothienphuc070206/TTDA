@@ -5,5 +5,5 @@ export const metadata = {
 };
 
 export default function FormCheckPage() {
-  redirect("/hoc-tap#cham-chua-ky-thuat");
+  redirect("/cham-chua");
 }

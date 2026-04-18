@@ -102,7 +102,7 @@ export default async function SiteFooter() {
               </details>
 
               {!pitchMode ? <FooterLink href="/cong-dong">{t("links.community")}</FooterLink> : null}
-              <FooterLink href="/hoc-tap#cham-chua-ky-thuat">{t("links.formCheck")}</FooterLink>
+              <FooterLink href="/cham-chua">{t("links.formCheck")}</FooterLink>
               <FooterLink href="/tien-do">{t("links.progress")}</FooterLink>
               <FooterLink href="/cua-hang">{t("links.shop")}</FooterLink>
               <FooterLink href="/ho-so">{t("links.profile")}</FooterLink>
