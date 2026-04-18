@@ -3,7 +3,6 @@ import { getLocale } from "next-intl/server";
 
 import JourneyStarterPanel from "@/components/JourneyStarterPanel";
 import MotivationPanel from "@/components/MotivationPanel";
-import { isPitchModeEnabled } from "@/lib/pitchMode";
 
 export const metadata = {
   title: "Learning",
@@ -73,14 +72,13 @@ function getCopy(locale) {
       motivationPoint2: "Clean form beats fast reps",
       motivationPoint3: "Short sessions can still be high quality",
       motivationPrimary: "Start one lesson",
-      motivationSecondary: "Plan this week",
-      roadmap: "Roadmap",
-      techniques: "Techniques",
-      schedule: "Schedule",
-      nutrition: "Nutrition",
+      motivationSecondary: "View progress",
+      course: "Course",
+      video: "Video",
+      formCheck: "Technique Feedback",
       progress: "Progress",
-      aiCoach: "AI Coach",
-      formCheck: "AI Form Check",
+      community: "Community",
+      techniques: "Techniques",
     };
   }
 
@@ -107,20 +105,19 @@ function getCopy(locale) {
       motivationPoint2: "速さより正確なフォーム",
       motivationPoint3: "短時間でも質は高められる",
       motivationPrimary: "1レッスン開始",
-      motivationSecondary: "今週を計画",
-      roadmap: "ロードマップ",
-      techniques: "技術",
-      schedule: "スケジュール",
-      nutrition: "栄養",
+      motivationSecondary: "進捗を見る",
+      course: "コース",
+      video: "動画",
+      formCheck: "技術フィードバック",
       progress: "進捗",
-      aiCoach: "AIコーチ",
-      formCheck: "AIフォームチェック",
+      community: "コミュニティ",
+      techniques: "技術",
     };
   }
 
   return {
     title: "Learning",
-    intro: "Core flow cho người mới: AI Coach tạo buổi tập mỗi ngày, AI Form Check sửa form, rồi vào đúng bài cần học.",
+    intro: "Trung tâm học tập gọn: vào khóa học, xem video kỹ thuật, chấm chữa và theo dõi tiến độ.",
     eyebrow: "Training Hub",
     courseTitle: "Course",
     courseDesc: "Dashboard khóa học theo hệ 14 cấp đai và tiến độ bài học.",
@@ -140,21 +137,19 @@ function getCopy(locale) {
     motivationPoint2: "Đúng form quan trọng hơn tập nhanh",
     motivationPoint3: "Buổi ngắn vẫn có thể rất chất lượng",
     motivationPrimary: "Bắt đầu 1 bài",
-    motivationSecondary: "Lên lịch tuần này",
-    roadmap: "Roadmap",
+    motivationSecondary: "Xem tiến độ",
+    course: "Khóa học",
+    video: "Video",
+    formCheck: "Chấm chữa kỹ thuật",
+    progress: "Tiến độ",
+    community: "Cộng đồng",
     techniques: "Techniques",
-    schedule: "Schedule",
-    nutrition: "Nutrition",
-    progress: "Progress",
-    aiCoach: "AI Coach",
-    formCheck: "AI Form Check",
   };
 }
 
 export default async function LearningHubPage() {
   const locale = await getLocale();
   const copy = getCopy(locale);
-  const pitchMode = isPitchModeEnabled();
 
   return (
     <div className="mx-auto w-full max-w-6xl px-4 py-10">
@@ -198,33 +193,17 @@ export default async function LearningHubPage() {
         />
       </div>
 
-      <section className="mt-6 rounded-3xl border border-emerald-300/20 bg-emerald-400/10 p-6 shadow-(--shadow-card)">
-        <p className="text-xs font-semibold uppercase tracking-wide text-emerald-100">Pitch focus</p>
-        <h2 className="mt-1 text-lg font-semibold text-white">AI Coach + AI Form Check là trục chính</h2>
-        <p className="mt-2 text-sm leading-6 text-slate-200">
-          Khi bật chế độ pitch, điều hướng học tập được rút gọn để judge thấy rõ vòng lặp cốt lõi: tạo buổi tập, sửa form ngay,
-          rồi bấm hoàn thành để giữ streak.
-        </p>
-        <div className="mt-4 flex flex-wrap gap-2">
-          <QuickLink href="/ai-coach">{copy.aiCoach}</QuickLink>
-          <QuickLink href="/form-check">{copy.formCheck}</QuickLink>
-          <QuickLink href="/tien-do">{copy.progress}</QuickLink>
-        </div>
-      </section>
-
       <section className="mt-6 rounded-3xl border border-white/10 bg-white/5 p-6 shadow-(--shadow-card)">
         <h2 className="text-sm font-semibold text-white">{copy.quickTools}</h2>
         <p className="mt-2 text-sm leading-6 text-slate-300">
           {copy.quickDesc}
         </p>
         <div className="mt-4 flex flex-wrap gap-2">
-          <QuickLink href="/lo-trinh">{copy.roadmap}</QuickLink>
-          <QuickLink href="/ky-thuat">{copy.techniques}</QuickLink>
-          <QuickLink href="/lich-tap">{copy.schedule}</QuickLink>
-          {!pitchMode ? <QuickLink href="/dinh-duong">{copy.nutrition}</QuickLink> : null}
+          <QuickLink href="/hoc-tap">{copy.course}</QuickLink>
+          <QuickLink href="/video">{copy.video}</QuickLink>
+          <QuickLink href="/cham-chua">{copy.formCheck}</QuickLink>
           <QuickLink href="/tien-do">{copy.progress}</QuickLink>
-          <QuickLink href="/ai-coach">{copy.aiCoach}</QuickLink>
-          <QuickLink href="/form-check">{copy.formCheck}</QuickLink>
+          <QuickLink href="/cong-dong">{copy.community}</QuickLink>
         </div>
       </section>
 
@@ -235,7 +214,7 @@ export default async function LearningHubPage() {
           points={[copy.motivationPoint1, copy.motivationPoint2, copy.motivationPoint3]}
           primaryHref="/hoc-tap"
           primaryLabel={copy.motivationPrimary}
-          secondaryHref="/lich-tap"
+          secondaryHref="/tien-do"
           secondaryLabel={copy.motivationSecondary}
         />
       </div>
