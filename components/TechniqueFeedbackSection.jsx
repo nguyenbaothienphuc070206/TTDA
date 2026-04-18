@@ -1,19 +1,19 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 const TECHNIQUES = [
   {
     id: "da-tong-truoc",
     title: "Đá tống trước",
-    videoNormal: "Video chuẩn (normal)",
-    videoSlow: "Video chuẩn (slow 0.5x)",
+    videoNormal: "Video chuẩn (thường)",
+    videoSlow: "Video chuẩn (chậm 0.5x)",
     checklist: [
       "Nâng gối đúng hướng (ngang hông)",
       "Giữ trục cơ thể thẳng",
       "Duỗi chân dứt khoát",
       "Thu chân về nhanh",
-      "Giữ tay guard ổn định",
+      "Giữ tay gác (guard) ổn định",
     ],
     commonErrors: [
       "Ngả người ra sau -> mất thăng bằng",
@@ -25,25 +25,21 @@ const TECHNIQUES = [
       "Tập trước gương",
       "Giữ gối cố định 1 giây trước khi đá",
     ],
+    progressFocus: "Giữ trục cơ thể tốt hơn",
+    attentionFocus: "Thu chân nhanh sau khi đá",
+    errorTags: ["Lệch trục", "Gối lệch", "Guard chưa ổn", "Thu chân chậm", "Sai nhịp"],
     goal: "Đá ổn định 10 lần liên tiếp mà không mất thăng bằng.",
-    sampleFeedback: {
-      rating: 3,
-      comment:
-        "Gối đang lệch nhẹ nên lực chưa tốt. Giữ gối thẳng trước hông và giảm tốc độ để kiểm soát.",
-      suggestion: "Tập chậm 10 lần trước gương mỗi ngày, tập trung giữ trục.",
-      mainErrors: ["Lệch trục", "Guard chưa ổn"],
-    },
   },
   {
     id: "dam-thang",
     title: "Đấm thẳng",
-    videoNormal: "Video mẫu đấm thẳng (normal)",
-    videoSlow: "Video mẫu đấm thẳng (slow 0.5x)",
+    videoNormal: "Video mẫu đấm thẳng (thường)",
+    videoSlow: "Video mẫu đấm thẳng (chậm 0.5x)",
     checklist: [
       "Lực đi từ chân -> hông -> tay",
       "Vai không nhô cao",
       "Thu tay về nhanh",
-      "Tay còn lại giữ guard",
+      "Tay còn lại giữ gác",
     ],
     commonErrors: [
       "Đấm bằng tay đơn thuần -> lực yếu",
@@ -51,19 +47,16 @@ const TECHNIQUES = [
       "Mất nhịp thở",
     ],
     fixes: ["Tập shadow boxing chậm", "Nhấn hông khi ra đòn", "Giữ nhịp thở đều"],
+    progressFocus: "Nhịp đòn ổn định hơn",
+    attentionFocus: "Thu tay nhanh và kín hơn",
+    errorTags: ["Thu tay chậm", "Vai nâng cao", "Guard hở", "Mất nhịp thở"],
     goal: "Thực hiện 20 cú đấm thẳng liên tục, form không vỡ.",
-    sampleFeedback: {
-      rating: 4,
-      comment: "Form khá ổn. Cần thu tay nhanh hơn để tránh hở khi phản công.",
-      suggestion: "Tập chuỗi 3 đòn với nhịp cố định, ưu tiên tốc độ thu tay.",
-      mainErrors: ["Thu tay chậm"],
-    },
   },
   {
     id: "tan-trung-binh",
     title: "Tấn trung bình",
-    videoNormal: "Video tấn trung bình (normal)",
-    videoSlow: "Video tấn trung bình (slow 0.5x)",
+    videoNormal: "Video tấn trung bình (thường)",
+    videoSlow: "Video tấn trung bình (chậm 0.5x)",
     checklist: [
       "Gối theo hướng mũi chân",
       "Lưng giữ thẳng",
@@ -72,19 +65,16 @@ const TECHNIQUES = [
     ],
     commonErrors: ["Gối đổ vào trong", "Lưng cong", "Nhấc gót chân trụ"],
     fixes: ["Giữ tấn 30 giây", "Tập trước gương", "Giảm biên độ để giữ form"],
+    progressFocus: "Trọng tâm ổn định hơn",
+    attentionFocus: "Giữ lưng thẳng khi cuối hiệp",
+    errorTags: ["Lưng cong", "Gối đổ vào trong", "Mất trọng tâm", "Nhịp thở rối"],
     goal: "Giữ tấn chuẩn 30 giây x 3 hiệp, không gãy lưng.",
-    sampleFeedback: {
-      rating: 3,
-      comment: "Lưng hơi gập ở cuối hiệp, cần giảm biên độ và giữ nhịp ổn định.",
-      suggestion: "Chia hiệp ngắn hơn và tăng dần thời gian giữ tấn.",
-      mainErrors: ["Lưng cong", "Mất trọng tâm"],
-    },
   },
   {
     id: "da-vong-cau",
     title: "Đá vòng cầu",
-    videoNormal: "Video đá vòng cầu (normal)",
-    videoSlow: "Video đá vòng cầu (slow 0.5x)",
+    videoNormal: "Video đá vòng cầu (thường)",
+    videoSlow: "Video đá vòng cầu (chậm 0.5x)",
     checklist: [
       "Xoay hông rõ ràng",
       "Chân trụ xoay đúng hướng",
@@ -93,19 +83,16 @@ const TECHNIQUES = [
     ],
     commonErrors: ["Không xoay hông -> mất lực", "Chân trụ đứng cứng", "Đá xong mất thăng bằng"],
     fixes: ["Tập riêng động tác xoay hông", "Tập đá thấp trước", "Giữ trục khi thu chân"],
+    progressFocus: "Xoay hông đúng nhịp hơn",
+    attentionFocus: "Chân trụ cần xoay đủ góc",
+    errorTags: ["Chân trụ không xoay", "Mất thăng bằng", "Thiếu xoay hông", "Thu chân chậm"],
     goal: "Đá vòng cầu 10 lần mỗi bên, giữ trục ổn định.",
-    sampleFeedback: {
-      rating: 2,
-      comment: "Chân trụ chưa xoay đủ nên đòn thiếu lực và mất cân bằng.",
-      suggestion: "Tập drill xoay chân trụ độc lập trước khi ghép đòn hoàn chỉnh.",
-      mainErrors: ["Chân trụ không xoay", "Mất thăng bằng"],
-    },
   },
   {
     id: "thoat-nam-co-tay",
     title: "Thoát nắm cổ tay",
-    videoNormal: "Video thoát nắm cổ tay (normal)",
-    videoSlow: "Video thoát nắm cổ tay (slow 0.5x)",
+    videoNormal: "Video thoát nắm cổ tay (thường)",
+    videoSlow: "Video thoát nắm cổ tay (chậm 0.5x)",
     checklist: [
       "Xoay theo hướng ngón cái",
       "Bước góc để tạo không gian",
@@ -114,21 +101,144 @@ const TECHNIQUES = [
     ],
     commonErrors: ["Kéo thẳng tay -> khó thoát", "Không bước góc", "Ra đòn quá chậm"],
     fixes: ["Tập chậm theo từng bước", "Đánh dấu vị trí chân", "Luyện phản xạ theo nhịp"],
+    progressFocus: "Bước góc rõ hơn trước",
+    attentionFocus: "Tăng độ dứt khoát khi giật tay",
+    errorTags: ["Sai hướng xoay", "Không bước góc", "Thiếu dứt khoát", "Phản xạ chậm"],
     goal: "Thoát nắm chính xác 8/10 lần với cùng một setup.",
-    sampleFeedback: {
-      rating: 4,
-      comment: "Hướng xoay đã đúng, cần tăng độ dứt khoát ở pha giật tay.",
-      suggestion: "Luyện 3 hiệp x 10 lần, tập trung bước góc trước khi giật.",
-      mainErrors: ["Thiếu dứt khoát"],
-    },
   },
 ];
 
 const STORAGE_KEY = "vovinam-technique-feedback-v1";
+const ANALYSIS_STEPS = [
+  "Đang tải video...",
+  "Đang phân tích chuyển động...",
+  "Đang kiểm tra trục cơ thể...",
+  "Đang đánh giá kỹ thuật...",
+];
+
+const FEEDBACK_PROFILES = {
+  1: {
+    title: "Cần cải thiện nhiều",
+    comments: [
+      "Kỹ thuật chưa đúng, trục cơ thể lệch rõ và nhịp ra đòn chưa ổn.",
+      "Bạn đang mất kiểm soát ở nhiều pha, cần quay lại bước cơ bản.",
+    ],
+    suggestions: [
+      "Tập lại từ đầu với tốc độ chậm, tập trung từng bước.",
+      "Giảm cường độ và luyện theo checklist trước gương mỗi ngày.",
+    ],
+    scoreRange: [2, 5],
+  },
+  2: {
+    title: "Cần cải thiện",
+    comments: [
+      "Bạn đã nắm ý chính nhưng form chưa ổn định, dễ mất thăng bằng.",
+      "Kỹ thuật còn rời rạc, nhịp và trục chưa phối hợp tốt.",
+    ],
+    suggestions: [
+      "Tập chậm trước gương và kiểm soát từng động tác.",
+      "Tách bài thành từng đoạn ngắn, hoàn thiện từng đoạn rồi ghép lại.",
+    ],
+    scoreRange: [4, 6],
+  },
+  3: {
+    title: "Ổn nhưng cần cải thiện",
+    comments: [
+      "Form cơ bản đã có, nhưng một vài pha vẫn thiếu ổn định.",
+      "Kỹ thuật tạm ổn, cần chỉnh thêm để đòn chắc và an toàn hơn.",
+    ],
+    suggestions: [
+      "Tập chậm 10 lần trước gương mỗi ngày.",
+      "Giữ nhịp đều, ưu tiên độ chính xác trước tốc độ.",
+    ],
+    scoreRange: [5, 8],
+  },
+  4: {
+    title: "Khá tốt",
+    comments: [
+      "Form khá ổn, chỉ cần tăng độ dứt khoát ở pha kết thúc.",
+      "Bạn kiểm soát tốt, có thể nâng tốc độ dần để tối ưu hiệu quả.",
+    ],
+    suggestions: [
+      "Tăng tốc dần sau khi đã kiểm soát chắc kỹ thuật.",
+      "Thêm 1 hiệp tốc độ vừa để cải thiện nhịp phản xạ.",
+    ],
+    scoreRange: [7, 9],
+  },
+  5: {
+    title: "Rất tốt",
+    comments: [
+      "Kỹ thuật tốt, giữ được trục và nhịp ổn định.",
+      "Động tác gọn và có kiểm soát, bạn có thể chuyển sang biến thể nâng cao.",
+    ],
+    suggestions: [
+      "Giữ nhịp hiện tại và thêm bài nâng cao để mở rộng kỹ năng.",
+      "Duy trì chất lượng động tác, sau đó tăng cường độ theo chu kỳ.",
+    ],
+    scoreRange: [8, 10],
+  },
+};
+
+function pickRandom(items) {
+  return items[Math.floor(Math.random() * items.length)];
+}
+
+function clamp(value, min, max) {
+  return Math.max(min, Math.min(max, value));
+}
+
+function sampleErrors(candidates, count) {
+  if (!Array.isArray(candidates) || !candidates.length || count <= 0) return [];
+  const pool = [...candidates];
+  const output = [];
+
+  while (pool.length && output.length < count) {
+    const idx = Math.floor(Math.random() * pool.length);
+    output.push(pool[idx]);
+    pool.splice(idx, 1);
+  }
+
+  return output;
+}
+
+function randomScore(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function generateFeedback(technique, previousRating) {
+  const rating = Math.floor(Math.random() * 5) + 1;
+  const profile = FEEDBACK_PROFILES[rating];
+
+  let errorCount = 0;
+  if (rating === 1) errorCount = 3;
+  if (rating === 2) errorCount = 2;
+  if (rating === 3) errorCount = 2;
+  if (rating === 4) errorCount = 1;
+
+  const errors = sampleErrors(technique.errorTags, errorCount);
+  const [minScore, maxScore] = profile.scoreRange;
+
+  return {
+    rating,
+    title: profile.title,
+    comment: pickRandom(profile.comments),
+    suggestion: pickRandom(profile.suggestions),
+    errors,
+    previousRating,
+    delta: rating - previousRating,
+    progressHighlight: technique.progressFocus,
+    attentionHighlight: technique.attentionFocus,
+    breakdown: {
+      axis: clamp(randomScore(minScore, maxScore) + (rating >= 4 ? 1 : 0), 1, 10),
+      speed: clamp(randomScore(minScore, maxScore), 1, 10),
+      control: clamp(randomScore(minScore, maxScore) + (rating >= 3 ? 1 : 0), 1, 10),
+    },
+  };
+}
 
 function Stars({ value, onChange }) {
   return (
-    <div className="flex items-center gap-1" aria-label="Self rating">
+    <div className="flex items-center gap-1" aria-label="Tự đánh giá">
       {[1, 2, 3, 4, 5].map((star) => {
         const active = star <= value;
         return (
@@ -142,7 +252,7 @@ function Stars({ value, onChange }) {
                 ? "border-amber-300/40 bg-amber-300/15 text-amber-200"
                 : "border-white/15 bg-white/5 text-slate-300 hover:bg-white/10")
             }
-            aria-label={`Rate ${star} star`}
+            aria-label={`Đánh giá ${star} sao`}
           >
             ★
           </button>
@@ -158,7 +268,13 @@ export default function TechniqueFeedbackSection() {
   const [rating, setRating] = useState(0);
   const [note, setNote] = useState("");
   const [fileName, setFileName] = useState("");
-  const [submitted, setSubmitted] = useState(false);
+  const [analysisState, setAnalysisState] = useState("idle");
+  const [analysisStep, setAnalysisStep] = useState("");
+  const [analysisProgress, setAnalysisProgress] = useState(0);
+  const [feedbackResult, setFeedbackResult] = useState(null);
+  const [lastRatingByTechnique, setLastRatingByTechnique] = useState({});
+  const intervalRef = useRef(null);
+  const timeoutRef = useRef(null);
 
   const technique = useMemo(
     () => TECHNIQUES.find((item) => item.id === techniqueId) || TECHNIQUES[0],
@@ -177,7 +293,11 @@ export default function TechniqueFeedbackSection() {
       setRating(Number(parsed.rating) || 0);
       setNote(String(parsed.note || ""));
       setFileName(String(parsed.fileName || ""));
-      setSubmitted(Boolean(parsed.submitted));
+      setAnalysisState(parsed.analysisState || "idle");
+      setAnalysisStep(String(parsed.analysisStep || ""));
+      setAnalysisProgress(Number(parsed.analysisProgress) || 0);
+      setFeedbackResult(parsed.feedbackResult || null);
+      setLastRatingByTechnique(parsed.lastRatingByTechnique || {});
     } catch {
       // Ignore malformed localStorage values.
     }
@@ -190,10 +310,36 @@ export default function TechniqueFeedbackSection() {
       rating,
       note,
       fileName,
-      submitted,
+      analysisState,
+      analysisStep,
+      analysisProgress,
+      feedbackResult,
+      lastRatingByTechnique,
     };
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
-  }, [techniqueId, checks, rating, note, fileName, submitted]);
+  }, [
+    techniqueId,
+    checks,
+    rating,
+    note,
+    fileName,
+    analysisState,
+    analysisStep,
+    analysisProgress,
+    feedbackResult,
+    lastRatingByTechnique,
+  ]);
+
+  useEffect(() => {
+    return () => {
+      if (intervalRef.current) {
+        window.clearInterval(intervalRef.current);
+      }
+      if (timeoutRef.current) {
+        window.clearTimeout(timeoutRef.current);
+      }
+    };
+  }, []);
 
   const toggleCheck = (item) => {
     setChecks((prev) => {
@@ -210,6 +356,60 @@ export default function TechniqueFeedbackSection() {
 
   const checkedMap = checks[technique.id] || {};
   const checkedCount = technique.checklist.filter((item) => checkedMap[item]).length;
+
+  const runAnalysis = () => {
+    if (intervalRef.current) {
+      window.clearInterval(intervalRef.current);
+    }
+    if (timeoutRef.current) {
+      window.clearTimeout(timeoutRef.current);
+    }
+
+    setAnalysisState("running");
+    setAnalysisProgress(0);
+    setFeedbackResult(null);
+
+    let idx = 0;
+    setAnalysisStep(ANALYSIS_STEPS[0]);
+
+    intervalRef.current = window.setInterval(() => {
+      setAnalysisStep(ANALYSIS_STEPS[idx]);
+      setAnalysisProgress(Math.round(((idx + 1) / ANALYSIS_STEPS.length) * 100));
+      idx += 1;
+
+      if (idx >= ANALYSIS_STEPS.length) {
+        window.clearInterval(intervalRef.current);
+        intervalRef.current = null;
+
+        timeoutRef.current = window.setTimeout(() => {
+          const previousRating = Number(lastRatingByTechnique[technique.id]) || 2;
+          const generated = generateFeedback(technique, previousRating);
+          setFeedbackResult(generated);
+          setLastRatingByTechnique((prev) => ({
+            ...prev,
+            [technique.id]: generated.rating,
+          }));
+          setAnalysisStep("Hoàn tất phân tích");
+          setAnalysisProgress(100);
+          setAnalysisState("done");
+        }, 800);
+      }
+    }, 700);
+  };
+
+  const resetResult = () => {
+    setAnalysisState("idle");
+    setAnalysisStep("");
+    setAnalysisProgress(0);
+    setFeedbackResult(null);
+  };
+
+  const ratingTone =
+    feedbackResult && feedbackResult.rating <= 2
+      ? "text-rose-200"
+      : feedbackResult && feedbackResult.rating === 3
+        ? "text-amber-200"
+        : "text-emerald-200";
 
   return (
     <section
@@ -233,7 +433,7 @@ export default function TechniqueFeedbackSection() {
               type="button"
               onClick={() => {
                 setTechniqueId(item.id);
-                setSubmitted(false);
+                resetResult();
               }}
               className={
                 "rounded-full border px-3 py-1.5 text-xs font-semibold transition " +
@@ -326,8 +526,11 @@ export default function TechniqueFeedbackSection() {
         </div>
 
         <div className="rounded-2xl border border-white/10 bg-slate-950/40 p-4">
-          <p className="text-sm font-semibold text-white">Gửi giáo viên chấm (Premium)</p>
-          <p className="mt-2 text-sm text-slate-300">Upload video kỹ thuật để nhận phản hồi chi tiết trong 12-24 giờ.</p>
+          <p className="text-sm font-semibold text-white">Gửi giáo viên chấm (nâng cao)</p>
+          <p className="mt-2 text-sm text-slate-300">Tải video kỹ thuật để nhận phản hồi chi tiết trong 12-24 giờ.</p>
+          <p className="mt-2 text-xs text-slate-400">
+            Demo hiện tại mô phỏng phản hồi giáo viên để thể hiện luồng học tập hoàn chỉnh.
+          </p>
 
           <label className="mt-3 inline-flex cursor-pointer items-center rounded-xl border border-white/15 bg-white/5 px-3 py-2 text-sm text-slate-200 hover:bg-white/10">
             <input
@@ -345,28 +548,67 @@ export default function TechniqueFeedbackSection() {
 
           <button
             type="button"
-            onClick={() => setSubmitted(true)}
+            onClick={runAnalysis}
             className="mt-3 inline-flex h-10 items-center justify-center rounded-xl bg-emerald-500 px-4 text-sm font-semibold text-slate-950 transition hover:bg-emerald-400"
           >
-            Upload video để được chấm
+            Tải video để được chấm
           </button>
 
-          {submitted ? (
+          {analysisState === "running" ? (
+            <div className="mt-4 rounded-xl border border-cyan-300/25 bg-cyan-400/10 p-3 text-sm text-slate-100">
+              <p className="font-semibold text-cyan-100">{analysisStep || "Đang chuẩn bị phân tích..."}</p>
+              <div className="mt-2 h-2 w-full overflow-hidden rounded-full border border-cyan-300/20 bg-slate-900/50">
+                <div
+                  className="h-full rounded-full bg-linear-to-r from-cyan-300 to-blue-500 transition-all"
+                  style={{ width: `${analysisProgress}%` }}
+                />
+              </div>
+              <p className="mt-2 text-xs text-slate-300">{analysisProgress}% hoàn tất</p>
+            </div>
+          ) : null}
+
+          {analysisState === "done" && feedbackResult ? (
             <div className="mt-4 rounded-xl border border-emerald-300/25 bg-emerald-400/10 p-3 text-sm text-slate-100">
-              <p className="font-semibold text-emerald-100">⭐ {technique.sampleFeedback.rating}/5 - Cần cải thiện</p>
-              <p className="mt-2">Nhận xét: {technique.sampleFeedback.comment}</p>
-              <p className="mt-2">Gợi ý: {technique.sampleFeedback.suggestion}</p>
-              <p className="mt-2">Lỗi chính: {technique.sampleFeedback.mainErrors.join(", ")}</p>
+              <p className={`font-semibold ${ratingTone}`}>
+                ⭐ {feedbackResult.rating}/5 - {feedbackResult.title}
+              </p>
+              <p className="mt-2"><strong>Nhận xét:</strong> {feedbackResult.comment}</p>
+              <p className="mt-2"><strong>Gợi ý:</strong> {feedbackResult.suggestion}</p>
+              <p className="mt-2">
+                <strong>Lỗi chính:</strong>{" "}
+                {feedbackResult.errors.length
+                  ? feedbackResult.errors.join(", ")
+                  : "Không có lỗi lớn"}
+              </p>
+
+              <div className="mt-3 rounded-lg border border-white/15 bg-white/5 p-2 text-xs">
+                <p>
+                  📈 So với lần trước: {feedbackResult.delta >= 0 ? "+" : ""}
+                  {feedbackResult.delta} sao
+                </p>
+                <p className="mt-1">🎯 Tiến bộ: {feedbackResult.progressHighlight}</p>
+                <p className="mt-1">⚠️ Cần chú ý: {feedbackResult.attentionHighlight}</p>
+              </div>
+
+              <div className="mt-3 rounded-lg border border-white/15 bg-white/5 p-2 text-xs">
+                <p className="font-semibold text-slate-100">Phân tích chi tiết</p>
+                <p className="mt-1">Trục cơ thể: {feedbackResult.breakdown.axis}/10</p>
+                <p>Tốc độ: {feedbackResult.breakdown.speed}/10</p>
+                <p>Kiểm soát: {feedbackResult.breakdown.control}/10</p>
+              </div>
+
               <button
                 type="button"
-                onClick={() => setSubmitted(false)}
+                onClick={resetResult}
                 className="mt-3 inline-flex rounded-lg border border-white/20 bg-white/10 px-3 py-1.5 text-xs font-semibold text-white hover:bg-white/15"
               >
                 Tập lại và gửi lại
               </button>
             </div>
           ) : (
-            <p className="mt-3 text-xs text-slate-400">Sau khi gửi sẽ hiển thị phản hồi mẫu để demo luồng học tập hoàn chỉnh.</p>
+            <p className="mt-3 text-xs text-slate-400">
+              Sau khi gửi sẽ chạy mô phỏng phân tích và trả phản hồi theo logic đánh giá 1-5 sao.
+            </p>
           )}
         </div>
       </div>
