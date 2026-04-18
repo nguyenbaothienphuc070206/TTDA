@@ -160,9 +160,6 @@ export default function SiteHeader() {
 
   const navItems = [
     { href: "/cong-dong", label: t("community") },
-    { href: "/lo-trinh", label: t("roadmap") },
-    { href: "/lich-tap", label: t("schedule") },
-    { href: "/dinh-duong", label: t("nutrition") },
     { href: "/cua-hang", label: t("store") },
     { href: "/ho-so", label: t("profile") },
   ].filter((item) => !(pitchMode && item.href === "/cong-dong"));

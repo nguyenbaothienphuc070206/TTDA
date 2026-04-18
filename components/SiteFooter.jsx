@@ -57,10 +57,10 @@ export default async function SiteFooter() {
                 {t("startLearning")}
               </Link>
               <Link
-                href="/lich-tap"
+                href="/cong-dong"
                 className="cta-secondary inline-flex h-11 items-center justify-center rounded-2xl px-4 text-sm font-semibold text-white transition focus:outline-none focus:ring-2 focus:ring-blue-400/30"
               >
-                {t("createSchedule")}
+                {t("links.community")}
               </Link>
             </div>
           </div>
@@ -102,12 +102,8 @@ export default async function SiteFooter() {
               </details>
 
               {!pitchMode ? <FooterLink href="/cong-dong">{t("links.community")}</FooterLink> : null}
-              <FooterLink href="/lo-trinh">{t("links.roadmap")}</FooterLink>
-              <FooterLink href="/lich-tap">{t("links.schedule")}</FooterLink>
-              <FooterLink href="/dinh-duong">{t("links.nutrition")}</FooterLink>
               <FooterLink href="/tien-do">{t("links.progress")}</FooterLink>
               <FooterLink href="/cua-hang">{t("links.shop")}</FooterLink>
-              <FooterLink href="/ai-coach">{t("links.aiCoach")}</FooterLink>
               <FooterLink href="/ho-so">{t("links.profile")}</FooterLink>
               <FooterLink href="/admin">{t("links.admin")}</FooterLink>
               <FooterLink href="/chinh-sach-bao-mat">{t("links.privacy")}</FooterLink>
@@ -133,7 +129,7 @@ export default async function SiteFooter() {
 
                   <div className="mt-3 grid gap-2">
                     {family.belts.map((belt) => (
-                      <FooterLink key={belt.id} href={`/lo-trinh#${belt.lessonLevel}`}>
+                      <FooterLink key={belt.id} href="/hoc-tap">
                         {belt.title}
                       </FooterLink>
                     ))}
