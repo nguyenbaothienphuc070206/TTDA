@@ -6,7 +6,6 @@ import { useTranslations } from "next-intl";
 const THEME_KEY = "vovinam_theme_v1";
 
 const THEMES = [
-  { id: "light" },
   { id: "dark" },
   { id: "vodo" },
 ];
@@ -18,7 +17,7 @@ function applyTheme(themeId) {
 
 function normalizeTheme(themeId) {
   const id = String(themeId || "");
-  return THEMES.some((t) => t.id === id) ? id : "light";
+  return THEMES.some((t) => t.id === id) ? id : "dark";
 }
 
 export default function ThemeToggle() {
@@ -26,7 +25,7 @@ export default function ThemeToggle() {
   const wrapRef = useRef(null);
   const [open, setOpen] = useState(false);
   const [theme, setTheme] = useState(() => {
-    if (typeof window === "undefined") return "light";
+    if (typeof window === "undefined") return "dark";
     return normalizeTheme(window.localStorage.getItem(THEME_KEY));
   });
 
@@ -36,7 +35,6 @@ export default function ThemeToggle() {
 
   const options = useMemo(() => {
     return [
-      { id: "light", label: t("light") },
       { id: "dark", label: t("dark") },
       { id: "vodo", label: t("vodo") },
     ];
@@ -90,14 +88,14 @@ export default function ThemeToggle() {
       >
         <span className="hidden sm:inline">{t("label")}</span>
         <span className="text-blue-200" suppressHydrationWarning>
-          {current?.label || t("light")}
+          {current?.label || t("dark")}
         </span>
       </button>
 
       {open ? (
         <div
           role="menu"
-          className="absolute right-0 z-60 mt-2 w-44 overflow-hidden rounded-2xl border border-white/10 bg-[color:var(--header-bg)] shadow-[var(--shadow-card)] backdrop-blur"
+          className="absolute right-0 z-60 mt-2 w-44 overflow-hidden rounded-2xl border border-white/10 bg-(--header-bg) shadow-(--shadow-card) backdrop-blur"
         >
           {options.map((opt) => {
             const active = theme === opt.id;
