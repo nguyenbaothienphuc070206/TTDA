@@ -1,7 +1,9 @@
 from typing import List
 
+from .model_runtime import predict_with_trained_model
 
-def calculate_score(user_pose: List[float], ideal_pose: List[float]) -> int:
+
+def _heuristic_score(user_pose: List[float], ideal_pose: List[float]) -> int:
     if not user_pose or not ideal_pose:
         return 0
 
@@ -15,8 +17,32 @@ def calculate_score(user_pose: List[float], ideal_pose: List[float]) -> int:
     return int(min(100, score))
 
 
-def build_feedback(user_pose: List[float], ideal_pose: List[float]):
+def calculate_score(user_pose: List[float], ideal_pose: List[float], technique: str = "tan-co-ban") -> int:
+    trained = predict_with_trained_model(user_pose, technique)
+
+    # If caller does not provide ideal_pose, prefer trained model result.
+    if not ideal_pose:
+        return int(trained["score"]) if trained else 0
+
+    heuristic = _heuristic_score(user_pose, ideal_pose)
+    if not trained:
+        return heuristic
+
+    # Blend deterministic heuristic with trained profile score.
+    mixed = round((heuristic * 0.6) + (int(trained["score"]) * 0.4))
+    return int(max(0, min(100, mixed)))
+
+
+def build_feedback(user_pose: List[float], ideal_pose: List[float], technique: str = "tan-co-ban"):
+    trained = predict_with_trained_model(user_pose, technique)
+
     if not user_pose or not ideal_pose:
+        if trained:
+            return trained.get("feedback", []) or [
+                "Model da duoc train nhung du lieu pose hien tai chua du on dinh.",
+                "Hay quay lai voi anh sang tot hon va lay du toan than.",
+            ]
+
         return [
             "Khong du du lieu pose de phan tich.",
             "Hay thu quay video ro hon va toan than.",
@@ -42,5 +68,10 @@ def build_feedback(user_pose: List[float], ideal_pose: List[float]):
 
     if not messages:
         messages.append("Dong tac kha on. Hay tiep tuc luyen deu nhip.")
+
+    if trained:
+        for msg in trained.get("feedback", []):
+            if msg and msg not in messages:
+                messages.append(msg)
 
     return messages

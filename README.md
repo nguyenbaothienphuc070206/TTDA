@@ -281,3 +281,22 @@ Hoặc ingest từ thư mục tài liệu của bạn (md/txt):
 ```bash
 node scripts/ingest-ai-kb.mjs --dir ./knowledge --source manual --belt lam-dai
 ```
+
+## Train AI Coach + AI Form Check
+
+Chạy ở thư mục `vovinam-app/`:
+
+```bash
+npm run train:coach
+npm run train:form-check
+```
+
+`train:coach` sẽ:
+
+- Ingest lại knowledge vào vector DB (RAG)
+- Sinh dataset huấn luyện `training/ai-coach-finetune.jsonl` để dùng cho fine-tuning sau này
+
+`train:form-check` sẽ:
+
+- Train profile model cho các kỹ thuật (`tan-co-ban`, `dam-thang`, `da-tong-ngang`)
+- Ghi model vào `ai-services/video-analyzer/models/form_check_model.json`

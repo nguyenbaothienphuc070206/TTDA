@@ -21,13 +21,12 @@ import { BELTS } from "@/data/belts";
 import { LEVELS, LESSONS, getLessonsByLevel } from "@/data/lessons";
 import { NEWS } from "@/data/news";
 import JsonLd from "@/components/JsonLd";
-import HomeDemoActions from "@/components/HomeDemoActions";
 import { isPitchModeEnabled } from "@/lib/pitchMode";
 
 export const metadata = {
   title: "Vovinam Learning - Học Vovinam Theo Lộ Trình",
   description:
-    "Nền tảng học Vovinam theo lộ trình rõ ràng: bài học từng bước, video kỹ thuật, lịch tập 7 ngày và theo dõi tiến độ.",
+    "Nền tảng học Vovinam tập trung vào học tập, cộng đồng và cửa hàng: bài học rõ ràng, chấm chữa kỹ thuật và theo dõi tiến độ.",
   openGraph: {
     title: "Vovinam Learning",
     description:
@@ -39,7 +38,7 @@ export const metadata = {
     card: "summary_large_image",
     title: "Vovinam Learning",
     description:
-      "Lộ trình Vovinam đầy đủ từ nền tảng đến nâng cao, kèm lịch tập và tiến độ cá nhân.",
+      "Học Vovinam theo từng bước rõ ràng, luyện tập cùng cộng đồng và trang bị đúng để tập hiệu quả.",
   },
 };
 
@@ -328,13 +327,13 @@ function MobileQuickActions({ startLabel, scheduleLabel }) {
     <div className="mobile-quick-actions sm:hidden">
       <div className="surface-card-strong enterprise-shell ui3d-card grid grid-cols-2 gap-2 rounded-2xl p-2">
         <Link
-          href="/lo-trinh"
+          href="/hoc-tap"
           className="cta-primary inline-flex h-10 items-center justify-center rounded-xl px-3 text-xs font-semibold"
         >
           {startLabel}
         </Link>
         <Link
-          href="/lich-tap"
+          href="/cong-dong"
           className="cta-secondary inline-flex h-10 items-center justify-center rounded-xl px-3 text-xs font-semibold text-white"
         >
           {scheduleLabel}
@@ -381,7 +380,7 @@ function buildHomeJsonLd(locale) {
         },
         inLanguage: localeId,
         description:
-          "Trang chủ học Vovinam với lộ trình, kỹ thuật, video và kế hoạch luyện tập theo tuần.",
+          "Trang chủ Vovinam Learning tập trung vào học tập theo hệ thống, cộng đồng luyện tập và cửa hàng trang bị.",
       },
       {
         "@type": "ItemList",
@@ -398,299 +397,257 @@ function buildHomeJsonLd(locale) {
 }
 
 function HomeVi() {
-  const pitchMode = isPitchModeEnabled();
-  const featured = BELTS.slice(0, 6)
-    .map((belt) => getLessonsByLevel(belt.lessonLevel)[0])
-    .filter(Boolean);
-
-  const levelTitleById = Object.fromEntries(
-    LEVELS.map((l) => [l.id, l.title])
-  );
-
   return (
-    <div className="ui3d-stage mobile-safe-bottom mx-auto w-full max-w-6xl px-4 py-6 sm:py-10">
+    <div className="ui3d-stage mobile-safe-bottom stagger-fade mx-auto w-full max-w-6xl px-4 py-6 sm:py-10">
       <JsonLd data={buildHomeJsonLd("vi")} />
-      <ProblemStatement
-        title="Người mới thường bỏ cuộc khi không có lộ trình rõ ràng"
-        description="90% người mới bỏ cuộc trong 2 tuần đầu vì không biết hôm nay tập gì. Vovinam Learning giải quyết bằng AI Coach tạo buổi tập mỗi ngày, bám đúng cấp hiện tại của bạn."
-      />
-      <section className="surface-card-strong enterprise-shell motion-gradient-surface ui3d-card hero-noise hero-compact relative overflow-hidden rounded-4xl p-5 sm:p-8">
+      <section
+        className="surface-card-strong enterprise-shell motion-gradient-surface ui3d-card hero-noise hero-compact relative overflow-hidden rounded-4xl p-5 fade-in-up sm:p-8"
+      >
         <div className="absolute inset-0 opacity-90 bg-[radial-gradient(circle_at_top,rgba(34,211,238,0.16),transparent_58%)]" />
         <div className="absolute -right-24 -top-20 h-64 w-64 rounded-full bg-blue-500/20 blur-3xl float-fast motion-gradient-orb" />
-        <div className="absolute -left-20 -bottom-24 h-64 w-64 rounded-full bg-amber-300/10 blur-3xl float-slower motion-gradient-orb" />
-        <div className="relative">
-          <div className="accent-line" />
-          <p className="inline-flex items-center gap-2 rounded-full border border-cyan-300/25 bg-cyan-300/10 px-3 py-1 text-xs font-semibold text-cyan-100">
-            Lộ trình rõ ràng • Từng bước dễ tập • Lưu tiến độ
-          </p>
+        <div className="absolute -left-20 -bottom-24 h-64 w-64 rounded-full bg-emerald-300/10 blur-3xl float-slower motion-gradient-orb" />
 
-          <h1 className="headline-gradient motion-gradient-title hero-title-enterprise mt-3 max-w-3xl font-semibold">
-            90% người mới bỏ cuộc trong 2 tuần. Bạn không cần nằm trong số đó.
-          </h1>
-          <p className="hero-subtitle-enterprise mt-2 max-w-2xl text-slate-300">
-            Core value: AI Coach tạo buổi tập mỗi ngày, theo đúng cấp đai và quỹ thời gian thực tế của bạn.
-          </p>
+        <div className="relative grid items-center gap-6 md:grid-cols-2">
+          <div>
+            <p className="inline-flex items-center gap-2 rounded-full border border-cyan-300/25 bg-cyan-300/10 px-3 py-1 text-xs font-semibold text-cyan-100">
+              Học tập • Cộng đồng • Cửa hàng
+            </p>
+            <h1 className="headline-gradient motion-gradient-title hero-title-enterprise mt-3 max-w-xl font-semibold">
+              Học Vovinam đúng cách, theo từng bước rõ ràng
+            </h1>
+            <p className="hero-subtitle-enterprise mt-3 max-w-lg text-slate-300">
+              Từ Lam đai tự vệ đến Hồng đai tứ. Không học lan man. Không tập mù mờ.
+            </p>
 
-          <div className="mt-5 flex flex-col gap-2.5 sm:flex-row">
-            <Link
-              href="/lo-trinh"
-              className="cta-primary motion-gradient-btn inline-flex h-11 items-center justify-center rounded-2xl px-5 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-cyan-300/50"
-            >
-              Tạo lộ trình cá nhân ngay
-            </Link>
-            <Link
-              href="/lich-tap"
-              className="cta-secondary motion-gradient-btn inline-flex h-11 items-center justify-center rounded-2xl px-5 text-sm font-semibold text-white transition focus:outline-none focus:ring-2 focus:ring-cyan-300/30"
-            >
-              Test trình độ trong 30s
-            </Link>
-            <Link
-              href="/form-check"
-              className="inline-flex h-11 items-center justify-center rounded-2xl border border-emerald-300/30 bg-emerald-400/10 px-5 text-sm font-semibold text-emerald-100 transition hover:bg-emerald-400/15 focus:outline-none focus:ring-2 focus:ring-emerald-300/40"
-            >
-              Thử AI Form Check (WOW)
-            </Link>
+            <div className="mt-6 flex flex-col gap-2.5 sm:flex-row">
+              <Link
+                href="/hoc-tap"
+                className="cta-primary motion-gradient-btn inline-flex h-11 items-center justify-center rounded-2xl px-5 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-cyan-300/50"
+              >
+                Bắt đầu học
+              </Link>
+              <Link
+                href="/cong-dong"
+                className="cta-secondary motion-gradient-btn inline-flex h-11 items-center justify-center rounded-2xl px-5 text-sm font-semibold text-white transition focus:outline-none focus:ring-2 focus:ring-cyan-300/30"
+              >
+                Xem cộng đồng
+              </Link>
+            </div>
           </div>
-          <p className="mt-3 text-sm font-medium text-cyan-100">
-            Người mới thường hoàn thành 3-4 bài trong tuần đầu khi có buổi tập rõ ràng mỗi ngày.
-          </p>
 
+          <div className="surface-card enterprise-shell ui3d-card rounded-3xl p-5">
+            <p className="text-xs font-semibold uppercase tracking-wide text-cyan-100">Learning dashboard</p>
+            <div className="mt-3 flex items-center justify-between text-sm text-slate-200">
+              <span>Tiến độ</span>
+              <span>1 / 56 bài (2%)</span>
+            </div>
+            <div className="mt-2 h-2 rounded-full bg-slate-800">
+              <div className="h-2 w-[2%] rounded-full bg-emerald-400" />
+            </div>
+            <div className="mt-4 rounded-2xl border border-white/10 bg-slate-950/40 p-4">
+              <p className="text-sm font-semibold text-white">Bài hôm nay: Quyền Lam đai tự vệ</p>
+              <p className="mt-1 text-xs text-slate-300">18 phút • 1 video + 1 kỹ thuật</p>
+            </div>
+          </div>
         </div>
       </section>
 
-      <HomeDemoActions
-        title="AI Coach tạo buổi tập mỗi ngày"
-        primaryLabel="Tạo buổi tập cho tôi"
-        aiPrompt="Tôi mới tập Vovinam, gợi ý 1 buổi tập 20 phút hôm nay theo cấp Lam đai."
-        resultLatencyMs={800}
-      />
-
-      <section className="mt-6 rounded-3xl border border-emerald-300/20 bg-emerald-400/10 p-5">
-        <p className="text-xs font-semibold uppercase tracking-wide text-emerald-100">Signature Feature</p>
-        <h2 className="mt-1 text-xl font-semibold text-white">AI Form Check: điểm wow khiến judge nhớ ngay</h2>
-        <p className="mt-2 text-sm leading-6 text-slate-200">
-          Dùng camera để nhận feedback form theo thời gian thực: lệch trục, guard, nhịp tấn. Người tập thấy giá trị chỉ sau
-          30 giây đầu, thay vì tập mơ hồ như khi chỉ xem video.
+      <section
+        className="mt-6 rounded-3xl border border-emerald-300/25 bg-emerald-400/10 px-5 py-4 text-center fade-in-up"
+        style={{ animationDelay: "100ms" }}
+      >
+        <p className="text-base font-semibold text-emerald-50 sm:text-lg">
+          Không chỉ học - bạn biết mình sai ở đâu
         </p>
-        <div className="mt-3">
+      </section>
+
+      <section
+        className="mt-10 grid items-center gap-5 md:grid-cols-2 fade-in-up"
+        style={{ animationDelay: "180ms" }}
+      >
+        <div className="surface-card enterprise-shell ui3d-card rounded-3xl p-6">
+          <p className="text-xs font-semibold uppercase tracking-wide text-emerald-100">Học tập</p>
+          <h2 className="mt-2 text-2xl font-semibold text-white">Học tập theo hệ thống rõ ràng</h2>
+          <p className="mt-2 text-sm leading-6 text-slate-300">
+            Học theo từng cấp đai, mỗi bài có video và kỹ thuật đi kèm để tập đúng ngay từ đầu.
+          </p>
+          <ul className="mt-4 grid gap-2 text-sm text-slate-200">
+            <li>• Học theo từng cấp đai, từng bước rõ ràng</li>
+            <li>• Video và kỹ thuật đi kèm trong mỗi bài</li>
+            <li>• Nội dung bám sát thực tế luyện tập</li>
+          </ul>
+
+          <h3 className="mt-5 text-base font-semibold text-emerald-200">Chấm chữa kỹ thuật</h3>
+          <p className="mt-1 text-sm text-slate-300">
+            Nhận diện lỗi cơ bản để biết mình sai ở đâu và sửa đơn giản, dễ hiểu.
+          </p>
+        </div>
+
+        <div className="surface-card enterprise-shell ui3d-card rounded-3xl p-6">
+          <p className="text-xs font-semibold uppercase tracking-wide text-slate-300">Phản hồi bài tập</p>
+          <div className="mt-4 grid gap-2 text-sm">
+            <div className="rounded-2xl border border-red-300/35 bg-red-400/10 px-3 py-2 text-red-100">
+              Lệch trục nhẹ - giữ thân người thẳng hơn.
+            </div>
+            <div className="rounded-2xl border border-amber-300/35 bg-amber-400/10 px-3 py-2 text-amber-100">
+              Nhịp chưa đều - tập chậm lại theo từng nhịp.
+            </div>
+            <div className="rounded-2xl border border-emerald-300/35 bg-emerald-400/10 px-3 py-2 text-emerald-100">
+              Guard ổn - duy trì như hiện tại.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section
+        className="mt-8 grid items-center gap-5 md:grid-cols-2 fade-in-up"
+        style={{ animationDelay: "260ms" }}
+      >
+        <div className="surface-card enterprise-shell ui3d-card rounded-3xl p-6 md:order-1">
+          <p className="text-xs font-semibold uppercase tracking-wide text-amber-100">Cộng đồng</p>
+          <div className="mt-3 space-y-2">
+            {[
+              { name: "Nguyễn A", level: "Lam đai tự vệ", progress: 2 },
+              { name: "Trần B", level: "Lam đai", progress: 15 },
+              { name: "Lê C", level: "Lam đai nhất", progress: 25 },
+            ].map((member) => (
+              <div
+                key={member.name}
+                className="rounded-2xl border border-white/10 bg-slate-950/40 px-3 py-2"
+              >
+                <p className="text-sm font-semibold text-white">{member.name}</p>
+                <p className="mt-0.5 text-xs text-slate-300">
+                  {member.level} • {member.progress}%
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="surface-card enterprise-shell ui3d-card rounded-3xl p-6 md:order-2">
+          <p className="text-xs font-semibold uppercase tracking-wide text-amber-100">Cộng đồng</p>
+          <h2 className="mt-2 text-2xl font-semibold text-white">Luyện tập cùng cộng đồng</h2>
+          <p className="mt-2 text-sm leading-6 text-slate-300">
+            Không tập một mình. Xem người khác đang học gì và tiến bộ ra sao để giữ động lực mỗi ngày.
+          </p>
+          <ul className="mt-4 grid gap-2 text-sm text-slate-200">
+            <li>• Học viên theo từng cấp đai</li>
+            <li>• Theo dõi tiến độ của nhau</li>
+            <li>• Tạo động lực luyện tập đều đặn</li>
+          </ul>
           <Link
-            href="/form-check"
-            className="inline-flex h-10 items-center justify-center rounded-2xl border border-emerald-300/30 bg-emerald-400/10 px-4 text-sm font-semibold text-emerald-100 transition hover:bg-emerald-400/15"
+            href="/cong-dong"
+            className="mt-5 inline-flex h-10 items-center justify-center rounded-2xl border border-amber-300/30 bg-amber-300/10 px-4 text-sm font-semibold text-amber-100 transition hover:bg-amber-300/15"
           >
-            Mở AI Form Check →
+            Khám phá cộng đồng →
           </Link>
         </div>
       </section>
 
-      <section className="mt-4 rounded-3xl border border-cyan-300/20 bg-cyan-300/10 p-5">
-        <p className="text-xs font-semibold uppercase tracking-wide text-cyan-100">Judge Q&amp;A</p>
-        <h2 className="mt-1 text-lg font-semibold text-white">Tại sao dùng app này thay vì YouTube?</h2>
-        <p className="mt-2 text-sm leading-6 text-slate-200">
-          Vì đây không chỉ là xem nội dung. Bạn có vòng lặp rõ ràng: AI Coach tạo buổi tập mỗi ngày, AI Form Check sửa lỗi
-          ngay khi tập, và tracking để duy trì đều đặn.
-        </p>
-        <p className="mt-2 text-sm font-semibold text-cyan-100">
-          Vovinam Learning is not just an app. It is a structured, AI-powered training system that transforms traditional martial arts into a scalable, data-driven experience.
-        </p>
-      </section>
-
-      <section className="mt-8">
-        <SectionHeading
-          id="how-it-works"
-          title="Cách hoạt động trong 3 bước"
-          description="Từ mơ hồ đến rõ ràng: test nhanh, tạo lộ trình, và theo dõi tiến bộ mỗi ngày."
-        />
-        <div className="mt-4 grid gap-3 md:grid-cols-3">
-          <StepCard
-            step="1"
-            title="Test nhanh 30 giây"
-            description="Trả lời vài câu hỏi cơ bản để xác định cấp hiện tại và mục tiêu tập."
-            bullets={["Không cần dụng cụ", "Có gợi ý an toàn", "Bắt đầu ngay"]}
-          />
-          <StepCard
-            step="2"
-            title="Sinh buổi tập cá nhân"
-            description="AI Coach đề xuất bài tập theo cấp đai, thời lượng và lịch bạn trong ngày."
-            bullets={["15-30 phút", "Theo cấp đai", "Có phương án thay thế"]}
-          />
-          <StepCard
-            step="3"
-            title="Đánh dấu và tăng cấp"
-            description="Hoàn thành bài, lưu tiến độ, và biết chính xác khi nào nên lên cấp tiếp theo."
-            bullets={["Track tiến độ", "Thống kê ngày/tuần", "Gợi ý bước tiếp"]}
-          />
-        </div>
-
-        <div className="surface-card enterprise-shell ui3d-card mt-4 rounded-3xl p-4 sm:p-5">
-          <p className="text-sm leading-6 text-slate-300">
-            Chỉ cần 3 thao tác mỗi ngày: mở app, tập theo buổi được gợi ý, bấm hoàn thành.
-            Khi mọi thứ đủ rõ, bạn không còn phải suy nghĩ “hôm nay tập gì” nữa.
+      <section
+        className="mt-8 grid items-center gap-5 md:grid-cols-2 fade-in-up"
+        style={{ animationDelay: "340ms" }}
+      >
+        <div className="surface-card enterprise-shell ui3d-card rounded-3xl p-6">
+          <p className="text-xs font-semibold uppercase tracking-wide text-cyan-100">Cửa hàng</p>
+          <h2 className="mt-2 text-2xl font-semibold text-white">Trang bị đúng để tập hiệu quả</h2>
+          <p className="mt-2 text-sm leading-6 text-slate-300">
+            Không cần mua nhiều. Chỉ cần đúng theo cấp đai để tập an toàn và bắt đầu nhanh hơn.
           </p>
+          <ul className="mt-4 grid gap-2 text-sm text-slate-200">
+            <li>• Gợi ý đồ tập theo cấp đai</li>
+            <li>• Combo cho người mới bắt đầu</li>
+            <li>• Mua trực tiếp tại đối tác</li>
+          </ul>
+          <Link
+            href="/cua-hang"
+            className="mt-5 inline-flex h-10 items-center justify-center rounded-2xl border border-cyan-300/30 bg-cyan-300/10 px-4 text-sm font-semibold text-cyan-100 transition hover:bg-cyan-300/15"
+          >
+            Xem cửa hàng →
+          </Link>
+        </div>
+
+        <div className="surface-card enterprise-shell ui3d-card rounded-3xl p-6">
+          <p className="text-xs font-semibold uppercase tracking-wide text-slate-300">Combo người mới</p>
+          <div className="mt-3 rounded-2xl border border-white/10 bg-slate-950/40 p-4">
+            <p className="text-base font-semibold text-white">Võ phục + Đai Lam + Bảo hộ</p>
+            <p className="mt-1 text-sm text-slate-300">Gọn, đủ dùng và ưu tiên an toàn.</p>
+            <p className="mt-3 text-lg font-semibold text-emerald-200">590.000đ</p>
+          </div>
         </div>
       </section>
 
-      <section className="mt-6">
+      <section
+        className="mt-12 grid gap-5 lg:grid-cols-3 fade-in-up"
+        style={{ animationDelay: "420ms" }}
+      >
         <div className="surface-card enterprise-shell ui3d-card rounded-3xl p-5">
-          <h2 className="text-lg font-semibold text-white">Vì sao có thể tin lộ trình này</h2>
-          <div className="mt-3 grid gap-2 sm:grid-cols-3">
-            <div className="rounded-2xl border border-white/10 bg-slate-950/30 px-3 py-2 text-xs font-semibold text-slate-200">
-              Dựa trên 14 cấp đai Vovinam chuẩn
-            </div>
-            <div className="rounded-2xl border border-white/10 bg-slate-950/30 px-3 py-2 text-xs font-semibold text-slate-200">
-              Thiết kế theo giáo trình thực tế
-            </div>
-            <div className="rounded-2xl border border-white/10 bg-slate-950/30 px-3 py-2 text-xs font-semibold text-slate-200">
-              Đã thử nghiệm nhỏ với người mới tập để tối ưu bước bắt đầu
-            </div>
-          </div>
+          <p className="text-xs font-semibold uppercase tracking-wide text-cyan-100">Learning preview</p>
+          <h3 className="mt-2 text-lg font-semibold text-white">Bắt đầu từ Lam đai tự vệ</h3>
+          <ul className="mt-3 grid gap-1 text-sm text-slate-300">
+            <li>• Quyền cơ bản</li>
+            <li>• Phản xạ an toàn</li>
+            <li>• Tư thế phòng vệ</li>
+          </ul>
+          <Link href="/hoc-tap" className="mt-4 inline-flex text-sm font-semibold text-cyan-200 hover:text-white">
+            Xem khóa học →
+          </Link>
+        </div>
 
-          <div className="mt-4 rounded-2xl border border-cyan-300/20 bg-cyan-300/10 p-3">
-            <p className="text-xs font-semibold uppercase tracking-wide text-cyan-100">Early signal</p>
-            <ul className="mt-2 grid gap-1 text-sm text-slate-100">
-              <li>• 84 học viên đang theo lộ trình và giữ nhịp luyện tập hằng tuần.</li>
-              <li>• Người mới thường hoàn thành 3-4 bài đầu ngay trong tuần đầu.</li>
-              <li>• Buổi tập 15-20 phút giúp duy trì 3-5 buổi/tuần dễ hơn với người bận rộn.</li>
-            </ul>
-          </div>
+        <div className="surface-card enterprise-shell ui3d-card rounded-3xl p-5">
+          <p className="text-xs font-semibold uppercase tracking-wide text-amber-100">Community preview</p>
+          <h3 className="mt-2 text-lg font-semibold text-white">84 học viên đang luyện tập</h3>
+          <ul className="mt-3 grid gap-1 text-sm text-slate-300">
+            <li>• Lam đai tự vệ: 6 người</li>
+            <li>• Lam đai: 6 người</li>
+            <li>• Lam đai nhất: 6 người</li>
+          </ul>
+          <Link href="/cong-dong" className="mt-4 inline-flex text-sm font-semibold text-amber-200 hover:text-white">
+            Xem cộng đồng →
+          </Link>
+        </div>
+
+        <div className="surface-card enterprise-shell ui3d-card rounded-3xl p-5">
+          <p className="text-xs font-semibold uppercase tracking-wide text-emerald-100">Store preview</p>
+          <h3 className="mt-2 text-lg font-semibold text-white">Combo cho người mới</h3>
+          <p className="mt-2 text-sm text-slate-300">Võ phục, đai Lam, bảo hộ cơ bản.</p>
+          <p className="mt-3 text-lg font-semibold text-emerald-200">590.000đ</p>
+          <Link href="/cua-hang" className="mt-4 inline-flex text-sm font-semibold text-emerald-200 hover:text-white">
+            Xem cửa hàng →
+          </Link>
         </div>
       </section>
 
-      <section className="mt-12">
-        <SectionHeading
-          id="product-depth"
-          title={pitchMode ? "Lộ trình cấp đai (preview 3 cấp đầu)" : "Product depth"}
-          description={
-            pitchMode
-              ? "Pitch mode chỉ giữ phần cốt lõi để thông điệp rõ. Tắt Pitch mode để xem đầy đủ depth."
-              : "Giữ đầy đủ chiều sâu sản phẩm, nhưng homepage chỉ hiển thị preview để không quá tải."
-          }
-          right={
-            <Link
-              href="/lo-trinh"
-              className="text-sm font-semibold text-cyan-200 hover:text-white transition"
-            >
-              Xem toàn bộ lộ trình →
-            </Link>
-          }
-        />
-
-        <div className="mt-5 grid gap-3 md:grid-cols-2 lg:grid-cols-3">
-          {BELTS.slice(0, 3).map((b) => (
-            <BeltPreview key={b.id} belt={b} />
-          ))}
-        </div>
-
-        {!pitchMode ? (
-          <>
-            <div className="mt-5 grid gap-3 md:grid-cols-2 lg:grid-cols-3">
-              {featured.slice(0, 3).map((lesson) => (
-                <LessonPreviewCard
-                  key={lesson.slug}
-                  lesson={lesson}
-                  levelTitle={levelTitleById[lesson.level] || "Bài học"}
-                />
-              ))}
-            </div>
-
-            <div className="mt-5 grid gap-3 lg:grid-cols-3">
-              {LEVELS.slice(0, 3).map((level) => (
-                <LevelPreview key={level.id} level={level} />
-              ))}
-            </div>
-          </>
-        ) : null}
-      </section>
-
-      {!pitchMode ? (
-        <section className="mt-12">
-        <SectionHeading
-          id="faq"
-          title="FAQ"
-          description="Các câu hỏi thường gặp khi mới bắt đầu tự luyện."
-          right={
-            <Link
-              href="/dieu-khoan"
-              className="text-sm font-semibold text-cyan-200 hover:text-white transition"
-            >
-              Xem điều khoản →
-            </Link>
-          }
-        />
-
-        <div className="mt-5 grid gap-3 lg:grid-cols-2">
-          <FaqItem
-            q="Mình mới hoàn toàn thì bắt đầu từ đâu?"
-            a="Vào trang Lộ trình, bắt đầu từ Lam đai tự vệ. Tập 2-3 bài đầu thật chắc trước khi học bài mới."
-          />
-          <FaqItem
-            q="Mỗi buổi nên tập bao lâu?"
-            a="Nếu mới: 20-30 phút là ổn (khởi động + tập + giãn cơ). Quan trọng là đều đặn và đúng kỹ thuật."
-          />
-          <FaqItem
-            q="Có cần dụng cụ gì không?"
-            a="Không bắt buộc. Nhưng nên có nước, không gian không trơn, và thảm/nệm mỏng nếu tập ngã an toàn."
-          />
-          <FaqItem
-            q="Tập đau gối/đau hông thì làm sao?"
-            a="Dừng lại, giảm độ hạ tấn/biên độ đá, kiểm tra hướng gối theo mũi chân. Nếu đau kéo dài, nên hỏi huấn luyện viên hoặc chuyên môn y tế."
-          />
-          <FaqItem
-            q="Khi nào nên lên cấp đai tiếp theo?"
-            a="Khi bạn kiểm soát được tư thế, thăng bằng và nhịp thở; tập chậm vẫn đúng động tác và không đau. Không cần vội."
-          />
-          <FaqItem
-            q="Tiến độ lưu ở đâu? Có mất không?"
-            a="Tiến độ và lịch tập lưu trong localStorage trên trình duyệt. Nếu bạn xóa dữ liệu trình duyệt hoặc đổi máy, dữ liệu sẽ mất."
-          />
-        </div>
-
-        <details className="surface-card enterprise-shell ui3d-card group mt-4 rounded-3xl p-5 open:bg-white/10">
-          <summary className="cursor-pointer list-none text-sm font-semibold text-white">
-            <div className="flex items-center justify-between gap-3">
-              <span>Thông tin sự kiện và giải đấu (mở rộng)</span>
-              <span className="inline-flex h-9 w-9 items-center justify-center rounded-2xl border border-white/10 bg-white/5 text-slate-200 transition group-open:rotate-45">+</span>
-            </div>
-          </summary>
-          <div className="mt-3 grid gap-3 md:grid-cols-2 lg:grid-cols-3">
-            {NEWS.slice(0, 3).map((n) => (
-              <NewsCard key={n.id} item={n} />
-            ))}
-          </div>
-        </details>
-      </section>
-      ) : null}
-
-      <section className="mt-12">
-        <div className="surface-card-strong enterprise-shell motion-gradient-surface ui3d-card relative overflow-hidden rounded-[2.25rem] p-7 sm:p-12">
+      <section className="mt-12 fade-in-up" style={{ animationDelay: "500ms" }}>
+        <div className="surface-card-strong enterprise-shell motion-gradient-surface ui3d-card relative overflow-hidden rounded-[2.25rem] p-7 text-center sm:p-12">
           <div className="absolute inset-0 opacity-80 bg-[radial-gradient(circle_at_top,rgba(34,211,238,0.12),transparent_55%)]" />
           <div className="relative">
             <h2 className="text-2xl font-semibold tracking-tight text-white sm:text-3xl">
-              Bắt đầu buổi tập đầu tiên ngay hôm nay
+              Bắt đầu buổi tập đầu tiên hôm nay
             </h2>
-            <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-300 sm:text-base">
-              Vào lộ trình, chọn bài phù hợp cấp đai và tập theo từng bước. Nhớ
-              khởi động kỹ, tập chậm, và đánh dấu hoàn thành để theo dõi tiến độ.
+            <p className="mt-3 text-sm leading-6 text-slate-300 sm:text-base">
+              Chỉ cần 1 bài. Là đủ để bắt đầu.
             </p>
 
-            <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-center">
               <Link
-                href="/lo-trinh"
+                href="/hoc-tap"
                 className="cta-primary motion-gradient-btn inline-flex h-12 items-center justify-center rounded-2xl px-5 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-cyan-300/50"
               >
-                Vào lộ trình
+                Bắt đầu học
               </Link>
               <Link
-                href="/lich-tap"
+                href="/cong-dong"
                 className="cta-secondary motion-gradient-btn inline-flex h-12 items-center justify-center rounded-2xl px-5 text-sm font-semibold text-white transition focus:outline-none focus:ring-2 focus:ring-cyan-300/30"
               >
-                Tạo lịch tập
+                Xem cộng đồng
               </Link>
             </div>
           </div>
         </div>
       </section>
 
-      <MobileQuickActions startLabel="Bắt đầu học" scheduleLabel="Lịch 7 ngày" />
+      <MobileQuickActions startLabel="Bắt đầu học" scheduleLabel="Xem cộng đồng" />
     </div>
   );
 }
@@ -700,127 +657,73 @@ function getGlobalHomeCopy(locale) {
 
   if (id === "en") {
     return {
-      heroPill: "Clear roadmap • Practical drills • Progress tracking",
-      heroTitle: "Train Vovinam with a clear step-by-step path",
+      heroPill: "Learning • Community • Store",
+      heroTitle: "Learn Vovinam with a clear, step-by-step system",
       heroDescription:
-        "Follow a structured flow from fundamentals to advanced levels. Learn safely, track progress, and build consistency each week.",
-      startLearning: "Build my personal roadmap",
-      createSchedule: "30s level assessment",
-      problemTitle: "Most beginners quit because training lacks structure",
-      problemDescription:
-        "Vovinam Learning combines 14 belt levels, mapped videos, and AI-guided short sessions so beginners always know what to train next.",
-      demoPrimary: "Demo AI coach workout",
-      demoSecondary: "One-click session generator",
-      statLessons: "Total lessons",
-      statBelts: "Belt levels",
-      statGoal: "Goal",
-      statGoalValue: "Clean technique",
-      highlightsTitle: "Core highlights",
-      highlightsDescription:
-        "Everything you need for practical self-training: clear instructions, safety-first guidance, and measurable progress.",
-      features: [
-        {
-          title: "Step-by-step lessons",
-          description: "Each lesson includes goals, sequence, common mistakes, and practical tips.",
-          icon: faBookOpen,
-        },
-        {
-          title: "Automatic progress",
-          description: "Mark lessons complete and keep your roadmap state saved on your device.",
-          icon: faChartLine,
-        },
-        {
-          title: "Weekly scheduling",
-          description: "Plan training sessions by level, frequency, and duration to stay consistent.",
-          icon: faCalendarDays,
-        },
-        {
-          title: "Technique library",
-          description: "Review movement details, common errors, and safety notes anytime.",
-          icon: faShieldHalved,
-        },
-      ],
-      quickLinksTitle: "Quick links",
-      motivationTitle: "You do not need perfection, you need consistency",
-      motivationMessage:
-        "Even a short 15-20 minute session counts. A clean session with control is always more valuable than chaotic volume.",
-      motivationChip1: "One completed lesson is a win",
-      motivationChip2: "Protect form before speed",
-      motivationChip3: "Scale down intensity, not commitment",
-      howTitle: "How it works in 3 steps",
-      howDescription: "Assess quickly, get a tailored session, then track progress daily.",
-      howStep1Title: "30s quick assessment",
-      howStep1Desc: "Answer a few questions to map your current belt and target.",
-      howStep2Title: "Generate today plan",
-      howStep2Desc: "AI Coach suggests a focused session based on level and available time.",
-      howStep3Title: "Track and level up",
-      howStep3Desc: "Mark complete, monitor consistency, and move to next belt with confidence.",
-      ctaTitle: "Ready for your first focused session?",
+        "From beginner basics to advanced levels. No random drills, no confusion.",
+      startLearning: "Start Learning",
+      exploreCommunity: "Explore Community",
+      valueStrip: "Do not just learn - know exactly what to fix",
+      learningTitle: "Structured learning by belt level",
+      learningDescription:
+        "Every lesson includes video, technique notes, and practical guidance you can use immediately.",
+      learningBullet1: "Clear belt-by-belt progression",
+      learningBullet2: "Video and technique in every lesson",
+      learningBullet3: "Practical content, no fluff",
+      coachingTitle: "Technique feedback",
+      coachingDescription:
+        "Catch common mistakes early and fix them with simple, actionable suggestions.",
+      communityTitle: "Train with the community",
+      communityDescription:
+        "See what others practice, follow shared progress, and stay motivated.",
+      communityBullet1: "Grouped by belt level",
+      communityBullet2: "Progress visibility",
+      communityBullet3: "Daily motivation loop",
+      storeTitle: "Get the right gear to train better",
+      storeDescription:
+        "Choose what fits your level. Start with essentials and avoid unnecessary purchases.",
+      storeBullet1: "Gear suggestions by belt",
+      storeBullet2: "Starter bundles",
+      storeBullet3: "Buy from trusted partners",
+      ctaTitle: "Start your first session today",
       ctaDescription:
-        "Open the roadmap, pick one suitable lesson, and train with clean form. Keep the pace controlled and safety-first.",
+        "One lesson is enough to start. Keep it simple and stay consistent.",
     };
   }
 
   if (id === "ja") {
     return {
-      heroPill: "明確なロードマップ • 実践練習 • 進捗管理",
-      heroTitle: "段階的な流れで Vovinam を練習する",
+      heroPill: "学習 • コミュニティ • ストア",
+      heroTitle: "段階的で分かりやすい Vovinam 学習",
       heroDescription:
-        "基礎から上位レベルまで、構造化された順序で学べます。安全を重視し、進捗を記録しながら毎週の習慣を作ります。",
-      startLearning: "個別ロードマップを作成",
-      createSchedule: "30秒レベル診断",
-      problemTitle: "継続できない最大要因は、明確な練習導線がないこと",
-      problemDescription:
-        "Vovinam Learning は14段階の帯、対応動画、短時間AI提案を統合し、初心者でも次に何を練習すべきかを明確にします。",
-      demoPrimary: "AIコーチ提案をデモ",
-      demoSecondary: "1クリックで本日の練習",
-      statLessons: "総レッスン数",
-      statBelts: "帯レベル",
-      statGoal: "目標",
-      statGoalValue: "正確な技術",
-      highlightsTitle: "主な特長",
-      highlightsDescription:
-        "自主練に必要な要素をまとめています。分かりやすい手順、安全重視のガイド、測定可能な進捗。",
-      features: [
-        {
-          title: "ステップ式レッスン",
-          description: "各レッスンに目標、手順、よくあるミス、実践ヒントを用意。",
-          icon: faBookOpen,
-        },
-        {
-          title: "進捗の自動保存",
-          description: "完了を記録すると端末にロードマップ状態が保存されます。",
-          icon: faChartLine,
-        },
-        {
-          title: "週間スケジュール",
-          description: "レベルや頻度、時間に応じて練習計画を作成できます。",
-          icon: faCalendarDays,
-        },
-        {
-          title: "技術ライブラリ",
-          description: "動作の細部、よくあるミス、安全ポイントをいつでも確認。",
-          icon: faShieldHalved,
-        },
-      ],
-      quickLinksTitle: "クイックリンク",
-      motivationTitle: "完璧より、継続が強さを作る",
-      motivationMessage:
-        "15-20分の短い練習でも十分です。量より、コントロールされた質の高い1セッションを重ねましょう。",
-      motivationChip1: "1レッスン完了は勝ち",
-      motivationChip2: "速度よりフォームを守る",
-      motivationChip3: "やめるより強度を調整する",
-      howTitle: "3ステップで習慣化",
-      howDescription: "短時間で把握し、今日の計画を作り、毎日進捗を積み上げます。",
-      howStep1Title: "30秒クイック診断",
-      howStep1Desc: "現在レベルと目的を簡単に把握します。",
-      howStep2Title: "今日の練習を生成",
-      howStep2Desc: "AIコーチがレベルと時間に合わせて提案します。",
-      howStep3Title: "記録して次へ",
-      howStep3Desc: "完了を記録し、安定して次の帯へ進みます。",
-      ctaTitle: "最初の集中トレーニングを始めましょう",
+        "初心者の基礎から上位レベルまで。迷わず、ムダなく練習できます。",
+      startLearning: "学習を始める",
+      exploreCommunity: "コミュニティを見る",
+      valueStrip: "学ぶだけでなく、どこを直すべきかが分かる",
+      learningTitle: "帯レベル別の体系学習",
+      learningDescription:
+        "各レッスンに動画と技術ポイントがあり、すぐ実践できます。",
+      learningBullet1: "帯ごとの明確なステップ",
+      learningBullet2: "毎レッスンに動画と技術解説",
+      learningBullet3: "実践重視で分かりやすい",
+      coachingTitle: "技術フィードバック",
+      coachingDescription:
+        "基本ミスを早く見つけ、シンプルな提案で修正できます。",
+      communityTitle: "コミュニティと一緒に練習",
+      communityDescription:
+        "他の学習者の進捗を見ながら、刺激を受けて継続できます。",
+      communityBullet1: "帯レベルごとの学習者",
+      communityBullet2: "進捗を見える化",
+      communityBullet3: "継続のモチベーション",
+      storeTitle: "必要な装備を正しく選ぶ",
+      storeDescription:
+        "レベルに合った装備を提案。初心者は必要なものから始められます。",
+      storeBullet1: "帯に合わせた装備提案",
+      storeBullet2: "初心者向けセット",
+      storeBullet3: "提携先から購入可能",
+      ctaTitle: "今日から最初の練習を始めよう",
       ctaDescription:
-        "ロードマップから自分に合うレッスンを1つ選び、正確なフォームで練習しましょう。ペース管理と安全を最優先に。",
+        "まずは1レッスンで十分。シンプルに始めて、継続して上達しましょう。",
     };
   }
 
@@ -828,126 +731,166 @@ function getGlobalHomeCopy(locale) {
 }
 
 function HomeGlobal({ copy, locale }) {
-  const pitchMode = isPitchModeEnabled();
-
   return (
-    <div className="ui3d-stage mobile-safe-bottom mx-auto w-full max-w-6xl px-4 py-6 sm:py-10">
+    <div className="ui3d-stage mobile-safe-bottom stagger-fade mx-auto w-full max-w-6xl px-4 py-6 sm:py-10">
       <JsonLd data={buildHomeJsonLd(locale)} />
-      <ProblemStatement title={copy.problemTitle} description={copy.problemDescription} />
-      <section className="surface-card-strong enterprise-shell motion-gradient-surface ui3d-card hero-noise hero-compact relative overflow-hidden rounded-4xl p-5 sm:p-8">
+      <section
+        className="surface-card-strong enterprise-shell motion-gradient-surface ui3d-card hero-noise hero-compact relative overflow-hidden rounded-4xl p-5 fade-in-up sm:p-8"
+      >
         <div className="absolute inset-0 opacity-90 bg-[radial-gradient(circle_at_top,rgba(34,211,238,0.16),transparent_58%)]" />
         <div className="absolute -right-24 -top-20 h-64 w-64 rounded-full bg-blue-500/20 blur-3xl float-fast motion-gradient-orb" />
-        <div className="absolute -left-20 -bottom-24 h-64 w-64 rounded-full bg-amber-300/10 blur-3xl float-slower motion-gradient-orb" />
-        <div className="relative">
-          <div className="accent-line" />
-          <p className="inline-flex items-center gap-2 rounded-full border border-cyan-300/25 bg-cyan-300/10 px-3 py-1 text-xs font-semibold text-cyan-100">
-            {copy.heroPill}
-          </p>
+        <div className="absolute -left-20 -bottom-24 h-64 w-64 rounded-full bg-emerald-300/10 blur-3xl float-slower motion-gradient-orb" />
 
-          <h1 className="headline-gradient motion-gradient-title hero-title-enterprise mt-3 max-w-3xl font-semibold">
-            {copy.heroTitle}
-          </h1>
-          <p className="hero-subtitle-enterprise mt-2 max-w-2xl text-slate-300">
-            {copy.heroDescription}
-          </p>
+        <div className="relative grid items-center gap-6 md:grid-cols-2">
+          <div>
+            <p className="inline-flex items-center gap-2 rounded-full border border-cyan-300/25 bg-cyan-300/10 px-3 py-1 text-xs font-semibold text-cyan-100">
+              {copy.heroPill}
+            </p>
+            <h1 className="headline-gradient motion-gradient-title hero-title-enterprise mt-3 max-w-xl font-semibold">
+              {copy.heroTitle}
+            </h1>
+            <p className="hero-subtitle-enterprise mt-3 max-w-lg text-slate-300">
+              {copy.heroDescription}
+            </p>
 
-          <div className="mt-5 flex flex-col gap-2.5 sm:flex-row">
-            <Link
-              href="/lo-trinh"
-              className="cta-primary motion-gradient-btn inline-flex h-11 items-center justify-center rounded-2xl px-5 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-cyan-300/50"
-            >
-              {copy.startLearning}
-            </Link>
-            <Link
-              href="/lich-tap"
-              className="cta-secondary motion-gradient-btn inline-flex h-11 items-center justify-center rounded-2xl px-5 text-sm font-semibold text-white transition focus:outline-none focus:ring-2 focus:ring-cyan-300/30"
-            >
-              {copy.createSchedule}
-            </Link>
+            <div className="mt-6 flex flex-col gap-2.5 sm:flex-row">
+              <Link
+                href="/hoc-tap"
+                className="cta-primary motion-gradient-btn inline-flex h-11 items-center justify-center rounded-2xl px-5 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-cyan-300/50"
+              >
+                {copy.startLearning}
+              </Link>
+              <Link
+                href="/cong-dong"
+                className="cta-secondary motion-gradient-btn inline-flex h-11 items-center justify-center rounded-2xl px-5 text-sm font-semibold text-white transition focus:outline-none focus:ring-2 focus:ring-cyan-300/30"
+              >
+                {copy.exploreCommunity}
+              </Link>
+            </div>
           </div>
 
-          <HomeDemoActions
-            primaryLabel={copy.demoPrimary}
-            secondaryLabel={copy.demoSecondary}
-            aiPrompt="Generate a focused 20-minute Vovinam session for today based on beginner level."
-          />
-
+          <div className="surface-card enterprise-shell ui3d-card rounded-3xl p-5">
+            <p className="text-xs font-semibold uppercase tracking-wide text-cyan-100">Learning dashboard</p>
+            <div className="mt-3 flex items-center justify-between text-sm text-slate-200">
+              <span>Progress</span>
+              <span>1 / 56 (2%)</span>
+            </div>
+            <div className="mt-2 h-2 rounded-full bg-slate-800">
+              <div className="h-2 w-[2%] rounded-full bg-emerald-400" />
+            </div>
+            <div className="mt-4 rounded-2xl border border-white/10 bg-slate-950/40 p-4">
+              <p className="text-sm font-semibold text-white">Today: Foundation Form</p>
+              <p className="mt-1 text-xs text-slate-300">18 min • 1 video + 1 technique</p>
+            </div>
+          </div>
         </div>
       </section>
 
-      <section className="mt-8">
-        <SectionHeading
-          id="how-it-works"
-          title={copy.howTitle}
-          description={copy.howDescription}
-        />
-        <div className="mt-4 grid gap-3 md:grid-cols-3">
-          <StepCard
-            step="1"
-            title={copy.howStep1Title}
-            description={copy.howStep1Desc}
-            bullets={["Fast", "Simple", "Actionable"]}
-          />
-          <StepCard
-            step="2"
-            title={copy.howStep2Title}
-            description={copy.howStep2Desc}
-            bullets={["AI guided", "Level aware", "Time aware"]}
-          />
-          <StepCard
-            step="3"
-            title={copy.howStep3Title}
-            description={copy.howStep3Desc}
-            bullets={["Track", "Improve", "Level up"]}
-          />
+      <section
+        className="mt-6 rounded-3xl border border-emerald-300/25 bg-emerald-400/10 px-5 py-4 text-center fade-in-up"
+        style={{ animationDelay: "100ms" }}
+      >
+        <p className="text-base font-semibold text-emerald-50 sm:text-lg">{copy.valueStrip}</p>
+      </section>
+
+      <section
+        className="mt-10 grid items-center gap-5 md:grid-cols-2 fade-in-up"
+        style={{ animationDelay: "180ms" }}
+      >
+        <div className="surface-card enterprise-shell ui3d-card rounded-3xl p-6">
+          <p className="text-xs font-semibold uppercase tracking-wide text-emerald-100">Learning</p>
+          <h2 className="mt-2 text-2xl font-semibold text-white">{copy.learningTitle}</h2>
+          <p className="mt-2 text-sm leading-6 text-slate-300">{copy.learningDescription}</p>
+          <ul className="mt-4 grid gap-2 text-sm text-slate-200">
+            <li>• {copy.learningBullet1}</li>
+            <li>• {copy.learningBullet2}</li>
+            <li>• {copy.learningBullet3}</li>
+          </ul>
+          <h3 className="mt-5 text-base font-semibold text-emerald-200">{copy.coachingTitle}</h3>
+          <p className="mt-1 text-sm text-slate-300">{copy.coachingDescription}</p>
+        </div>
+
+        <div className="surface-card enterprise-shell ui3d-card rounded-3xl p-6">
+          <p className="text-xs font-semibold uppercase tracking-wide text-slate-300">Technique feedback</p>
+          <div className="mt-4 grid gap-2 text-sm">
+            <div className="rounded-2xl border border-red-300/35 bg-red-400/10 px-3 py-2 text-red-100">Axis drift detected - keep your torso aligned.</div>
+            <div className="rounded-2xl border border-amber-300/35 bg-amber-400/10 px-3 py-2 text-amber-100">Rhythm unstable - slow down and reset timing.</div>
+            <div className="rounded-2xl border border-emerald-300/35 bg-emerald-400/10 px-3 py-2 text-emerald-100">Guard stable - keep this posture.</div>
+          </div>
         </div>
       </section>
 
-      {!pitchMode ? (
-        <section className="mt-10">
-        <SectionHeading
-          id="highlights"
-          title={copy.highlightsTitle}
-          description={copy.highlightsDescription}
-        />
+      <section
+        className="mt-8 grid items-center gap-5 md:grid-cols-2 fade-in-up"
+        style={{ animationDelay: "260ms" }}
+      >
+        <div className="surface-card enterprise-shell ui3d-card rounded-3xl p-6 md:order-1">
+          <p className="text-xs font-semibold uppercase tracking-wide text-amber-100">Community</p>
+          <div className="mt-3 space-y-2">
+            {[
+              { name: "Nguyen A", level: "Blue Belt Intro", progress: 2 },
+              { name: "Tran B", level: "Blue Belt", progress: 15 },
+              { name: "Le C", level: "Blue Belt 1", progress: 25 },
+            ].map((member) => (
+              <div key={member.name} className="rounded-2xl border border-white/10 bg-slate-950/40 px-3 py-2">
+                <p className="text-sm font-semibold text-white">{member.name}</p>
+                <p className="mt-0.5 text-xs text-slate-300">{member.level} • {member.progress}%</p>
+              </div>
+            ))}
+          </div>
+        </div>
 
-        <div className="mt-5 grid gap-3 md:grid-cols-2">
-          {copy.features.map((feature) => (
-            <FeatureCard
-              key={feature.title}
-              title={feature.title}
-              description={feature.description}
-              icon={<FontAwesomeIcon icon={feature.icon} className="h-5 w-5" />}
-            />
-          ))}
+        <div className="surface-card enterprise-shell ui3d-card rounded-3xl p-6 md:order-2">
+          <p className="text-xs font-semibold uppercase tracking-wide text-amber-100">Community</p>
+          <h2 className="mt-2 text-2xl font-semibold text-white">{copy.communityTitle}</h2>
+          <p className="mt-2 text-sm leading-6 text-slate-300">{copy.communityDescription}</p>
+          <ul className="mt-4 grid gap-2 text-sm text-slate-200">
+            <li>• {copy.communityBullet1}</li>
+            <li>• {copy.communityBullet2}</li>
+            <li>• {copy.communityBullet3}</li>
+          </ul>
+          <Link
+            href="/cong-dong"
+            className="mt-5 inline-flex h-10 items-center justify-center rounded-2xl border border-amber-300/30 bg-amber-300/10 px-4 text-sm font-semibold text-amber-100 transition hover:bg-amber-300/15"
+          >
+            {copy.exploreCommunity} →
+          </Link>
         </div>
       </section>
-      ) : null}
 
-      {!pitchMode ? (
-        <section className="mt-10">
-        <SectionHeading id="quick-links" title={copy.quickLinksTitle} />
-        <div className="mt-4 flex flex-wrap gap-2">
-          <ChipLink href="/lo-trinh">Roadmap</ChipLink>
-          <ChipLink href="/hoc-tap">Learning</ChipLink>
-          <ChipLink href="/ky-thuat">Techniques</ChipLink>
-          <ChipLink href="/video">Videos</ChipLink>
-          <ChipLink href="/lich-tap">Schedule</ChipLink>
-          <ChipLink href="/cong-dong">Community</ChipLink>
+      <section
+        className="mt-8 grid items-center gap-5 md:grid-cols-2 fade-in-up"
+        style={{ animationDelay: "340ms" }}
+      >
+        <div className="surface-card enterprise-shell ui3d-card rounded-3xl p-6">
+          <p className="text-xs font-semibold uppercase tracking-wide text-cyan-100">Store</p>
+          <h2 className="mt-2 text-2xl font-semibold text-white">{copy.storeTitle}</h2>
+          <p className="mt-2 text-sm leading-6 text-slate-300">{copy.storeDescription}</p>
+          <ul className="mt-4 grid gap-2 text-sm text-slate-200">
+            <li>• {copy.storeBullet1}</li>
+            <li>• {copy.storeBullet2}</li>
+            <li>• {copy.storeBullet3}</li>
+          </ul>
+          <Link
+            href="/cua-hang"
+            className="mt-5 inline-flex h-10 items-center justify-center rounded-2xl border border-cyan-300/30 bg-cyan-300/10 px-4 text-sm font-semibold text-cyan-100 transition hover:bg-cyan-300/15"
+          >
+            View Store →
+          </Link>
+        </div>
+
+        <div className="surface-card enterprise-shell ui3d-card rounded-3xl p-6">
+          <p className="text-xs font-semibold uppercase tracking-wide text-slate-300">Starter bundle</p>
+          <div className="mt-3 rounded-2xl border border-white/10 bg-slate-950/40 p-4">
+            <p className="text-base font-semibold text-white">Uniform + Blue belt + Protection</p>
+            <p className="mt-1 text-sm text-slate-300">Simple, essential, and beginner-safe.</p>
+            <p className="mt-3 text-lg font-semibold text-emerald-200">590,000 VND</p>
+          </div>
         </div>
       </section>
-      ) : null}
 
-      {!pitchMode ? (
-        <MotivationStrip
-          title={copy.motivationTitle}
-          message={copy.motivationMessage}
-          chips={[copy.motivationChip1, copy.motivationChip2, copy.motivationChip3]}
-        />
-      ) : null}
-
-      <section className="mt-12">
-        <div className="surface-card-strong enterprise-shell motion-gradient-surface ui3d-card relative overflow-hidden rounded-[2.25rem] p-7 sm:p-12">
+      <section className="mt-12 fade-in-up" style={{ animationDelay: "420ms" }}>
+        <div className="surface-card-strong enterprise-shell motion-gradient-surface ui3d-card relative overflow-hidden rounded-[2.25rem] p-7 text-center sm:p-12">
           <div className="absolute inset-0 opacity-80 bg-[radial-gradient(circle_at_top,rgba(34,211,238,0.12),transparent_55%)]" />
           <div className="relative">
             <h2 className="text-2xl font-semibold tracking-tight text-white sm:text-3xl">
@@ -957,25 +900,25 @@ function HomeGlobal({ copy, locale }) {
               {copy.ctaDescription}
             </p>
 
-            <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-center">
               <Link
-                href="/lo-trinh"
+                href="/hoc-tap"
                 className="cta-primary motion-gradient-btn inline-flex h-12 items-center justify-center rounded-2xl px-5 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-cyan-300/50"
               >
                 {copy.startLearning}
               </Link>
               <Link
-                href="/lich-tap"
+                href="/cong-dong"
                 className="cta-secondary motion-gradient-btn inline-flex h-12 items-center justify-center rounded-2xl px-5 text-sm font-semibold text-white transition focus:outline-none focus:ring-2 focus:ring-cyan-300/30"
               >
-                {copy.createSchedule}
+                {copy.exploreCommunity}
               </Link>
             </div>
           </div>
         </div>
       </section>
 
-      <MobileQuickActions startLabel={copy.startLearning} scheduleLabel={copy.createSchedule} />
+      <MobileQuickActions startLabel={copy.startLearning} scheduleLabel={copy.exploreCommunity} />
     </div>
   );
 }

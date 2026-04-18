@@ -6,7 +6,9 @@
     "dev": "next dev --webpack",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "train:coach": "node scripts/train-ai-coach.mjs --from project",
+    "train:form-check": "python ai-services/video-analyzer/train_form_model.py --out ai-services/video-analyzer/models/form_check_model.json"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^7.2.0",
